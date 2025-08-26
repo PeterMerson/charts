@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Shares</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('FRONT-REAR-PARKING.jpg');
+            background-repeat: repeat-x;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .marquee {
+            background-color: yellow;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+            color: green;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: marquee 18s linear infinite;
+        }
+
+        .marquee:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .draggable {
+            position: relative;
+            width: 600px;
+            background: white;
+            border: 3px solid #ff0000;
+            padding: 10px;
+            cursor: move;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .collapsible-panel {
+            margin-bottom: 10px;
+        }
+
+        .panel-header {
+            background: #ff0000;
+            color: white;
+            padding: 10px;
+            font-size: 1.5rem;
+            text-transform: capitalize;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .panel-content {
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        th {
+            background: #ffff00;
+            font-weight: bold;
+        }
+
+        .highlight-red {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .highlight-total {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .apartments-table th, .apartments-table td {
+            padding: 5px;
+        }
+
+        hr {
+            border: 1px solid blue;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 600px) {
+            .draggable {
+                width: 100%;
+            }
+
+            .panel-header {
+                font-size: 1.2rem;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body>
+    <hr>
+    <div class="marquee">
+        Apartment Share Numbers are from the original Offering Plan of 1981, pages 8 thru 14 - Grab and move the box around if you like - CLICK ON THE BOXES TO DISPLAY DATA - and have a good time - Cheers
+    </div>
+    <hr>
+
+    <div class="container">
+        <div class="draggable" id="draggable" draggable="true">
+            <div class="collapsible-panel" x-data="{ open: false }">
+                <div class="panel-header" @click="open = !open">
+                    Riverside Shares - Right Side of Screen
+                </div>
+                <div class="panel-content" x-show="open" x-transition>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th colspan="2" class="highlight-red">SOUTH</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        <tr>
+                            <th class="highlight-red">Shares</th>
+                            <th>FLOOR</th>
+                            <th>F</th>
+                            <th>G</th>
+                            <th>H</th>
+                            <th>J</th>
+                            <th>K</th>
+                            <th></th>
+                            <th>L</th>
+                            <th>M</th>
+                            <th>N</th>
+                            <th>O</th>
+                            <th>P</th>
+                        </tr>
+                        <tr>
+                            <td>5,744</td>
+                            <td>8th</td>
+                            <td>706</td>
+                            <td>591</td>
+                            <td>601</td>
+                            <td>591</td>
+                            <td>383</td>
+                            <td></td>
+                            <td>383</td>
+                            <td>591</td>
+                            <td>601</td>
+                            <td>591</td>
+                            <td>706</td>
+                        </tr>
+						<tr>
+                            <td>5,700</td>
+                            <td>7th</td>
+                            <td>701</td>
+                            <td>586</td>
+                            <td>596</td>
+                            <td>586</td>
+                            <td>381</td>
+                            <td></td>
+                            <td>381</td>
+                            <td>586</td>
+                            <td>596</td>
+                            <td>586</td>
+                            <td>701</td>
+                        </tr>
+						<tr>
+                            <td>5,656</td>
+                            <td>6th</td>
+                            <td>696</td>
+                            <td>581</td>
+                            <td>591</td>
+                            <td>581</td>
+                            <td>379</td>
+                            <td></td>
+                            <td>379</td>
+                            <td>581</td>
+                            <td>591</td>
+                            <td>581</td>
+                            <td>696</td>
+                        </tr>
+						<tr>
+                            <td>5,612</td>
+                            <td>5th</td>
+                            <td>691</td>
+                            <td>576</td>
+                            <td>586</td>
+                            <td>576</td>
+                            <td>377</td>
+                            <td></td>
+                            <td>377</td>
+                            <td>576</td>
+                            <td>586</td>
+                            <td>576</td>
+                            <td>691</td>
+                        </tr>
+						<tr>
+                            <td>5,568</td>
+                            <td>4th</td>
+                            <td>686</td>
+                            <td>571</td>
+                            <td>581</td>
+                            <td>571</td>
+                            <td>375</td>
+                            <td></td>
+                            <td>375</td>
+                            <td>571</td>
+                            <td>581</td>
+                            <td>571</td>
+                            <td>686</td>
+                        </tr>
+						<tr>
+                            <td>5,524</td>
+                            <td>3rd</td>
+                            <td>681</td>
+                            <td>566</td>
+                            <td>576</td>
+                            <td>566</td>
+                            <td>373</td>
+                            <td></td>
+                            <td>373</td>
+                            <td>566</td>
+                            <td>576</td>
+                            <td>566</td>
+                            <td>681</td>
+                        </tr>
+                        <!-- Repeat similar rows for 7th to 1st floors -->
+                        <tr>
+                            <td>5,480</td>
+                            <td>2nd</td>
+                            <td>676</td>
+                            <td>561</td>
+                            <td>571</td>
+                            <td>561</td>
+                            <td>371</td>
+                            <td></td>
+                            <td>371</td>
+                            <td>561</td>
+                            <td>571</td>
+                            <td>561</td>
+                            <td>676</td>
+                        </tr>
+                        <tr>
+                            <td>4,765</td>
+                            <td>1st</td>
+                            <td>0</td>
+                            <td>556</td>
+                            <td>566</td>
+                            <td>556</td>
+                            <td>369</td>
+                            <td></td>
+                            <td>369</td>
+                            <td>556</td>
+                            <td>566</td>
+                            <td>556</td>
+                            <td>671</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight-red">44,049</td>
+                            <td class="highlight-red">total</td>
+                            <td colspan="12"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="collapsible-panel" x-data="{ open: false }">
+                <div class="panel-header" @click="open = !open">
+                    Woods Side Shares - Left Side of Screen
+                </div>
+                <div class="panel-content" x-show="open" x-transition>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th colspan="2" class="highlight-red">SOUTH</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th class="highlight-red">Shares</th>
+                            <th>FLOOR</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>C</th>
+                            <th>B</th>
+                            <th>A</th>
+                            <th></th>
+                            <th>U</th>
+                            <th>T</th>
+                            <th>S</th>
+                            <th>R</th>
+                            <th>Q</th>
+                        </tr>
+                        <tr>
+                            <td>5,372</td>
+                            <td>8th</td>
+                            <td>687</td>
+                            <td>544</td>
+                            <td>554</td>
+                            <td>544</td>
+                            <td>357</td>
+                            <td></td>
+                            <td>357</td>
+                            <td>544</td>
+                            <td>554</td>
+                            <td>544</td>
+                            <td>687</td>
+                        </tr>
+						<tr>
+                            <td>5,328</td>
+                            <td>7th</td>
+                            <td>682</td>
+                            <td>539</td>
+                            <td>549</td>
+                            <td>539</td>
+                            <td>355</td>
+                            <td></td>
+                            <td>355</td>
+                            <td>539</td>
+                            <td>549</td>
+                            <td>539</td>
+                            <td>682</td>
+                        </tr>
+						<tr>
+                            <td>5,284</td>
+                            <td>6th</td>
+                            <td>677</td>
+                            <td>534</td>
+                            <td>544</td>
+                            <td>534</td>
+                            <td>353</td>
+                            <td></td>
+                            <td>353</td>
+                            <td>534</td>
+                            <td>544</td>
+                            <td>534</td>
+                            <td>677</td>
+                        </tr>
+						<tr>
+                            <td>5,240</td>
+                            <td>5th</td>
+                            <td>672</td>
+                            <td>529</td>
+                            <td>539</td>
+                            <td>529</td>
+                            <td>351</td>
+                            <td></td>
+                            <td>351</td>
+                            <td>529</td>
+                            <td>539</td>
+                            <td>529</td>
+                            <td>672</td>
+                        </tr>
+						<tr>
+                            <td>5,196</td>
+                            <td>4th</td>
+                            <td>667</td>
+                            <td>524</td>
+                            <td>534</td>
+                            <td>524</td>
+                            <td>349</td>
+                            <td></td>
+                            <td>349</td>
+                            <td>524</td>
+                            <td>534</td>
+                            <td>524</td>
+                            <td>667</td>
+                        </tr>
+						<tr>
+                            <td>5,152</td>
+                            <td>3rd</td>
+                            <td>662</td>
+                            <td>519</td>
+                            <td>529</td>
+                            <td>519</td>
+                            <td>347</td>
+                            <td></td>
+                            <td>347</td>
+                            <td>519</td>
+                            <td>529</td>
+                            <td>519</td>
+                            <td>662</td>
+                        </tr>
+						<tr>
+                            <td>5,092</td>
+                            <td>2nd</td>
+                            <td>657</td>
+                            <td>514</td>
+                            <td>524</td>
+                            <td>514</td>
+                            <td>337</td>
+                            <td></td>
+                            <td>337</td>
+                            <td>514</td>
+                            <td>524</td>
+                            <td>514</td>
+                            <td>657</td>
+                        </tr>
+						
+                        <!-- Repeat similar rows for 7th to 1st floors -->
+                        <tr>
+                            <td>4,314</td>
+                            <td>1st</td>
+                            <td>644</td>
+                            <td>501</td>
+                            <td>511</td>
+                            <td>501</td>
+                            <td colspan="3">LOBBY</td>
+                            <td>501</td>
+                            <td>511</td>
+                            <td>501</td>
+                            <td>644</td>
+                        </tr>
+                        <tr>
+                            <td class="highlight-red">40,978</td>
+                            <td class="highlight-red">total</td>
+                            <td colspan="12"></td>
+                        </tr>
+                        <tr>
+                            <td class="highlight-total">85,027</td>
+                            <td class="highlight-total">TOTAL</td>
+                            <td colspan="12"></td>
+                        </tr>
+                    </table>
+                    <table class="apartments-table">
+                        <tr>
+							<th><u>Apartments</u></th>
+                            <th></th>
+                            <th><u>#</u></th>
+                            <th></th>
+							<th><u>Apt. Lines</u></th>
+							<th><u>Approx Square Feet</u></th>
+                        </tr>
+                        <tr>
+                            <th>Studios</th>
+                            <td></td>
+                            <td>30</td>
+                            <td></td>
+                            <td>A,K,L,U</td>
+							<td>480</td>
+                        </tr>
+                        <tr>
+                            <th>One Bedroom</th>
+                            <td></td>
+                            <td>64</td>
+                            <td></td>
+                            <td>B,D,G,J,M,O,R,T</td>
+							<td>770</td>
+                        </tr>
+                        <tr>
+                            <th>Jr Two Bedroom</th>
+                            <td></td>
+                            <td>32</td>
+                            <td></td>
+                            <td>C,S,H,N</td>
+							<td>786</td>
+                        </tr>
+                        <tr>
+                            <th>Two Bedroom</th>
+                            <td></td>
+                            <td>16</td>
+                            <td></td>
+                            <td>E,P</td>
+							<td>1,098</td>
+                        </tr>
+						<th>Three Bedroom</th>
+                            <td></td>
+                            <td>16</td>
+                            <td></td>
+                            <td>F,Q</td>
+							<td>1,098</td>
+                        <tr>
+                            <th>Total</th>
+                            <td></td>
+                            <td>158</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag and Drop functionality
+        const draggable = document.getElementById('draggable');
+        let offsetX, offsetY;
+
+        draggable.addEventListener('dragstart', (e) => {
+            offsetX = e.offsetX;
+            offsetY = e.offsetY;
+        });
+
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            draggable.style.left = `${x}px`;
+            draggable.style.top = `${y}px`;
+            draggable.style.position = 'absolute';
+        });
+    </script>
+</body>
+</html>
