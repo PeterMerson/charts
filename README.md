@@ -1,0 +1,1 @@
+This is a table listing the number of shares per apartment and then summarizing the apartment types and square footage of each at the bottom. One side of the co-op faces a nature preserve referred to as the "Woods Side" and the "Riverside" faces the Hudson River.
