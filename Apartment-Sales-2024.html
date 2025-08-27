@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Apartments Bought / Sold</title>
+</head>
+<div id="apartment"  align="center" margin style="height: 375px; margin-top:100px">
+</div>
+<body>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script><span style="font-family: &quot;Trebuchet MS&quot;,sans-serif;"><span style="font-size: large;"><span style="font-family: &quot;Trebuchet MS&quot;,sans-serif;"><span style="font-size: large;">  <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Calculated Apartment Sales', 'Average'],
+['1990',   6, 8],
+['1991',   7, 8],
+['1992',   1, 8],
+['1993',   4, 8],
+['1994',   7, 8],
+['1995',   8, 8],
+['1996',   6, 8],
+['1997',   8, 8],
+['1998',  10, 8],
+['1999',  14, 8],
+['2000',  20, 8],
+['2001',  11, 8],
+['2002',  11, 8],
+['2003',  10, 8],     
+['2004',  20, 8],
+['2005',  12, 8],
+['2006',  9, 8],
+['2007',  6, 8],
+['2008',  5, 8],
+['2009',  5, 8],
+['2010',  0, 8],
+['2011',  2, 8],
+['2012',  2, 8],            
+['2013',  8, 8],                    
+['2014',  7, 8],
+['2015',  5, 8],
+['2016',  5, 8], 
+['2017',  4, 8],
+['2018',  3, 8],                  
+['2019',  2, 8],
+['2020',  2, 8],
+['2021',  9, 8],
+['2022',  8, 8],
+['2023',  5, 8],
+['2024',  4, 8]
+		]);
+
+          // Create and draw the visualization.
+        var ac = new google.visualization.ComboChart(document.getElementById('apartment'));
+        ac.draw(data, {
+     allowHtml: true,
+       legend: {position: 'top'},  
+	   title: 'Riveredge Co-op Annual Apartment Sales - 1990 thru 2024 - 35 years - 158 Total Apartments - figure it out',
+    vAxis: {title: "Apartments sold / bought"}, 
+       hAxis: {title: 'Data is from the annual "INCOME STATEMENT" - The "FLIP TAX" divided by 1,500', titleTextStyle: {color: 'blue'}, titleTextStyle:{color: 'blue'}},
+seriesType: "bars", lineWidth:  7,  pointSize: 0,
+      
+       series: {1: {type: "line"}}
+        });
+      }
+    </script> 
+</body>
+</html>
