@@ -97,7 +97,10 @@
         <h2>2018 Operating Expenses - $1,435,982</h2>  
         <canvas id="Op-Exp-2018" aria-label="Pie chart of operating expenses for 2018"></canvas>
     </div>
-	
+	<div class="chart-section">
+        <h2>2017 Operating Expenses - $1,x35,982</h2>  
+        <canvas id="Op-Exp-2017" aria-label="Pie chart of operating expenses for 2017"></canvas>
+    </div>
 	
 	
 	<script>
@@ -242,8 +245,29 @@
                         { label: 'Corporate Taxes & Misc', value: 24027 },
                         { label: 'Excess Operating Income', value: 258214 } // Verify this value
                     ]
+                },				  
+            {
+                    id: 'Op-Exp-2017',
+                <!--title: '2017 Operating Expenses - $ 1,394,928',  -->
+                    total: 1394928, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 366335 },
+                        { label: 'Utilities Oil & Electric', value: 199826 },
+                        { label: 'Payroll & Related (3 people)', value: 220249 },
+                        { label: 'Mortgage Interest & Principal', value: 185567 },
+                        { label: 'Repairs & Maintenance', value: 163940 },
+                        { label: 'Insurance', value: 63759 },
+                        { label: 'Security', value: 56376 },
+                        { label: 'Management Fee', value: 45131 },
+                        { label: 'Water & Sewer', value: 41666 },
+                        { label: 'Legal & Audit Fees', value: 27642 },
+                        { label: 'Corporate Taxes & Misc', value: 24437 },
+                        { label: 'Excess Operating Income', value: 275255 } // Verify this value
+                    ]
                 }				  
-            ];
+								  
+												  
+			];
 
             const colors = [
                 '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
