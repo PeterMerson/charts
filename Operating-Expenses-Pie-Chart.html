@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Annual Operating Expenses</title>
+</head>
+		
+<table border="2" cellpadding="1" cellspacing="1" ><tbody>
+<tr> 
+	
+<strong><hr></strong>
+<a><center><b>2024</b></center></a>
+<strong><hr></strong>	
+	<div id="Op-Exp-2024" align="justify" margin-left="15" style="height: 550px; width: 1500px;">	</div>
+
+	<P style="page-break-before: always">
+	
+<strong><hr></strong>
+<a><center><b>2023</b></center></a>	
+<strong><hr></strong>		
+<div id="Op-Exp-2023" margin-left="15" style="height: 550px; width: 1500px;">	</div>
+		
+	<P style="page-break-before: always"> 
+			
+ </table>
+
+	<!-- ALL CARTS TO PRINT ABOVE -->
+		
+		
+		
+	<!-- PIE CHART ALL EXPENSES BELOW -->
+	
+<body>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+     <script type="text/javascript">
+	 google.load('visualization', '1', {packages: ['corechart']});
+    </script><script type="text/javascript">
+function drawVisualization() {
+        // Create and populate the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Item');
+        data.addColumn('number', 'Cost Item');
+  data.addRows(14);
+         data.setValue(0, 0, '1) Real estate taxes');
+        data.setValue(0, 1,  384242);
+       	data.setValue(1, 0, '2) Utilities Oil & Electric');
+        data.setValue(1, 1,  328592);
+	    data.setValue(2, 0, '3) Payroll & Related-3 people');
+        data.setValue(2, 1,  262939);
+	    data.setValue(3, 0, '4) Mortgage int & prin');
+        data.setValue(3, 1, 185476);	
+	    data.setValue(4, 0, '5) Repairs & Maintenance');
+        data.setValue(4, 1,  495817);
+	    data.setValue(5, 0, '6) Insurance');
+        data.setValue(5, 1,  99094);
+	    data.setValue(6, 0, '7) Security');
+        data.setValue(6, 1,  77373);
+		data.setValue(7, 0, '8) Management fee');
+        data.setValue(7, 1,  52725);
+        data.setValue(8, 0, '9 Water & sewer');
+        data.setValue(8, 1,  52221);
+	    data.setValue(9, 0, '10) Legal & audit fees');
+        data.setValue(9, 1,  10953);
+	    data.setValue(10, 0, '11) Corporate taxes & misc');
+        data.setValue(10, 1,  31577);
+	    data.setValue(11, 0, '12 Excess Operating Income - 17% of Maintenance');
+        data.setValue(11, 1, 7);		
+       
+
+    var formatter = new google.visualization.NumberFormat({prefix: '$', fractionDigits: "0"});  formatter.format(data, 1); // Apply formatter to second column
+
+  // Create and draw the visualization.n
+        new google.visualization.PieChart(document.getElementById('Op-Exp-2024')).
+            draw(data, {title:"Total Operating Expenditures for- 2024 - $1,981,009", is3D: true, legend:'right'});
+            }
+       google.setOnLoadCallback(drawVisualization);
+    </script>
+    
+		
+		<!-- PIE CHART CAPITAL EXPENDITURES AND CASH BELOW -->
+		<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+     <script type="text/javascript">
+	 google.load('visualization', '1', {packages: ['corechart']});
+    </script><script type="text/javascript">
+function drawVisualization() {
+        // Create and populate the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Item');
+        data.addColumn('number', 'Cost Item');
+  data.addRows(14);
+         data.setValue(0, 0, '1) Real estate taxes');
+        data.setValue(0, 1,  369302);
+       	data.setValue(1, 0, '2) Utilities Oil & Electric');
+        data.setValue(1, 1,  290726);
+	    data.setValue(2, 0, '3) Payroll & Related-3 people');
+        data.setValue(2, 1,  249503);
+	    data.setValue(3, 0, '4) Mortgage int & prin');
+        data.setValue(3, 1, 187392);	
+	    data.setValue(4, 0, '5) Repairs & Maintenance');
+        data.setValue(4, 1,  224945);
+	    data.setValue(5, 0, '6) Insurance');
+        data.setValue(5, 1,  86587);
+	    data.setValue(6, 0, '7) Security');
+        data.setValue(6, 1,  72322);
+		data.setValue(7, 0, '8) Management fee');
+        data.setValue(7, 1,  51150);
+        data.setValue(8, 0, '9 Water & sewer');
+        data.setValue(8, 1,  52920);
+	    data.setValue(9, 0, '10) Legal & audit fees');
+        data.setValue(9, 1,  39560);
+	    data.setValue(10, 0, '11) Corporate taxes & misc');
+        data.setValue(10, 1,  24720);
+	    data.setValue(11, 0, '12 Excess Operating Income - 17% of Maintenance');
+        data.setValue(11, 1, 7);		
+       
+
+    var formatter = new google.visualization.NumberFormat({prefix: '$', fractionDigits: "0"});  formatter.format(data, 1); // Apply formatter to second column
+
+  // Create and draw the visualization.n
+        new google.visualization.PieChart(document.getElementById('Op-Exp-2023')).
+            draw(data, {title:"Total Operating Expenditures for- 2023 - $1,649,127", is3D: true, legend:'right'});
+            }
+       google.setOnLoadCallback(drawVisualization);
+    </script>
+    
+   
+    
+    </body>
+</html>
