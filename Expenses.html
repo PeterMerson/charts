@@ -75,9 +75,15 @@
         <h2>2023 Operating Expenses - $1,649,127</h2>  
         <canvas id="Op-Exp-2023" aria-label="Pie chart of operating expenses for 2023"></canvas>
     </div>
+	<hr>
     <div class="chart-section">
         <h2>2022 Operating Expenses - $1,626,411</h2>  
         <canvas id="Op-Exp-2022" aria-label="Pie chart of operating expenses for 2022"></canvas>
+    </div>
+	<hr>
+    <div class="chart-section">
+        <h2>2021 Operating Expenses - $1,463,423</h2>  
+        <canvas id="Op-Exp-2021" aria-label="Pie chart of operating expenses for 2021"></canvas>
     </div>
 
     <script>
@@ -143,8 +149,27 @@
                         { label: 'Corporate Taxes & Misc', value: 26900 },
                         { label: 'Excess Operating Income', value: 7 } // Verify this value
                     ]
-                }						  
+                },
 								  
+				{
+                    id: 'Op-Exp-2021',
+                <!--title: '2021 Operating Expenses - $1,463,423',  -->
+                    total: 1463423, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 240345 },
+                        { label: 'Utilities Oil & Electric', value: 232313 },
+                        { label: 'Payroll & Related (3 people)', value: 236860 },
+                        { label: 'Mortgage Interest & Principal', value: 185520 },
+                        { label: 'Repairs & Maintenance', value: 230215 },
+                        { label: 'Insurance', value: 73682 },
+                        { label: 'Security', value: 63439 },
+                        { label: 'Management Fee', value: 48552 },
+                        { label: 'Water & Sewer', value: 48244 },
+                        { label: 'Legal & Audit Fees', value: 76978 },
+                        { label: 'Corporate Taxes & Misc', value: 27275 },
+                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                    ]
+                }				  
             ];
 
             const colors = [
