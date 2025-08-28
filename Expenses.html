@@ -61,6 +61,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
     <div class="chart-section">
@@ -77,10 +78,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Register the datalabels plugin
+            Chart.register(ChartDataLabels);
+
             const chartData = [
                 {
                     id: 'Op-Exp-2024',
                     title: 'Operating Expenditures for 2024 - $1,981,009',
+                    total: 1981009, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 384242 },
                         { label: 'Utilities Oil & Electric', value: 328592 },
@@ -99,6 +104,7 @@
                 {
                     id: 'Op-Exp-2023',
                     title: 'Operating Expenditures for 2023 - $1,649,127',
+                    total: 1649127, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 369302 },
                         { label: 'Utilities Oil & Electric', value: 290726 },
@@ -122,7 +128,7 @@
                 '#900C3F', '#581845'
             ];
 
-            chartData.forEach(({ id, title, data }, index) => {
+            chartData.forEach(({ id, title, total, data }) => {
                 try {
                     const ctx = document.getElementById(id).getContext('2d');
                     new Chart(ctx, {
@@ -160,9 +166,22 @@
                                     callbacks: {
                                         label: (context) => {
                                             const value = context.raw;
-                                            return `${context.label}: $${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+                                            const percentage = ((value / total) * 100).toFixed(1);
+                                            return `${context.label}: $${value.toLocaleString('en-US', { maximumFractionDigits: 0 })} (${percentage}%)`;
                                         }
                                     }
+                                },
+                                datalabels: {
+                                    formatter: (value, context) => {
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${percentage}%`;
+                                    },
+                                    color: '#fff',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 12
+                                    },
+                                    textAlign: 'center'
                                 }
                             }
                         }
