@@ -91,7 +91,11 @@
     </div>
     <div class="chart-section">
         <h2>2019 Operating Expenses - $1,477,320</h2>  
-        <canvas id="Op-Exp-2019" aria-label="Pie chart of operating expenses for 2020"></canvas>
+        <canvas id="Op-Exp-2019" aria-label="Pie chart of operating expenses for 2019"></canvas>
+    </div>
+	<div class="chart-section">
+        <h2>2018 Operating Expenses - $1,477,320</h2>  
+        <canvas id="Op-Exp-2018" aria-label="Pie chart of operating expenses for 2018"></canvas>
     </div>
 	
 	
@@ -218,6 +222,25 @@
                         { label: 'Legal & Audit Fees', value: 46161 },
                         { label: 'Corporate Taxes & Misc', value: 24004 },
                         { label: 'Excess Operating Income', value: 231573 } // Verify this value
+                    ]
+                },
+				       {
+                    id: 'Op-Exp-2018',
+                <!--title: '2018 Operating Expenses - $ 1,477,320',  -->
+                    total: 1350723, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 379313 },
+                        { label: 'Utilities Oil & Electric', value: 215961 },
+                        { label: 'Payroll & Related (3 people)', value: 223696 },
+                        { label: 'Mortgage Interest & Principal', value: 185557 },
+                        { label: 'Repairs & Maintenance', value: 154212 },
+                        { label: 'Insurance', value: 66478 },
+                        { label: 'Security', value: 60748 },
+                        { label: 'Management Fee', value: 46032 },
+                        { label: 'Water & Sewer', value: 31278 },
+                        { label: 'Legal & Audit Fees', value: 48669 },
+                        { label: 'Corporate Taxes & Misc', value: 24027 },
+                        { label: 'Excess Operating Income', value: 258214 } // Verify this value
                     ]
                 }				  
             ];
