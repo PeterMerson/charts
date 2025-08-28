@@ -75,6 +75,10 @@
         <h2>2023 Operating Expenses - $1,649,127</h2>  
         <canvas id="Op-Exp-2023" aria-label="Pie chart of operating expenses for 2023"></canvas>
     </div>
+    <div class="chart-section">
+        <h2>2022 Operating Expenses - $1,649,127</h2>  
+        <canvas id="Op-Exp-2022" aria-label="Pie chart of operating expenses for 2022"></canvas>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -119,7 +123,28 @@
                         { label: 'Corporate Taxes & Misc', value: 24720 },
                         { label: 'Excess Operating Income', value: 7 } // Verify this value
                     ]
-                }
+                },
+								  
+				{
+                    id: 'Op-Exp-2022',
+                <!--title: '2022 Operating Expenses - $x,xxx,xxx',  -->
+                    total: 1626411, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 365157 },
+                        { label: 'Utilities Oil & Electric', value: 344997 },
+                        { label: 'Payroll & Related (3 people)', value: 235531 },
+                        { label: 'Mortgage Interest & Principal', value: 185506 },
+                        { label: 'Repairs & Maintenance', value: 199709 },
+                        { label: 'Insurance', value: 76529 },
+                        { label: 'Security', value: 71560 },
+                        { label: 'Management Fee', value: 49341 },
+                        { label: 'Water & Sewer', value: 46731 },
+                        { label: 'Legal & Audit Fees', value: 24450 },
+                        { label: 'Corporate Taxes & Misc', value: 26900 },
+                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                    ]
+                }						  
+								  
             ];
 
             const colors = [
