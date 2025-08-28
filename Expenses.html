@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Operating Expenses - Riveredge Cooperative</title>
+    <style>
+        body {
+            font-family: 'Trebuchet MS', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .chart-section {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        hr {
+            border: 1px solid #ccc;
+            margin: 20px 0;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .chart-section {
+                padding: 10px;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media print {
+            .chart-section {
+                page-break-before: always;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="chart-section">
+        <h2>Operating Expenditures for 2024 - $1,981,009</h2>
+        <canvas id="Op-Exp-2024" aria-label="Pie chart of operating expenses for 2024"></canvas>
+    </div>
+
+    <hr>
+
+    <div class="chart-section">
+        <h2>Operating Expenditures for 2023 - $1,649,127</h2>
+        <canvas id="Op-Exp-2023" aria-label="Pie chart of operating expenses for 2023"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartData = [
+                {
+                    id: 'Op-Exp-2024',
+                    title: 'Operating Expenditures for 2024 - $1,981,009',
+                    data: [
+                        { label: 'Real Estate Taxes', value: 384242 },
+                        { label: 'Utilities Oil & Electric', value: 328592 },
+                        { label: 'Payroll & Related (3 people)', value: 262939 },
+                        { label: 'Mortgage Interest & Principal', value: 185476 },
+                        { label: 'Repairs & Maintenance', value: 495817 },
+                        { label: 'Insurance', value: 99094 },
+                        { label: 'Security', value: 77373 },
+                        { label: 'Management Fee', value: 52725 },
+                        { label: 'Water & Sewer', value: 52221 },
+                        { label: 'Legal & Audit Fees', value: 10953 },
+                        { label: 'Corporate Taxes & Misc', value: 31577 },
+                        { label: 'Excess Operating Income (17% of Maintenance)', value: 7 } // Verify this value
+                    ]
+                },
+                {
+                    id: 'Op-Exp-2023',
+                    title: 'Operating Expenditures for 2023 - $1,649,127',
+                    data: [
+                        { label: 'Real Estate Taxes', value: 369302 },
+                        { label: 'Utilities Oil & Electric', value: 290726 },
+                        { label: 'Payroll & Related (3 people)', value: 249503 },
+                        { label: 'Mortgage Interest & Principal', value: 187392 },
+                        { label: 'Repairs & Maintenance', value: 224945 },
+                        { label: 'Insurance', value: 86587 },
+                        { label: 'Security', value: 72322 },
+                        { label: 'Management Fee', value: 51150 },
+                        { label: 'Water & Sewer', value: 52920 },
+                        { label: 'Legal & Audit Fees', value: 39560 },
+                        { label: 'Corporate Taxes & Misc', value: 24720 },
+                        { label: 'Excess Operating Income (17% of Maintenance)', value: 7 } // Verify this value
+                    ]
+                }
+            ];
+
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#C9CBCF', '#7BC225', '#FF5733', '#C70039',
+                '#900C3F', '#581845'
+            ];
+
+            chartData.forEach(({ id, title, data }, index) => {
+                try {
+                    const ctx = document.getElementById(id).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: data.map(item => item.label),
+                            datasets: [{
+                                data: data.map(item => item.value),
+                                backgroundColor: colors,
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        font: {
+                                            family: 'Trebuchet MS',
+                                            size: 14
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: title,
+                                    font: {
+                                        family: 'Trebuchet MS',
+                                        size: 16
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (context) => {
+                                            const value = context.raw;
+                                            return `${context.label}: $${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error(`Error rendering chart ${id}:`, error);
+                    document.getElementById(id).insertAdjacentHTML(
+                        'afterend',
+                        '<p class="error-message">Failed to load chart. Please try again later.</p>'
+                    );
+                }
+            });
+        });
+    </script>
+</body>
+</html>
