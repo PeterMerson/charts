@@ -89,7 +89,14 @@
         <h2>2020 Operating Expenses - $1,350,723</h2>  
         <canvas id="Op-Exp-2020" aria-label="Pie chart of operating expenses for 2020"></canvas>
     </div>
-    <script>
+    <div class="chart-section">
+        <h2>2019 Operating Expenses - $1,477,320</h2>  
+        <canvas id="Op-Exp-2019" aria-label="Pie chart of operating expenses for 2020"></canvas>
+    </div>
+	
+	
+	
+	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
             Chart.register(ChartDataLabels);
@@ -111,7 +118,7 @@
                         { label: 'Water & Sewer', value: 52221 },
                         { label: 'Legal & Audit Fees', value: 10953 },
                         { label: 'Corporate Taxes & Misc', value: 31577 },
-                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                        { label: 'Excess Operating Income', value: -134338 } // Verify this value
                     ]
                 },
                 {
@@ -130,7 +137,7 @@
                         { label: 'Water & Sewer', value: 52920 },
                         { label: 'Legal & Audit Fees', value: 39560 },
                         { label: 'Corporate Taxes & Misc', value: 24720 },
-                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                        { label: 'Excess Operating Income', value:  96652 } // Verify this value
                     ]
                 },
 								  
@@ -150,7 +157,7 @@
                         { label: 'Water & Sewer', value: 46731 },
                         { label: 'Legal & Audit Fees', value: 24450 },
                         { label: 'Corporate Taxes & Misc', value: 26900 },
-                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                        { label: 'Excess Operating Income', value:  50595 } // Verify this value
                     ]
                 },
 								  
@@ -170,10 +177,11 @@
                         { label: 'Water & Sewer', value: 48244 },
                         { label: 'Legal & Audit Fees', value: 76978 },
                         { label: 'Corporate Taxes & Misc', value: 27275 },
-                        { label: 'Excess Operating Income', value: 7 } // Verify this value
+                        { label: 'Excess Operating Income', value:  215213 } // Verify this value
                     ]
                 },
-								  {
+				
+				 {
                     id: 'Op-Exp-2020',
                 <!--title: '2020 Operating Expenses - $1,350,723',  -->
                     total: 1350723, // Total for percentage calculations
@@ -190,6 +198,26 @@
                         { label: 'Legal & Audit Fees', value: 9325 },
                         { label: 'Corporate Taxes & Misc', value: 29322 },
                         { label: 'Excess Operating Income', value: 334222 } // Verify this value
+                    ]
+                },	
+								  
+					    {
+                    id: 'Op-Exp-2019',
+                <!--title: '2019 Operating Expenses - $ 1,477,320',  -->
+                    total: 1350723, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 399172 },
+                        { label: 'Utilities Oil & Electric', value: 231878 },
+                        { label: 'Payroll & Related (3 people)', value: 238312 },
+                        { label: 'Mortgage Interest & Principal', value: 185564 },
+                        { label: 'Repairs & Maintenance', value: 139146 },
+                        { label: 'Insurance', value: 67615 },
+                        { label: 'Security', value: 61180 },
+                        { label: 'Management Fee', value: 46954 },
+                        { label: 'Water & Sewer', value: 37334 },
+                        { label: 'Legal & Audit Fees', value: 46161 },
+                        { label: 'Corporate Taxes & Misc', value: 24004 },
+                        { label: 'Excess Operating Income', value: 231573 } // Verify this value
                     ]
                 }				  
             ];
