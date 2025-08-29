@@ -101,7 +101,10 @@
         <h2>2017 Operating Expenses - $1,394,928</h2>  
         <canvas id="Op-Exp-2017" aria-label="Pie chart of operating expenses for 2017"></canvas>
     </div>
-	
+	<div class="chart-section">
+        <h2>2016 Operating Expenses - $1,x94,928</h2>  
+        <canvas id="Op-Exp-2016" aria-label="Pie chart of operating expenses for 2016"></canvas>
+    </div>
 	
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -111,8 +114,8 @@
             const chartData = [
                 {
                     id: 'Op-Exp-2024',
-               <!-- title: '2024 Operating Expenses - $1,981,009', -->
-                    total: 1981009, // Total for percentage calculations
+                    title: 'Calculation: Operating Expense item ➗ Total Income $ 1,846,671',
+                    total: 1846671, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 384242 },
                         { label: 'Utilities Oil & Electric', value: 328592 },
@@ -130,8 +133,8 @@
                 },
                 {
                     id: 'Op-Exp-2023',
-                <!--title: '2023 Operating Expenses - $1,649,127',  -->
-                    total: 1649127, // Total for percentage calculations
+                    title: 'Calculation: Operating Expense item ➗ Total Income $ 1,745,779',
+                    total: 1745779, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 369302 },
                         { label: 'Utilities Oil & Electric', value: 290726 },
@@ -150,8 +153,8 @@
 								  
 				{
                     id: 'Op-Exp-2022',
-                <!--title: '2022 Operating Expenses - $x,xxx,xxx',  -->
-                    total: 1626411, // Total for percentage calculations
+                    title: 'Calculation: Operating Expense item ➗ Total Income $ 1,677,006',
+                    total:  1677006, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 365157 },
                         { label: 'Utilities Oil & Electric', value: 344997 },
@@ -170,8 +173,8 @@
 								  
 				{
                     id: 'Op-Exp-2021',
-                <!--title: '2021 Operating Expenses - $1,463,423',  -->
-                    total: 1463423, // Total for percentage calculations
+                    title: 'Calculation: Operating Expense item ➗ Total Income $1,678,636',
+                    total:  1678636, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 240345 },
                         { label: 'Utilities Oil & Electric', value: 232313 },
@@ -190,8 +193,8 @@
 				
 				 {
                     id: 'Op-Exp-2020',
-                <!--title: '2020 Operating Expenses - $1,350,723',  -->
-                    total: 1350723, // Total for percentage calculations
+                    title: 'Calculation: Operating Expense item ➗ Total Income $1,684,945', 
+                    total:  1684945, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 381895 },
                         { label: 'Utilities Oil & Electric', value: 163262 },
@@ -211,7 +214,7 @@
 					    {
                     id: 'Op-Exp-2019',
                 <!--title: '2019 Operating Expenses - $ 1,477,320',  -->
-                    total: 1350723, // Total for percentage calculations
+                    total: 1477320, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 399172 },
                         { label: 'Utilities Oil & Electric', value: 231878 },
@@ -230,7 +233,7 @@
 				       {
                     id: 'Op-Exp-2018',
                 <!--title: '2018 Operating Expenses - $ 1,435,982',  -->
-                    total: 1350723, // Total for percentage calculations
+                    total: 1435982, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value: 379313 },
                         { label: 'Utilities Oil & Electric', value: 215961 },
@@ -264,8 +267,26 @@
                         { label: 'Corporate Taxes & Misc', value: 24437 },
                         { label: 'Excess Operating Income', value: 275255 } // Verify this value
                     ]
-                }				  
-								  
+                },				  
+			 {
+                    id: 'Op-Exp-2016',
+                <!--title: '2016 Operating Expenses - $ 1,x94,928',  -->
+                    total: 1394928, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 366335 },
+                        { label: 'Utilities Oil & Electric', value: 199826 },
+                        { label: 'Payroll & Related (3 people)', value: 220249 },
+                        { label: 'Mortgage Interest & Principal', value: 185567 },
+                        { label: 'Repairs & Maintenance', value: 163940 },
+                        { label: 'Insurance', value: 63759 },
+                        { label: 'Security', value: 56376 },
+                        { label: 'Management Fee', value: 45131 },
+                        { label: 'Water & Sewer', value: 41666 },
+                        { label: 'Legal & Audit Fees', value: 27642 },
+                        { label: 'Corporate Taxes & Misc', value: 24437 },
+                        { label: 'Excess Operating Income', value: 275255 } // Verify this value
+                    ]
+                }				  					  
 												  
 			];
 
