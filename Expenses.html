@@ -105,6 +105,10 @@
         <h2>2016 Operating Expenses - $1,317,507</h2>  
         <canvas id="Op-Exp-2016" aria-label="Pie chart of operating expenses for 2016"></canvas>
     </div>
+	<div class="chart-section">
+        <h2>2015 Operating Expenses - $1,455,700</h2>  
+        <canvas id="Op-Exp-2015" aria-label="Pie chart of operating expenses for 2015"></canvas>
+    </div>
 	
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -286,8 +290,26 @@
                         { label: 'Corporate Taxes & Misc', value:  24623 },
                         { label: 'Excess Operating Income', value: 334945 } // Verify this value
                     ]
-                }				  					  
-												  
+                },				  					  
+				{
+                    id: 'Op-Exp-2015',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $1,664,369', 
+                     total: 1664369, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:  365790 },
+                        { label: 'Utilities Oil & Electric', value:  199659 },
+                        { label: 'Payroll & Related (3 people)', value:  205605 },
+                        { label: 'Mortgage Interest & Principal', value: 183690 },
+                        { label: 'Repairs & Maintenance', value:  263380 },
+                        { label: 'Insurance', value:  71196 },
+                        { label: 'Security', value:  52724 },
+                        { label: 'Management Fee', value:  43496 },
+                        { label: 'Water & Sewer', value:  38772 },
+                        { label: 'Legal & Audit Fees', value:  11069 },
+                        { label: 'Corporate Taxes & Misc', value:  20319 },
+                        { label: 'Excess Operating Income', value: 208669 } // Verify this value
+                    ]
+                }				  										  
 			];
 
             const colors = [
