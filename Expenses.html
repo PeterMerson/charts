@@ -121,6 +121,10 @@
         <h2>2012 Operating Expenses -  $1,534,516</h2>  
         <canvas id="Op-Exp-2012" aria-label="Pie chart of operating expenses for 2012"></canvas>
     </div>
+	<div class="chart-section">
+        <h2>2011 Operating Expenses -   $1,509,242 </h2>  
+        <canvas id="Op-Exp-2011" aria-label="Pie chart of operating expenses for 2011"></canvas>
+    </div>
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
@@ -378,7 +382,27 @@
                         { label: 'Corporate Taxes & Misc', value:  19156 },
                         { label: 'Excess Operating Income', value: 226378 } // Verify this value
                     ]
-                }				  	
+                },
+				{
+				id: 'Op-Exp-2011',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $1,769,448', 
+                     total: 1769448, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:  321051 },
+                        { label: 'Utilities Oil & Electric', value: 248050 },
+                        { label: 'Payroll & Related (3 people)', value:  166778 },
+                        { label: 'Mortgage Interest & Principal', value: 365838 },
+                        { label: 'Repairs & Maintenance', value: 192532 },
+                        { label: 'Insurance', value: 59481 },
+                        { label: 'Security', value:  55463 },
+                        { label: 'Management Fee', value:  39816 },
+                        { label: 'Water & Sewer', value: 21851 },
+                        { label: 'Legal & Audit Fees', value: 12285 },
+                        { label: 'Corporate Taxes & Misc', value:  26097  },
+                        { label: 'Excess Operating Income', value: 260206 } // Verify this value
+                    ]
+                }
+				
 			];
 
             const colors = [
