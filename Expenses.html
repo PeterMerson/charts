@@ -117,7 +117,10 @@
         <h2>2013 Operating Expenses - $1,308,064</h2>  
         <canvas id="Op-Exp-2013" aria-label="Pie chart of operating expenses for 2013"></canvas>
     </div>
-	
+	<div class="chart-section">
+        <h2>2012 Operating Expenses -  $1,534,516</h2>  
+        <canvas id="Op-Exp-2012" aria-label="Pie chart of operating expenses for 2012"></canvas>
+    </div>
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
@@ -341,7 +344,7 @@
 				{
                     id: 'Op-Exp-2013',
 				     title: 'Calculation: Operating Expense item ➗ Total Income $1,702,178', 
-                     total: 1659232, // Total for percentage calculations
+                     total: 1702178, // Total for percentage calculations
                     data: [
                         { label: 'Real Estate Taxes', value:   326072 },
                         { label: 'Utilities Oil & Electric', value:   271746 },
@@ -355,6 +358,25 @@
                         { label: 'Legal & Audit Fees', value:  8979  },
                         { label: 'Corporate Taxes & Misc', value:  23644 },
                         { label: 'Excess Operating Income', value: 394114 } // Verify this value
+                    ]
+                },
+				{
+                    id: 'Op-Exp-2012',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $1,760,891', 
+                     total: 1760891, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:    315063 },
+                        { label: 'Utilities Oil & Electric', value:   291470 },
+                        { label: 'Payroll & Related (3 people)', value:   182676 },
+                        { label: 'Mortgage Interest & Principal', value: 365866 },
+                        { label: 'Repairs & Maintenance', value:   160652 },
+                        { label: 'Insurance', value:   57732 },
+                        { label: 'Security', value:  53133 },
+                        { label: 'Management Fee', value:  39816 },
+                        { label: 'Water & Sewer', value:   17196 },
+                        { label: 'Legal & Audit Fees', value:  31756 },
+                        { label: 'Corporate Taxes & Misc', value:  19156 },
+                        { label: 'Excess Operating Income', value: 226378 } // Verify this value
                     ]
                 }				  	
 			];
