@@ -137,6 +137,15 @@
         <h2>2008 Operating Expenses -   $  1,544,655  </h2>  
         <canvas id="Op-Exp-2008" aria-label="Pie chart of operating expenses for 2008"></canvas>
     </div>
+	<div class="chart-section">
+        <h2>2007 Operating Expenses -   $  1,485,259  </h2>  
+        <canvas id="Op-Exp-2007" aria-label="Pie chart of operating expenses for 2007"></canvas>
+    </div>
+	<div class="chart-section">
+        <h2>2006 Operating Expenses -   $   1,462,139  </h2>  
+        <canvas id="Op-Exp-2006" aria-label="Pie chart of operating expenses for 2007"></canvas>
+    </div>
+	
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
@@ -470,7 +479,45 @@
                         { label: 'Corporate Taxes & Misc', value: 16089 },
                         { label: 'Excess Operating Income', value: 192182 } // Verify this value
                     ]
-                }
+                },
+				{
+				id: 'Op-Exp-2007',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $ 1,722,145', 
+                     total:  1722145, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 407434 },
+                        { label: 'Utilities Oil & Electric', value: 260863 },
+                        { label: 'Payroll & Related (3 people)', value: 166463 },
+                        { label: 'Mortgage Interest & Principal', value: 367181 },
+                        { label: 'Repairs & Maintenance', value: 108752 },
+                        { label: 'Insurance', value: 68873 },
+                        { label: 'Security', value: 46998  },
+                        { label: 'Management Fee', value: 31333 },
+                        { label: 'Water & Sewer', value: 12223 },
+                        { label: 'Legal & Audit Fees', value: 9261 },
+                        { label: 'Corporate Taxes & Misc', value: 5878 },
+                        { label: 'Excess Operating Income', value: 236886 } // Verify this value
+                    ]
+                },
+				{
+				id: 'Op-Exp-2006',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $ 1,720,108', 
+                     total:  1720108, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value: 397399 },
+                        { label: 'Utilities Oil & Electric', value: 211495 },
+                        { label: 'Payroll & Related (3 people)', value: 185106 },
+                        { label: 'Mortgage Interest & Principal', value: 384356 },
+                        { label: 'Repairs & Maintenance', value: 110046 },
+                        { label: 'Insurance', value: 64626 },
+                        { label: 'Security', value: 47102 },
+                        { label: 'Management Fee', value: 34000 },
+                        { label: 'Water & Sewer', value: 11909 },
+                        { label: 'Legal & Audit Fees', value: 8050 },
+                        { label: 'Corporate Taxes & Misc', value: 8050 },
+                        { label: 'Excess Operating Income', value: 257965 } // Verify this value
+                    ]
+                }				
 			];
 
             const colors = [
