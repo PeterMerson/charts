@@ -143,9 +143,12 @@
     </div>
 	<div class="chart-section">
         <h2>2006 Operating Expenses -   $   1,462,139  </h2>  
-        <canvas id="Op-Exp-2006" aria-label="Pie chart of operating expenses for 2007"></canvas>
+        <canvas id="Op-Exp-2006" aria-label="Pie chart of operating expenses for 2006"></canvas>
     </div>
-	
+	<div class="chart-section">
+        <h2>2005 Operating Expenses -   $    1,484,841  </h2>  
+        <canvas id="Op-Exp-2005" aria-label="Pie chart of operating expenses for 2005"></canvas>
+    </div>
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
@@ -516,6 +519,25 @@
                         { label: 'Legal & Audit Fees', value: 8050 },
                         { label: 'Corporate Taxes & Misc', value: 8050 },
                         { label: 'Excess Operating Income', value: 257965 } // Verify this value
+                    ]
+                },
+				{
+				id: 'Op-Exp-2005',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $ 1,454,039', 
+                     total:   1454039, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:  372308 },
+                        { label: 'Utilities Oil & Electric', value: 232000 },
+                        { label: 'Payroll & Related (3 people)', value: 188198 },
+                        { label: 'Mortgage Interest & Principal', value: 395538 },
+                        { label: 'Repairs & Maintenance', value: 120358 },
+                        { label: 'Insurance', value: 63743 },
+                        { label: 'Security', value: 46115 },
+                        { label: 'Management Fee', value: 33250 },
+                        { label: 'Water & Sewer', value: 9202 },
+                        { label: 'Legal & Audit Fees', value: 16887 },
+                        { label: 'Corporate Taxes & Misc', value: 10242 },
+                        { label: 'Excess Operating Income', value: -30802 } // Verify this value
                     ]
                 }				
 			];
