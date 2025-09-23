@@ -150,8 +150,12 @@
         <canvas id="Op-Exp-2005" aria-label="Pie chart of operating expenses for 2005"></canvas>
     </div>
 	<div class="chart-section">
-        <h2>2004 Operating Expenses -   $     1,417,321   </h2>  
+        <h2>2004 Operating Expenses -   $   1,417,321   </h2>  
         <canvas id="Op-Exp-2004" aria-label="Pie chart of operating expenses for 2004"></canvas>
+    </div>
+	<div class="chart-section">
+        <h2>2003 Operating Expenses -   $   1,352,556    </h2>  
+        <canvas id="Op-Exp-2003" aria-label="Pie chart of operating expenses for 2003"></canvas>
     </div>
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -561,6 +565,25 @@
                         { label: 'Legal & Audit Fees', value: 12651 },
                         { label: 'Corporate Taxes & Misc', value: 12261 },
                         { label: 'Excess Operating Income', value: -107733 } // Verify this value
+                    ]
+                },
+				{
+				id: 'Op-Exp-2003',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $  1,226,416', 
+                     total:      1226416, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:  299670 },
+                        { label: 'Utilities Oil & Electric', value: 160400 },
+                        { label: 'Payroll & Related (3 people)', value: 173570 },
+                        { label: 'Mortgage Interest & Principal', value: 392638 },
+                        { label: 'Repairs & Maintenance', value: 145987 },
+                        { label: 'Insurance', value: 46519 },
+                        { label: 'Security', value: 44764 },
+                        { label: 'Management Fee', value: 31000 },
+                        { label: 'Water & Sewer', value: 5303 },
+                        { label: 'Legal & Audit Fees', value: 40225 },
+                        { label: 'Corporate Taxes & Misc', value: 12507 },
+                        { label: 'Excess Operating Income', value: -126420 } // Verify this value
                     ]
                 }				
 			];
