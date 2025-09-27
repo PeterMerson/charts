@@ -157,6 +157,10 @@
         <h2>2003 Operating Expenses -   $   1,352,556    </h2>  
         <canvas id="Op-Exp-2003" aria-label="Pie chart of operating expenses for 2003"></canvas>
     </div>
+	<div class="chart-section">
+        <h2>2002 Operating Expenses -   $    1,244,211   </h2>  
+        <canvas id="Op-Exp-2002" aria-label="Pie chart of operating expenses for 2002"></canvas>
+    </div>
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
             // Register the datalabels plugin
@@ -584,6 +588,25 @@
                         { label: 'Legal & Audit Fees', value: 40225 },
                         { label: 'Corporate Taxes & Misc', value: 12507 },
                         { label: 'Excess Operating Income', value: -126420 } // Verify this value
+                    ]
+                },
+				{
+				id: 'Op-Exp-2002',
+				     title: 'Calculation: Operating Expense item ➗ Total Income $1,215,986', 
+                     total:       1215986, // Total for percentage calculations
+                    data: [
+                        { label: 'Real Estate Taxes', value:  288391 },
+                        { label: 'Utilities Oil & Electric', value: 122339 },
+                        { label: 'Payroll & Related (3 people)', value: 162718 },
+                        { label: 'Mortgage Interest & Principal', value: 370774 },
+                        { label: 'Repairs & Maintenance', value: 117169 },
+                        { label: 'Insurance', value: 47531 },
+                        { label: 'Security', value: 48819 },
+                        { label: 'Management Fee', value: 31000 },
+                        { label: 'Water & Sewer', value: 7639 },
+                        { label: 'Legal & Audit Fees', value: 32421 },
+                        { label: 'Corporate Taxes & Misc', value: 15410 },
+                        { label: 'Excess Operating Income', value: -28225 } // Verify this value
                     ]
                 }				
 			];
