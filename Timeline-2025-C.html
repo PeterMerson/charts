@@ -1,0 +1,102 @@
+<<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Riveredge Cooperative Timeline</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .timeline-container {
+      width: 100%;
+      max-width: 2000px;
+      margin: 0 auto 40px;
+    }
+    select {
+      display: block;
+      margin: 0 auto 20px;
+      font-size: 16px;
+      padding: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>TIMELINE AND TENURE FOR THE: Riveredge Cooperative</h2>
+  <label for="groupFilter" style="text-align:center;display:block;">Filter by Group:</label>
+  <select id="groupFilter">
+    <option value="All">All</option>
+    <option value="Board of Directors">Board of Directors</option>
+    <option value="All Board Treasurers">All Board Treasurers</option>
+    <option value="Maintenance (est.)">Maintenance (est.)</option>
+    <option value="Managing Agent">Managing Agent</option>
+    <option value="Accountants">Accountants</option>
+  </select>
+
+  <div id="timelineChart" class="timeline-container" style="height: 400px;"></div>
+
+  <script type="text/javascript">
+    google.charts.load("current", {packages:["timeline"]});
+    google.charts.setOnLoadCallback(drawFilteredChart);
+
+    const allRows = [
+      ['_', '_', new Date(1980, 0, 1), new Date(2030, 0, 1)],
+      ['Board of Directors', 'Deven Sharma - Apt 4E', new Date(2015, 4, 15), new Date(2017, 2, 7)],
+      ['Board of Directors', 'Laura Szego - Apt 7S', new Date(2019, 2, 8), new Date(2027, 4, 15)],
+      ['Board of Directors', 'Nami Kaur - Apt 8N, 1K, 1L', new Date(2012, 4, 15), new Date(2026, 4, 15)],
+      ['Board of Directors', 'Michael Hertz - Apt 8F', new Date(2009, 4, 15), new Date(2027, 4, 15)],
+      ['Board of Directors', 'Peter Merson - Apt 8T', new Date(1999, 4, 15), new Date(2009, 4, 15)],
+      ['Board of Directors', 'Karen Gongora - Apt 4O', new Date(2005, 4, 15), new Date(2025, 4, 15)],
+      ['Board of Directors', 'Sara Casten - Apt 3?', new Date(2025, 4, 16), new Date(2027, 4, 15)],
+      ['Board of Directors', 'Janet Henry - Apt 5B', new Date(2003, 4, 15), new Date(2025, 4, 15)],
+      ['Board of Directors', 'Jennifer LaGrippo - Apt 3K', new Date(2025, 4, 16), new Date(2027, 4, 15)],
+      ['All Board Treasurers', 'Howard Katz - Treasurer', new Date(1990, 4, 15), new Date(2005, 4, 15)],
+      ['All Board Treasurers', 'Laura Szego - Treasurer', new Date(2001, 4, 15), new Date(2006, 4, 15)],
+      ['All Board Treasurers', 'Les Lew - Treasurer', new Date(2006, 4, 15), new Date(2026, 4, 15)],
+      ['Maintenance (est.)', 'Scott Orser - Superintendent', new Date(1989, 11, 31), new Date(2000, 11, 30)],
+      ['Maintenance (est.)', 'Dennis Inzalaco - Superintendent', new Date(2000, 11, 31), new Date(2008, 5, 1)],
+      ['Maintenance (est.)', 'Alex Sanchez - Apt 1F - Superintendent', new Date(2008, 5, 1), new Date(2020, 4, 31)],
+      ['Maintenance (est.)', 'Luis Torres - Apt 1F - Superintendent', new Date(2020, 5, 1), new Date(2025, 11, 31)],
+      ['Managing Agent', 'Hudson North Property Management LLC - Dan Tomaino', new Date(1989, 11, 31), new Date(2007, 2, 30)],
+      ['Managing Agent', 'Platzner International Group LTD - Steve Librett', new Date(2007, 3, 1), new Date(2010, 11, 31)],
+      ['Managing Agent', 'Westchester Property Management Group Inc - Laurette Valdez', new Date(2010, 11, 31), new Date(2025, 11, 31)],
+      ['Accountants', 'J.Gittelson CPA PC', new Date(1989, 11, 31), new Date(2007, 11, 31)],
+      ['Accountants', 'Shavelson, Newman & Company LLP', new Date(2007, 11, 31), new Date(2020, 11, 31)],
+      ['Accountants', 'PragerMetis CPAs LLC - Penn Plaza NY', new Date(2020, 11, 31), new Date(2025, 11, 31)]
+    ];
+
+    function drawFilteredChart() {
+      const selectedGroup = document.getElementById('groupFilter').value;
+      const container = document.getElementById('timelineChart');
+      const chart = new google.visualization.Timeline(container);
+      const dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'Position' });
+      dataTable.addColumn({ type: 'string', id: 'Name' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+
+      const filteredRows = selectedGroup === 'All'
+        ? allRows
+        : allRows.filter(row => row[0] === selectedGroup || row[0] === '_');
+
+      dataTable.addRows(filteredRows);
+
+      chart.draw(dataTable, {
+        timeline: {
+          avoidOverlappingGridLines: false,
+          rowLabelStyle: { fontSize: 10 },
+          barLabelStyle: { fontSize: 10 }
+        }
+      });
+    }
+
+    document.getElementById('groupFilter').addEventListener('change', drawFilteredChart);
+  </script>
+</body>
+</html>
