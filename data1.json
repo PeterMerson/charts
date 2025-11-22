@@ -1,6 +1,6 @@
 {
   "incomeExpensesData": [
-["1990",  1175653, "x", "<div class='annotation-tooltip'><a href=\"Maintenance Increase-2024.pdf\" style=\"color:blue; font-weight:bold;\">xx</div>", 1105904, "", ""],
+["1990",  1175653, "x", "<div class='annotation-tooltip'>xx</div>", 1105904, "", ""],
 ["1991",  1150811, "", "", 1114963, "", ""],
 ["1992",  1132520, "", "", 1156390, "", ""],
 ["1993",  1148098, "SA - 1993", "<div class='annotation-tooltip'> A Special Assessment of $2.00 per share is charged to shareholders this year to pay for the Hallway Renovation. The total amount collected was  $170,050 ($2.00 per share x 85,027 co-op shares) </div>",1157968, "", ""],
@@ -47,7 +47,7 @@
 	["1992",  180787,"", "",    -300431, "", ""],
     ["1993",  177502,"Intelligent", "<div class='annotation-tooltip'> <b>A Special Assessment of $2.00 per share is charged to shareholders this year to pay for the Hallway Renovation. The total amount collected was  $170,050 ($2.00 per share x 85,027 co-op shares) </b></div>",  -420148, "", ""],
     ["1994",  209161,       "", "",   -441744, "", ""],
-	["1995",  288525,       "VIDEO", "<div  class='annotation-tooltip'><p>New video pending<br/><br /><iframe height='1245' <a href='Maintenance Increase-2024.pdf' </a> width='425'></iframe></p></div>",       -441744, "", ""],
+	["1995",  288525,       "VIDEO", "<div  class='annotation-tooltip'><p>New video pending<br/><br /><iframe height='245' src='http://www.youtube.com/embed/6TuGtufFeHE?version=3&amp;autohide=1&amp;showinfo=1&amp;rel=0?rel=0&autoplay=1' width='425'></iframe></p></div>",       -441744, "", ""],
     ["1996",  307762,"", "",    -445227, "", ""],
     ["1997",  337957,"Tax", "<div class='annotation-tooltip'> <p>1997 Includes a tax refund of approx $100,000</p></div>",   -463826, "", ""],
 	["1998",  566633, "Mortgage Refinance", "<div class='annotation-tooltip'><p><u><strong> 1998</strong></u><br/><br /><strong>The cooperatives existing 11% $4,000,000 Interest Only mortgage was refinanced with a 7.35% 15 year amortizable mortgage. <br /><br />This means the principal balance due in 2013 , 15 years later , is approx $2,600,000 ,  that is a good deal.<br /><br />The co-op has Howard Katz , the then Treasurer , to thank for this. <br /><br />Thanks Howard , the only intelligent Board Member i ever meet.</strong></p></div>", -734664, "", ""],
