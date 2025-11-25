@@ -71,7 +71,11 @@ function drawIncomeExpensesChart(incomeExpensesData) {
   chart.draw(dataTable, options);
 
   // Allow clicking a point to open a persistent tooltip, and clicking the same point again to close it.
-  let lastSelection = null;
+  // Also support opening the tooltip on mouseover and clearing on mouseout (unless a point has been clicked to persist).
+  let lastSelection = null; // persistent selection from click
+  let lastHover = null;     // transient selection from hover
+
+  // Click selection behavior (toggle persistent tooltip)
   google.visualization.events.addListener(chart, 'select', function () {
     const sel = chart.getSelection() || [];
     // If the same point is clicked twice, clear selection (close tooltip)
@@ -80,12 +84,44 @@ function drawIncomeExpensesChart(incomeExpensesData) {
       lastSelection = null;
       return;
     }
-    // Otherwise remember the new selection
+    // Otherwise remember the new selection (if any)
     if (sel.length) {
       lastSelection = sel.slice();
     } else {
       lastSelection = null;
     }
+  });
+
+  // Mouseover opens tooltip (transient); does not override a persistent selection permanently.
+  google.visualization.events.addListener(chart, 'onmouseover', function (e) {
+    // e.row is defined for data points; ignore otherwise.
+    if (typeof e.row === 'undefined' || e.row === null) return;
+
+    const hoverSel = [{ row: e.row, column: e.column }];
+
+    // If the hovered point is already the persistent selection, do nothing.
+    if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(hoverSel)) {
+
+      lastHover = null;
+      return;
+    }
+
+    // Show tooltip for hovered point
+    chart.setSelection(hoverSel);
+    lastHover = hoverSel.slice();
+  });
+
+  // Mouseout clears the transient hover tooltip, but restores persistent selection if present.
+  google.visualization.events.addListener(chart, 'onmouseout', function () {
+    if (lastSelection) {
+      // If a point is persistently selected, restore it visually.
+      chart.setSelection(lastSelection);
+      lastHover = null;
+      return;
+    }
+    // Otherwise clear the selection (close tooltip)
+    chart.setSelection([]);
+    lastHover = null;
   });
 }
 
@@ -126,8 +162,10 @@ function drawCashReservesChart(cashReservesData) {
   const chart = new google.visualization.AreaChart(document.getElementById('cash-reserves'));
   chart.draw(dataTable, options);
 
-  // Toggle persistent tooltip behavior for this chart as well
+  // Toggle persistent tooltip behavior for this chart as well, and support mouseover opening.
   let lastSelection = null;
+  let lastHover = null;
+
   google.visualization.events.addListener(chart, 'select', function () {
     const sel = chart.getSelection() || [];
     if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(sel)) {
@@ -140,5 +178,29 @@ function drawCashReservesChart(cashReservesData) {
     } else {
       lastSelection = null;
     }
+  });
+
+  google.visualization.events.addListener(chart, 'onmouseover', function (e) {
+    if (typeof e.row === 'undefined' || e.row === null) return;
+
+    const hoverSel = [{ row: e.row, column: e.column }];
+
+    if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(hoverSel)) {
+      lastHover = null;
+      return;
+    }
+
+    chart.setSelection(hoverSel);
+    lastHover = hoverSel.slice();
+  });
+
+  google.visualization.events.addListener(chart, 'onmouseout', function () {
+    if (lastSelection) {
+      chart.setSelection(lastSelection);
+      lastHover = null;
+      return;
+    }
+    chart.setSelection([]);
+    lastHover = null;
   });
 }
