@@ -101,7 +101,6 @@ function drawIncomeExpensesChart(incomeExpensesData) {
 
     // If the hovered point is already the persistent selection, do nothing.
     if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(hoverSel)) {
-
       lastHover = null;
       return;
     }
