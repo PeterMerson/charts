@@ -53,7 +53,7 @@ function drawIncomeExpensesChart(incomeExpensesData) {
   formatter.format(dataTable, 4); // Total Expenses
 
   const options = {
-    tooltip: { isHtml: true, ignoreBounds: false },
+    tooltip: { isHtml: true, ignoreBounds: false, trigger: 'selection' },
     legend: { position: 'top', alignment: 'center' },
     vAxis: { title: 'Dollars ($)' },
     hAxis: {
@@ -69,6 +69,24 @@ function drawIncomeExpensesChart(incomeExpensesData) {
 
   const chart = new google.visualization.ComboChart(document.getElementById('expenses'));
   chart.draw(dataTable, options);
+
+  // Allow clicking a point to open a persistent tooltip, and clicking the same point again to close it.
+  let lastSelection = null;
+  google.visualization.events.addListener(chart, 'select', function () {
+    const sel = chart.getSelection() || [];
+    // If the same point is clicked twice, clear selection (close tooltip)
+    if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(sel)) {
+      chart.setSelection([]); // this will close the tooltip
+      lastSelection = null;
+      return;
+    }
+    // Otherwise remember the new selection
+    if (sel.length) {
+      lastSelection = sel.slice();
+    } else {
+      lastSelection = null;
+    }
+  });
 }
 
 function drawCashReservesChart(cashReservesData) {
@@ -93,7 +111,7 @@ function drawCashReservesChart(cashReservesData) {
   formatter.format(dataTable, 4); // Capital Expenditures
 
   const options = {
-    tooltip: { isHtml: true, ignoreBounds: false },
+    tooltip: { isHtml: true, ignoreBounds: false, trigger: 'selection' },
     legend: { position: 'top', alignment: 'center' },
     vAxis: { title: 'Dollars ($)' },
     hAxis: {
@@ -107,4 +125,20 @@ function drawCashReservesChart(cashReservesData) {
 
   const chart = new google.visualization.AreaChart(document.getElementById('cash-reserves'));
   chart.draw(dataTable, options);
+
+  // Toggle persistent tooltip behavior for this chart as well
+  let lastSelection = null;
+  google.visualization.events.addListener(chart, 'select', function () {
+    const sel = chart.getSelection() || [];
+    if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(sel)) {
+      chart.setSelection([]); // close tooltip on second click
+      lastSelection = null;
+      return;
+    }
+    if (sel.length) {
+      lastSelection = sel.slice();
+    } else {
+      lastSelection = null;
+    }
+  });
 }
