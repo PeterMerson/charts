@@ -57,7 +57,7 @@ function drawIncomeExpensesChart(incomeExpensesData) {
     legend: { position: 'top', alignment: 'center' },
     vAxis: { title: 'Dollars ($)' },
     hAxis: {
-      title: '*Total Operating Expenses include Mortgage Principal Costs - Total Co-op shares are 85,027',
+      title: '*Total Operating Expenses include Mortgage Principal Costs - Total Co-op shares are 85,027 - 158 apartments',
       titleTextStyle: { color: 'red', fontWeight: 'bold' }
     },
     chartArea: { width: '86%', height: '75%' },
