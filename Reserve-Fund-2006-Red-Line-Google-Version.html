@@ -40,8 +40,8 @@
 </head>
 <body>
   <header>
-    <h1>Riveredge Co-op Reserve Fund per Unit vs. Westchester "Solid Adequate" Range</h1>
-    <div class="sub">Interactive chart (Chart.js v4 + chartjs-plugin-annotation v2). Vertical red line marks 2006.</div>
+    <h1>Riveredge Co-op Reserve Fund & Cash per Unit vs. Westchester "Solid Adequate" Range (Then-Year-Dollars)</h1>
+    <div class="sub">Actual vs. Inflation Adjusted Adequate Reserves & Cash per unit (1990-2024)</div> 
   </header>
 
   <main>
@@ -49,12 +49,16 @@
       <canvas id="reservesChart" aria-label="Reserves chart" role="img"></canvas>
     </div>
 
-    <p class="meta small">Notes: The chart expects data arrays for the years 1990 through 2024 (inclusive). The script validates lengths and will show a warning if arrays don't match the label count.</p>
+    <p class="meta small" style="text-align:center; max-width:1000px; margin:40px auto; color:#555;">
+       <b> The orange shaded band shows the Westchester-adjusted "solid adequate" range ($3,500–$5,000 per unit in 2025 dollars, backward-adjusted using regional construction inflation).<br>
+        The blue line is your co-op's actual year-end cash & reserve balance divided by 158 units.<br>
+		   Data source: Provided reserve balances 1990–2024.</b>
+    </p>
     <div id="data-warning" class="warn" style="display:none;">Data arrays missing or length mismatch — paste your full arrays into the script.</div>
   </main>
 
   <footer>
-    <div>Source: Riveredge Co-op reserves & Westchester range — maintained by Riveredge Co-op</div>
+   <!- <div>Source: Riveredge Co-op reserves and cash balance & Westchester range — maintained by Riveredge Co-op</div> ->
     <div style="margin-top:6px; font-size:0.9rem; color:#666;">Generated: 2025-12-28</div>
   </footer>
 
@@ -225,7 +229,7 @@
               order: 1
             },
             {
-              label: 'Actual Reserves per Unit (Riveredge 158 units)',
+              label: 'Actual Reserves & Cash per Unit (Riveredge 158 units)',
               data: actualReserves,
               borderColor: '#0066cc',
               backgroundColor: '#0066cc',
@@ -264,5 +268,6 @@
       new Chart(ctx, cfg);
     }
   </script>
+	 
 </body>
 </html>
