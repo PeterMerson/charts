@@ -1,96 +1,268 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riveredge Co-op Reserves vs. Westchester Adequate Range</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="cdn.jsdelivr.net"></script>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
-        h1 { text-align: center; font-size: 1.5rem; }
-        .chart-container { max-width: 1000px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Riveredge Co-op Reserves vs. Westchester Adequate Range (1990–2024)</title>
+
+  <!-- Chart.js v4 UMD and chartjs-plugin-annotation v2 UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2/dist/chartjs-plugin-annotation.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; background:#f8f9fa; margin:0; color:#222; }
+
+    /* Default: small screens -> left aligned header */
+    header {
+      background:#0b63b6;
+      color:#fff;
+      padding:18px 20px;
+      text-align: left;
+    }
+    header h1 { margin:0; font-size:1.05rem; line-height:1.2; }
+    header .sub { margin-top:6px; font-size:0.9rem; color:rgba(255,255,255,0.9); }
+
+    /* On larger screens center the header/title */
+    @media (min-width: 700px) {
+      header {
+        text-align: center;
+      }
+      header h1 { font-size:1.1rem; }
+    }
+
+    main { padding:20px; max-width:1100px; margin:0 auto 24px; }
+    .chart-container { background:#fff; padding:20px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    footer { background:#f1f3f5; padding:14px 20px; text-align:center; color:#444; font-size:0.95rem; }
+    .meta { color:#666; font-size:0.9rem; margin-top:8px; }
+    .warn { color:#b33; font-weight:bold; margin-top:12px; }
+    .small { font-size:0.9rem; color:#666; }
+  </style>
 </head>
 <body>
+  <header>
     <h1>Riveredge Co-op Reserve Fund per Unit vs. Westchester "Solid Adequate" Range</h1>
-    <div class="chart-container">
-        <canvas id="reservesChart"></canvas>
+    <div class="sub">Interactive chart (Chart.js v4 + chartjs-plugin-annotation v2). Vertical red line marks 2006.</div>
+  </header>
+
+  <main>
+    <div class="chart-container" style="height:520px;">
+      <canvas id="reservesChart" aria-label="Reserves chart" role="img"></canvas>
     </div>
 
-    <script>
-        // Correct registration for the annotation plugin
-        Chart.register(schema = window['chartjs-plugin-annotation']);
+    <p class="meta small">Notes: The chart expects data arrays for the years 1990 through 2024 (inclusive). The script validates lengths and will show a warning if arrays don't match the label count.</p>
+    <div id="data-warning" class="warn" style="display:none;">Data arrays missing or length mismatch — paste your full arrays into the script.</div>
+  </main>
 
-        const ctx = document.getElementById('reservesChart').getContext('2d');
+  <footer>
+    <div>Source: Riveredge Co-op reserves & Westchester range — maintained by Riveredge Co-op</div>
+    <div style="margin-top:6px; font-size:0.9rem; color:#666;">Generated: 2025-12-28</div>
+  </footer>
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'],
-                datasets: [
-                    {
-                        label: 'Actual Reserves per Unit (Riveredge)',
-                        data: [2427,1899,1144,1123,1324,1826,1948,2139,3586,3999,4154,4253,4565,3253,2346,1987,1717,3250,4429,6833,7970,7247,7286,9985,9173,9904,9926,11284,12509,14114,15309,15886,15543,14660,12511],
-                        borderColor: '#0066cc',
-                        backgroundColor: '#0066cc',
-                        borderWidth: 3,
-                        fill: false,
-                        pointRadius: 4,
-                        tension: 0.1,
-                        order: 1 // Keep this on top
-                    },
-                    {
-                        label: 'Lower Bound Adequate',
-                        data: [870,900,925,955,990,1025,1050,1080,1110,1140,1165,1195,1225,1250,1315,1370,1430,1490,1540,1520,1540,1605,1665,1725,1780,1835,1890,1955,2035,2135,2190,2335,2630,2780,2870],
-                        borderColor: '#ff8800',
-                        borderWidth: 1,
-                        fill: false, // Don't fill from the bottom
-                        pointRadius: 0,
-                        borderDash: [5,5]
-                    },
-                    {
-                        label: 'Upper Bound Adequate',
-                        data: [1245,1280,1320,1365,1410,1460,1495,1545,1580,1630,1665,1705,1750,1785,1880,1955,2040,2130,2200,2175,2200,2295,2380,2465,2540,2620,2700,2795,2905,3050,3125,3335,3760,3970,4100],
-                        borderColor: '#ff8800',
-                        backgroundColor: 'rgba(255,136,0,0.2)',
-                        borderWidth: 1,
-                        fill: '-1', // Fills the space between this and the Lower Bound
-                        pointRadius: 0,
-                        borderDash: [5,5]
-                    }
-                ]
+  <script>
+    // Debug: list plugin objects on window
+    console.log('window.chartjsPluginAnnotation:', window.chartjsPluginAnnotation);
+    console.log('window["chartjs-plugin-annotation"]:', window['chartjs-plugin-annotation']);
+
+    // Register annotation plugin (v2 UMD may export under different names)
+    (function registerAnnotation() {
+      let plugin = window.chartjsPluginAnnotation || window['chartjs-plugin-annotation'] || null;
+      if (plugin && plugin.default) plugin = plugin.default;
+      if (!plugin) {
+        console.warn('Annotation plugin not found on window — plugin-based annotation disabled; fallback will still draw line.');
+        return;
+      }
+      try {
+        Chart.register(plugin);
+        console.log('Annotation plugin registered.');
+      } catch (err) {
+        console.error('Failed to register annotation plugin:', err);
+      }
+    })();
+
+    // Build labels: 1990..2024 (strings for category axis)
+    const startYear = 1990;
+    const endYear = 2024;
+    const labels = Array.from({length: endYear - startYear + 1}, (_, i) => String(startYear + i));
+
+    // ====== DATA ARRAYS (embedded as you provided) ======
+    const actualReserves = [
+      2427, 1899, 1144, 1123, 1324, 1826, 1948, 2139, 3586, 3999,
+      4154, 4253, 4565, 3253, 2346, 1987, 1717, 3250, 4429, 6833,
+      7970, 7247, 7286, 9985, 9173, 9904, 9926, 11284, 12509, 14114,
+      15309, 15886, 15543, 14660, 12511
+    ];
+
+    const lowerBound = [
+      870,900,925,955,990,1025,1050,1080,1110,1140,
+      1165,1195,1225,1250,1315,1370,1430,1490,1540,1520,
+      1540,1605,1665,1725,1780,1835,1890,1955,2035,2135,
+      2190,2335,2630,2780,2870
+    ];
+
+    const upperBound = [
+      1245,1280,1320,1365,1410,1460,1495,1545,1580,1630,
+      1665,1705,1750,1785,1880,1955,2040,2130,2200,2175,
+      2200,2295,2380,2465,2540,2620,2700,2795,2905,3050,
+      3125,3335,3760,3970,4100
+    ];
+    // ====================================================
+
+    // validation helper
+    function arraysValid() {
+      const required = labels.length;
+      const ok = actualReserves.length === required &&
+                 lowerBound.length === required &&
+                 upperBound.length === required;
+      if (!ok) {
+        console.warn('Expected arrays length =', required,
+          'actualReserves:', actualReserves.length,
+          'lowerBound:', lowerBound.length,
+          'upperBound:', upperBound.length);
+      }
+      return ok;
+    }
+
+    const markYear = '2006';
+    const index2006 = labels.indexOf(markYear);
+    console.log('index2006 =', index2006);
+
+    // annotation config using numeric index for category axis (plugin v2)
+    const annotationForPlugin = (function() {
+      if (index2006 === -1) return {};
+      return {
+        vline2006: {
+          type: 'line',
+          scaleID: 'x',
+          xMin: index2006,
+          xMax: index2006,
+          borderColor: 'red',
+          borderWidth: 2,
+          borderDash: [6,4],
+          label: {
+            enabled: true,
+            content: markYear,
+            position: 'start',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            color: 'red',
+            font: { weight: 'bold' }
+          }
+        }
+      };
+    })();
+
+    // Failsafe: draws the same vertical line in case annotation plugin isn't available or to ensure visibility
+    const verticalLineFallback = {
+      id: 'verticalLineFallback',
+      afterDraw(chart) {
+        if (!arraysValid()) return;
+        if (index2006 === -1) return;
+        const ctx = chart.ctx;
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+        const x = xScale.getPixelForValue(index2006);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x, yScale.top);
+        ctx.lineTo(x, yScale.bottom);
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6,4]);
+        ctx.strokeStyle = 'red';
+        ctx.stroke();
+        ctx.fillStyle = 'red';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(markYear, x + 6, yScale.top + 6);
+        ctx.restore();
+      }
+    };
+    Chart.register(verticalLineFallback);
+
+    // Build and render chart (or placeholder + warning if arrays invalid)
+    const ctx = document.getElementById('reservesChart').getContext('2d');
+
+    if (!arraysValid()) {
+      // show UI warning
+      document.getElementById('data-warning').style.display = 'block';
+      // create a minimal placeholder chart so the canvas isn't empty
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{ label: 'Data missing: paste arrays in script', data: labels.map(() => null), borderColor:'#ccc', pointRadius:0 }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { x: { type: 'category' }, y: { display: false } }
+        }
+      });
+    } else {
+      const cfg = {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Lower Bound Adequate (Westchester-adjusted)',
+              data: lowerBound,
+              borderColor: '#ff8800',
+              borderWidth: 1,
+              pointRadius: 0,
+              borderDash: [5,5],
+              fill: false,
+              order: 0
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' },
-                    annotation: {
-                        annotations: {
-                            line2006: {
-                                type: 'line',
-                                xMin: '2006',
-                                xMax: '2006',
-                                borderColor: 'red',
-                                borderWidth: 2,
-                                borderDash: [6, 4],
-                                label: {
-                                    display: true,
-                                    content: '2006',
-                                    position: 'start'
-                                }
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { callback: v => '$' + v.toLocaleString() }
-                    }
-                }
+            {
+              label: 'Upper Bound Adequate (Westchester-adjusted)',
+              data: upperBound,
+              borderColor: '#ff8800',
+              backgroundColor: 'rgba(255,136,0,0.18)',
+              borderWidth: 1,
+              pointRadius: 0,
+              borderDash: [5,5],
+              // Fill the area between this dataset and the previous (lowerBound)
+              fill: '-1',
+              order: 1
+            },
+            {
+              label: 'Actual Reserves per Unit (Riveredge 158 units)',
+              data: actualReserves,
+              borderColor: '#0066cc',
+              backgroundColor: '#0066cc',
+              borderWidth: 3,
+              fill: false,
+              pointRadius: 4,
+              tension: 0.12,
+              order: 2
             }
-        });
-    </script>
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' },
+            annotation: {
+              annotations: annotationForPlugin
+            }
+          },
+          scales: {
+            x: { type: 'category', title: { display: true, text: 'Year' } },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Dollars per Unit' },
+              ticks: {
+                callback: function(value) {
+                  if (typeof value === 'number') return '$' + value.toLocaleString();
+                  return value;
+                }
+              }
+            }
+          }
+        }
+      };
+      new Chart(ctx, cfg);
+    }
+  </script>
 </body>
 </html>
