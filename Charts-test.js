@@ -57,7 +57,7 @@ function drawIncomeExpensesChart(incomeExpensesData) {
     legend: { position: 'top', alignment: 'center' },
     vAxis: { title: 'Dollars ($)' },
     hAxis: {
-      title: '*Total Operating Expenses include Mortgage Principal Costs - Total Co-op shares are 85,027 - 158 apartments',
+      title: '*Total Operating Expenses include Mortgage Principal Costs - Total Co-op shares are 85,027 - 2024 excludes $228,074 one-time fire damage charge',
       titleTextStyle: { color: 'red', fontWeight: 'bold' }
     },
     chartArea: { width: '86%', height: '75%' },
@@ -101,6 +101,7 @@ function drawIncomeExpensesChart(incomeExpensesData) {
 
     // If the hovered point is already the persistent selection, do nothing.
     if (lastSelection && JSON.stringify(lastSelection) === JSON.stringify(hoverSel)) {
+
       lastHover = null;
       return;
     }
