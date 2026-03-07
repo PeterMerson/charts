@@ -200,7 +200,7 @@
   {
     "Year": "2023",
     "Income": { "MaintenanceCharges": 1513404, "Parking": 81329, "Laundry": 26280, "TransferFees": 7599, "Interest": 76136, "Miscellaneous": 9734, "SpecialAssessment": 0, "Storage": 31297 },
-    "Expenses": { "RETaxes": 369902, "Utilities": 290726, "Payroll": 249503, "MortgagePI": 187392, "Repairs": 224945, "Insurance": 86587, "Security": 72322, "ManagementFee": 51150, "WaterSewer": 52920, "LegalAudit": 39560, "CorpTaxMisc": 24720 },
+    "Expenses": { "RETaxes": 369302, "Utilities": 290726, "Payroll": 249503, "MortgagePI": 187392, "Repairs": 224945, "Insurance": 86587, "Security": 72322, "ManagementFee": 51150, "WaterSewer": 52920, "LegalAudit": 39560, "CorpTaxMisc": 24720 },
     "CapitalExpenditures": 327568, "CashAndEquivalents": 1425016, "ReserveFund": 891297
   },
   {
