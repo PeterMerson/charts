@@ -3,42 +3,42 @@
     "Year": "1990",
     "Income": { "MaintenanceCharges": 1020324, "Parking": 87315, "Laundry": 15025, "TransferFees": 8750, "Interest": 32403, "Miscellaneous": 11836, "SpecialAssessment": 0, "Storage": 0 },
     "Expenses": { "RETaxes": 265982, "Utilities": 104562, "Payroll": 110540, "MortgagePI": 433000, "Repairs": 82760, "Insurance": 18834, "Security": 36400, "ManagementFee": 25250, "WaterSewer": 9624, "LegalAudit": 4350, "CorpTaxMisc": 14602 },
-    "CapitalExpenditures": 236435, "CashAndEquivalents": 383527, "ReserveFund": 0
+    "CapitalExpenditures": 242235, "CashAndEquivalents": 383527, "ReserveFund": 0
   },
   {
     "Year": "1991",
     "Income": { "MaintenanceCharges": 1020324, "Parking": 84893, "Laundry": 15000, "TransferFees": 10189, "Interest": 17121, "Miscellaneous": 3284, "SpecialAssessment": 0, "Storage": 0 },
-    "Expenses": { "RETaxes": 273827, "Utilities": 88133, "Payroll": 110540, "MortgagePI": 433000, "Repairs": 85791, "Insurance": 22208, "Security": 35834, "ManagementFee": 27000, "WaterSewer": 9996, "LegalAudit": 10206, "CorpTaxMisc": 17963 },
-    "CapitalExpenditures": 50004, "CashAndEquivalents": 300048, "ReserveFund": 0
+    "Expenses": { "RETaxes": 273827, "Utilities": 88133, "Payroll": 111036, "MortgagePI": 433000, "Repairs": 85751, "Insurance": 22208, "Security": 35843, "ManagementFee": 27000, "WaterSewer": 9996, "LegalAudit": 10206, "CorpTaxMisc": 17963 },
+    "CapitalExpenditures": 55804, "CashAndEquivalents": 300047, "ReserveFund": 0
   },
   {
     "Year": "1992",
-    "Income": { "MaintenanceCharges": 1020324, "Parking": 83638, "Laundry": 15550, "TransferFees": 1026, "Interest": 7906, "Miscellaneous": 4076, "SpecialAssessment": 0, "Storage": 0 },
+    "Income": { "MaintenanceCharges": 1020324, "Parking": 85403, "Laundry": 15000, "TransferFees": 1026, "Interest": 7906, "Miscellaneous": 4076, "SpecialAssessment": 0, "Storage": 0 },
     "Expenses": { "RETaxes": 277303, "Utilities": 90745, "Payroll": 125652, "MortgagePI": 433000, "Repairs": 113059, "Insurance": 23521, "Security": 31908, "ManagementFee": 27000, "WaterSewer": 8468, "LegalAudit": 8521, "CorpTaxMisc": 17213 },
-    "CapitalExpenditures": 2392, "CashAndEquivalents": 180787, "ReserveFund": 0
+    "CapitalExpenditures": 8192, "CashAndEquivalents": 180787, "ReserveFund": 0
   },
   {
     "Year": "1993",
     "Income": { "MaintenanceCharges": 1027976, "Parking": 83638, "Laundry": 15550, "TransferFees": 6276, "Interest": 6225, "Miscellaneous": 8433, "SpecialAssessment": 170050, "Storage": 0 },
     "Expenses": { "RETaxes": 295757, "Utilities": 92375, "Payroll": 133297, "MortgagePI": 433000, "Repairs": 93777, "Insurance": 22324, "Security": 35336, "ManagementFee": 27000, "WaterSewer": 8586, "LegalAudit": 7994, "CorpTaxMisc": 8522 },
-    "CapitalExpenditures": 119717, "CashAndEquivalents": 177502, "ReserveFund": 0
+    "CapitalExpenditures": 125517, "CashAndEquivalents": 177502, "ReserveFund": 0
   },
   {
     "Year": "1994",
     "Income": { "MaintenanceCharges": 1048884, "Parking": 83792, "Laundry": 15600, "TransferFees": 11231, "Interest": 7200, "Miscellaneous": 9582, "SpecialAssessment": 0, "Storage": 0 },
     "Expenses": { "RETaxes": 302044, "Utilities": 91005, "Payroll": 137797, "MortgagePI": 433000, "Repairs": 109903, "Insurance": 23100, "Security": 32978, "ManagementFee": 30000, "WaterSewer": 8995, "LegalAudit": 5905, "CorpTaxMisc": 7333 },
-    "CapitalExpenditures": 0, "CashAndEquivalents": 209161, "ReserveFund": 0
+    "CapitalExpenditures": 27396, "CashAndEquivalents": 209161, "ReserveFund": 0
   },
   {
     "Year": "1995",
-    "Income": { "MaintenanceCharges": 1066534, "Parking": 82754, "Laundry": 15600, "TransferFees": 11789, "Interest": 7029, "Miscellaneous": 15376, "SpecialAssessment": 0, "Storage": 0 },
+    "Income": { "MaintenanceCharges": 1066534, "Parking": 82754, "Laundry": 15600, "TransferFees": 11798, "Interest": 7029, "Miscellaneous": 15376, "SpecialAssessment": 0, "Storage": 0 },
     "Expenses": { "RETaxes": 267846, "Utilities": 88951, "Payroll": 127715, "MortgagePI": 433000, "Repairs": 83332, "Insurance": 26217, "Security": 34155, "ManagementFee": 30000, "WaterSewer": 17993, "LegalAudit": 7106, "CorpTaxMisc": 10334 },
     "CapitalExpenditures": 0, "CashAndEquivalents": 288525, "ReserveFund": 0
   },
   {
     "Year": "1996",
     "Income": { "MaintenanceCharges": 1074031, "Parking": 82684, "Laundry": 15600, "TransferFees": 8481, "Interest": 14977, "Miscellaneous": 9882, "SpecialAssessment": 0, "Storage": 0 },
-    "Expenses": { "RETaxes": 241053, "Utilities": 106499, "Payroll": 130715, "MortgagePI": 433000, "Repairs": 79472, "Insurance": 26181, "Security": 34296, "ManagementFee": 30000, "WaterSewer": 14000, "LegalAudit": 9445, "CorpTaxMisc": 11321 },
+    "Expenses": { "RETaxes": 241053, "Utilities": 106499, "Payroll": 130715, "MortgagePI": 433000, "Repairs": 79472, "Insurance": 26181, "Security": 34296, "ManagementFee": 30000, "WaterSewer": 14000, "LegalAudit": 9445, "CorpTaxMisc": 11312 },
     "CapitalExpenditures": 3483, "CashAndEquivalents": 307762, "ReserveFund": 0
   },
   {
@@ -61,50 +61,50 @@
   },
   {
     "Year": "2000",
-    "Income": { "MaintenanceCharges": 1069444, "Parking": 76065, "Laundry": 17283, "TransferFees": 30057, "Interest": 36306, "Miscellaneous": 6502, "SpecialAssessment": 0, "Storage": 0 },
-    "Expenses": { "RETaxes": 266507, "Utilities": 148203, "Payroll": 142862, "MortgagePI": 366467, "Repairs": 128258, "Insurance": 31445, "Security": 41865, "ManagementFee": 31000, "WaterSewer": 6903, "LegalAudit": 13782, "CorpTaxMisc": 9811 },
+    "Income": { "MaintenanceCharges": 1025255, "Parking": 76065, "Laundry": 17283, "TransferFees": 30057, "Interest": 36306, "Miscellaneous": 6502, "SpecialAssessment": 0, "Storage": 0 },
+    "Expenses": { "RETaxes": 222318, "Utilities": 148203, "Payroll": 142862, "MortgagePI": 366467, "Repairs": 128258, "Insurance": 31445, "Security": 41865, "ManagementFee": 31000, "WaterSewer": 6903, "LegalAudit": 13782, "CorpTaxMisc": 9811 },
     "CapitalExpenditures": 102732, "CashAndEquivalents": 656294, "ReserveFund": 0
   },
   {
     "Year": "2001",
-    "Income": { "MaintenanceCharges": 1075712, "Parking": 80649, "Laundry": 17838, "TransferFees": 17042, "Interest": 25123, "Miscellaneous": 7569, "SpecialAssessment": 0, "Storage": 0 },
-    "Expenses": { "RETaxes": 276489, "Utilities": 130296, "Payroll": 157841, "MortgagePI": 366452, "Repairs": 232217, "Insurance": 36238, "Security": 38131, "ManagementFee": 31232, "WaterSewer": 7286, "LegalAudit": 12597, "CorpTaxMisc": 10894 },
+    "Income": { "MaintenanceCharges": 1005859, "Parking": 80649, "Laundry": 17838, "TransferFees": 17042, "Interest": 25123, "Miscellaneous": 7569, "SpecialAssessment": 0, "Storage": 0 },
+    "Expenses": { "RETaxes": 206645, "Utilities": 130296, "Payroll": 157841, "MortgagePI": 366452, "Repairs": 232217, "Insurance": 36238, "Security": 38131, "ManagementFee": 31232, "WaterSewer": 7286, "LegalAudit": 12597, "CorpTaxMisc": 10894 },
     "CapitalExpenditures": 38733, "CashAndEquivalents": 672010, "ReserveFund": 0
   },
   {
     "Year": "2002",
-    "Income": { "MaintenanceCharges": 1069345, "Parking": 86754, "Laundry": 27727, "TransferFees": 16019, "Interest": 6885, "Miscellaneous": 9256, "SpecialAssessment": 62771, "Storage": 0 },
-    "Expenses": { "RETaxes": 288391, "Utilities": 122339, "Payroll": 162718, "MortgagePI": 370774, "Repairs": 117169, "Insurance": 47531, "Security": 48819, "ManagementFee": 31000, "WaterSewer": 7639, "LegalAudit": 32421, "CorpTaxMisc": 15410 },
+    "Income": { "MaintenanceCharges": 983558, "Parking": 86754, "Laundry": 27727, "TransferFees": 16019, "Interest": 6885, "Miscellaneous": 9256, "SpecialAssessment": 63771, "Storage": 0 },
+    "Expenses": { "RETaxes": 202604, "Utilities": 122339, "Payroll": 162718, "MortgagePI": 370774, "Repairs": 117152, "Insurance": 47531, "Security": 48819, "ManagementFee": 31000, "WaterSewer": 7639, "LegalAudit": 32421, "CorpTaxMisc": 15410 },
     "CapitalExpenditures": 235389, "CashAndEquivalents": 721199, "ReserveFund": 0
   },
   {
     "Year": "2003",
-    "Income": { "MaintenanceCharges": 1088367, "Parking": 87093, "Laundry": 26278, "TransferFees": 15271, "Interest": 4452, "Miscellaneous": 4955, "SpecialAssessment": 191313, "Storage": 0 },
-    "Expenses": { "RETaxes": 299670, "Utilities": 160400, "Payroll": 173570, "MortgagePI": 392611, "Repairs": 145987, "Insurance": 46519, "Security": 44764, "ManagementFee": 31000, "WaterSewer": 5303, "LegalAudit": 40225, "CorpTaxMisc": 12507 },
-    "CapitalExpenditures": 274410, "CashAndEquivalents": 513905, "ReserveFund": 0
+    "Income": { "MaintenanceCharges": 1005504, "Parking": 87193, "Laundry": 26278, "TransferFees": 15271, "Interest": 4451, "Miscellaneous": 4955, "SpecialAssessment": 191313, "Storage": 0 },
+    "Expenses": { "RETaxes": 216787, "Utilities": 168270, "Payroll": 172346, "MortgagePI": 392611, "Repairs": 141385, "Insurance": 46519, "Security": 46157, "ManagementFee": 31000, "WaterSewer": 5303, "LegalAudit": 24977, "CorpTaxMisc": 12504 },
+    "CapitalExpenditures": 274710, "CashAndEquivalents": 523256, "ReserveFund": 0
   },
   {
     "Year": "2004",
-    "Income": { "MaintenanceCharges": 1161724, "Parking": 84212, "Laundry": 23477, "TransferFees": 30594, "Interest": 2478, "Miscellaneous": 7103, "SpecialAssessment": 189681, "Storage": 0 },
-    "Expenses": { "RETaxes": 351533, "Utilities": 171051, "Payroll": 166694, "MortgagePI": 392571, "Repairs": 156003, "Insurance": 60106, "Security": 49395, "ManagementFee": 31000, "WaterSewer": 14056, "LegalAudit": 12651, "CorpTaxMisc": 12261 },
+    "Income": { "MaintenanceCharges": 1053243, "Parking": 84212, "Laundry": 23477, "TransferFees": 30594, "Interest": 2478, "Miscellaneous": 7103, "SpecialAssessment": 189681, "Storage": 0 },
+    "Expenses": { "RETaxes": 243043, "Utilities": 171051, "Payroll": 166694, "MortgagePI": 392571, "Repairs": 156003, "Insurance": 60106, "Security": 49395, "ManagementFee": 31000, "WaterSewer": 14056, "LegalAudit": 12651, "CorpTaxMisc": 12261 },
     "CapitalExpenditures": 233070, "CashAndEquivalents": 370624, "ReserveFund": 0
   },
   {
     "Year": "2005",
-    "Income": { "MaintenanceCharges": 1308354, "Parking": 83814, "Laundry": 29926, "TransferFees": 18224, "Interest": 5104, "Miscellaneous": 8617, "SpecialAssessment": 191313, "Storage": 0 },
-    "Expenses": { "RETaxes": 372308, "Utilities": 232000, "Payroll": 188198, "MortgagePI": 392538, "Repairs": 120358, "Insurance": 63743, "Security": 46115, "ManagementFee": 33250, "WaterSewer": 9202, "LegalAudit": 16887, "CorpTaxMisc": 10242 },
+    "Income": { "MaintenanceCharges": 1184580, "Parking": 83814, "Laundry": 29926, "TransferFees": 18224, "Interest": 5104, "Miscellaneous": 8617, "SpecialAssessment": 191313, "Storage": 0 },
+    "Expenses": { "RETaxes": 248534, "Utilities": 232000, "Payroll": 188198, "MortgagePI": 392528, "Repairs": 120358, "Insurance": 63743, "Security": 46115, "ManagementFee": 33250, "WaterSewer": 9202, "LegalAudit": 16887, "CorpTaxMisc": 10242 },
     "CapitalExpenditures": 198459, "CashAndEquivalents": 313914, "ReserveFund": 0
   },
   {
     "Year": "2006",
-    "Income": { "MaintenanceCharges": 1571429, "Parking": 85139, "Laundry": 28597, "TransferFees": 13233, "Interest": 7688, "Miscellaneous": 14022, "SpecialAssessment": 127542, "Storage": 0 },
-    "Expenses": { "RETaxes": 397399, "Utilities": 211495, "Payroll": 185106, "MortgagePI": 384356, "Repairs": 110046, "Insurance": 64626, "Security": 47102, "ManagementFee": 34000, "WaterSewer": 11909, "LegalAudit": 8050, "CorpTaxMisc": 8050 },
+    "Income": { "MaintenanceCharges": 1436277, "Parking": 85139, "Laundry": 28597, "TransferFees": 13233, "Interest": 7688, "Miscellaneous": 14022, "SpecialAssessment": 127542, "Storage": 0 },
+    "Expenses": { "RETaxes": 262247, "Utilities": 211495, "Payroll": 185106, "MortgagePI": 384356, "Repairs": 110046, "Insurance": 64626, "Security": 47102, "ManagementFee": 34000, "WaterSewer": 11909, "LegalAudit": 8050, "CorpTaxMisc": 8050 },
     "CapitalExpenditures": 32932, "CashAndEquivalents": 271218, "ReserveFund": 0
   },
   {
     "Year": "2007",
-    "Income": { "MaintenanceCharges": 1570096, "Parking": 87939, "Laundry": 39492, "TransferFees": 9309, "Interest": 10178, "Miscellaneous": 5131, "SpecialAssessment": 0, "Storage": 0 },
-    "Expenses": { "RETaxes": 407434, "Utilities": 260863, "Payroll": 166463, "MortgagePI": 367181, "Repairs": 108752, "Insurance": 68873, "Security": 46998, "ManagementFee": 31333, "WaterSewer": 12223, "LegalAudit": 9261, "CorpTaxMisc": 5878 },
+    "Income": { "MaintenanceCharges": 1429801, "Parking": 87939, "Laundry": 39492, "TransferFees": 9309, "Interest": 10178, "Miscellaneous": 5131, "SpecialAssessment": 0, "Storage": 0 },
+    "Expenses": { "RETaxes": 267139, "Utilities": 260863, "Payroll": 166463, "MortgagePI": 367181, "Repairs": 108752, "Insurance": 68873, "Security": 46998, "ManagementFee": 31333, "WaterSewer": 12223, "LegalAudit": 9261, "CorpTaxMisc": 5878 },
     "CapitalExpenditures": 12950, "CashAndEquivalents": 513300, "ReserveFund": 0
   },
   {
