@@ -61,13 +61,13 @@
  },
 {
     "Year": "2002",
-     "Expenses": { "Pool expense including supplies": 8153, "Landscaping": 22390, "Janitorial supplies": 31750, "Miscellaneous repairs and general contracting": 45495, "Plumbing, heating boiler": 9381, "Water damages and mold remediation": 0, "Elevator": 0, "Painting, plastering and apartment repairs": 0, "Doors,locks,windows and intercom": 0, "Laundry room": 0, "Exterminating": 0, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 0, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 0,"miscellaneous-B": 0 },
+     "Expenses": { "Pool expense including supplies": 8153, "Landscaping": 6768, "Janitorial supplies": 31750, "Miscellaneous repairs and general contracting": 45496, "Plumbing, heating boiler": 9381, "Water damages and mold remediation": 0, "Elevator": 0, "Painting, plastering and apartment repairs": 0, "Doors,locks,windows and intercom": 0, "Laundry room": 0, "Exterminating": 0, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 0, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 5604,"miscellaneous-B": 0 },
      "Utilities": { "Fuel Oil": 72694, "Electric & Gas": 49645 },
  },	
 {
     "Year": "2003",
-     "Repairs and Maintenance": { "Pool expense including supplies": 9401, "Landscaping": 14256, "Janitorial supplies": 19247, "Miscellaneous repairs and general contracting": 53949, "Plumbing, heating boiler": 18330, "Water damages and mold remediation": 0, "Elevator": 0, "Painting, plastering and apartment repairs": 0, "Doors,locks,windows and intercom": 0, "Laundry room": 0, "Exterminating": 0, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 0, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 26202,"miscellaneous-B": 0 },
-     "Utilities": { "Fuel Oil": 101402, "Electric & Gas": 58998 },
+     "Expenses": { "Pool expense including supplies": 9401, "Landscaping": 14256, "Janitorial supplies": 19247, "Miscellaneous repairs and general contracting": 53949, "Plumbing, heating boiler": 18330, "Water damages and mold remediation": 0, "Elevator": 0, "Painting, plastering and apartment repairs": 0, "Doors,locks,windows and intercom": 0, "Laundry room": 0, "Exterminating": 0, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 0, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 26202,"miscellaneous-B": 0 },
+     "Utilities": { "Fuel Oil": 109272, "Electric & Gas": 58998 },
  },
 {
     "Year": "2004",
@@ -106,7 +106,7 @@
  },
 {
     "Year": "2011",
-     "Expenses": { "Pool expense including supplies": 33193, "Landscaping": 16306, "Janitorial supplies": 29159, "Miscellaneous repairs and general contracting": 16406, "Plumbing, heating boiler": 21803, "Water damages and mold remediation": 0, "Elevator": 17856, "Painting, plastering and apartment repairs": 36000, "Doors,locks,windows and intercom": 3255, "Laundry room": 3477, "Exterminating": 5236, "Electric repairs": 4348, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 856, "Fencing": 2200, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 298,"miscellaneous-B": 2139 },
+     "Expenses": { "Pool expense including supplies": 33193, "Landscaping": 16302, "Janitorial supplies": 29159, "Miscellaneous repairs and general contracting": 16406, "Plumbing, heating boiler": 21803, "Water damages and mold remediation": 0, "Elevator": 17856, "Painting, plastering and apartment repairs": 36000, "Doors,locks,windows and intercom": 3255, "Laundry room": 3477, "Exterminating": 5236, "Electric repairs": 4348, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 856, "Fencing": 2200, "Exterior": 0,"Other Insurance refunds": 0,"Fire and water damages,net": 0,"Roadway repairs": 0,"miscellaneous-A": 298,"miscellaneous-B": 2139 },
      "Utilities": { "Fuel Oil": 196876, "Electric & Gas": 51174 },
  },
 {
