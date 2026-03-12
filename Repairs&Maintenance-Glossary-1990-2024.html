@@ -1,0 +1,683 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge — Repairs & Maintenance Glossary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1923;
+    --surface: #162030;
+    --surface2: #1c2a3a;
+    --accent: #c9a84c;
+    --accent-soft: rgba(201,168,76,0.12);
+    --accent-border: rgba(201,168,76,0.25);
+    --text: #e8e2d5;
+    --muted: #7a8fa6;
+    --green: #4caf8a;
+    --green-soft: rgba(76,175,138,0.12);
+    --red: #e05c5c;
+    --red-soft: rgba(224,92,92,0.10);
+    --border: rgba(255,255,255,0.07);
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 24px 64px;
+  }
+
+  /* Header */
+  .header {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 16px;
+    border-radius: 2px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .meta-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .pill strong { color: var(--accent); }
+
+  /* Search */
+  .search-wrap {
+    max-width: 900px;
+    margin: 0 auto 32px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px 12px 44px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent-border); }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  /* Section tabs */
+  .tabs {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 8px;
+  }
+  .tab {
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.18s;
+    font-family: 'Source Sans 3', sans-serif;
+  }
+  .tab:hover { color: var(--text); border-color: var(--accent-border); }
+  .tab.active { background: var(--accent); color: #0f1923; border-color: var(--accent); }
+
+  /* Main content */
+  .content { max-width: 900px; margin: 0 auto; }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 32px 0 16px;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .section-header .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-count {
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: var(--surface2);
+    border-radius: 99px;
+    padding: 2px 10px;
+    border: 1px solid var(--border);
+  }
+
+  /* Glossary cards */
+  .glossary-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .glossary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px 24px;
+    align-items: start;
+    transition: border-color 0.18s, background 0.18s;
+    cursor: default;
+    animation: fadeUp 0.3s ease both;
+  }
+  .glossary-card:hover {
+    border-color: var(--accent-border);
+    background: var(--surface2);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-left {}
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tag {
+    font-size: 0.72rem;
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .tag-recurring { background: var(--green-soft); color: var(--green); border: 1px solid rgba(76,175,138,0.25); }
+  .tag-periodic { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-border); }
+  .tag-occasional { background: rgba(122,143,166,0.12); color: var(--muted); border: 1px solid rgba(122,143,166,0.2); }
+  .tag-credit { background: var(--red-soft); color: var(--red); border: 1px solid rgba(224,92,92,0.25); }
+  .tag-utility { background: rgba(33,150,243,0.1); color: #64b5f6; border: 1px solid rgba(33,150,243,0.2); }
+
+  .card-right {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .card-total {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-total.credit { color: var(--red); }
+  .card-peak {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .card-years {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .hidden { display: none !important; }
+
+  /* Totals summary bar */
+  .summary-bar {
+    max-width: 900px;
+    margin: 0 auto 32px;
+    background: var(--surface);
+    border: 1px solid var(--accent-border);
+    border-radius: 14px;
+    padding: 20px 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    text-align: center;
+  }
+  .sum-item-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+  .sum-item-value { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--accent); }
+  .sum-item-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .divider { border-left: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Repairs & Maintenance <span>Glossary</span></h1>
+  <p>A complete reference of every line item tracked in the Riveredge Repairs & Maintenance detail file, including descriptions, historical totals, and activity periods.</p>
+  <div class="meta-pills">
+    <div class="pill">Years: <strong>1990 – 2024</strong></div>
+    <div class="pill">Expense items: <strong>21</strong></div>
+    <div class="pill">Utility items: <strong>2</strong></div>
+    <div class="pill">Total records: <strong>35 years</strong></div>
+  </div>
+</div>
+
+<div class="summary-bar">
+  <div>
+    <div class="sum-item-label">Total R&M Spend (35 yrs)</div>
+    <div class="sum-item-value">$5,131,258</div>
+    <div class="sum-item-sub">All expense line items combined</div>
+  </div>
+  <div class="divider">
+    <div class="sum-item-label">Total Utilities Spend (35 yrs)</div>
+    <div class="sum-item-value">$6,646,093</div>
+    <div class="sum-item-sub">Fuel Oil + Electric & Gas</div>
+  </div>
+  <div class="divider">
+    <div class="sum-item-label">Largest Single Category</div>
+    <div class="sum-item-value">Misc. Repairs</div>
+    <div class="sum-item-sub">$1,312,591 over 35 years</div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="Search line items…" oninput="filterCards()">
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="filterSection('all', this)">All Items</button>
+  <button class="tab" onclick="filterSection('repairs', this)">Repairs & Maintenance</button>
+  <button class="tab" onclick="filterSection('utilities', this)">Utilities</button>
+</div>
+
+<div class="content" id="content">
+
+  <!-- REPAIRS SECTION -->
+  <div class="section-header" data-section="repairs">
+    <h2>Repairs & Maintenance</h2>
+    <div class="line"></div>
+    <div class="section-count">21 line items</div>
+  </div>
+
+  <div class="glossary-grid" id="repairs-grid">
+
+    <div class="glossary-card" data-section="repairs" data-name="miscellaneous repairs and general contracting">
+      <div class="card-left">
+        <div class="card-name">Miscellaneous Repairs & General Contracting</div>
+        <div class="card-desc">The primary catch-all category for routine and unclassified repair work across the property. Covers general contractor labor, minor building repairs, hardware, and maintenance tasks that don't fall into a more specific category. Active every year since 1990 and consistently the largest single repairs line item.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$1,312,591</div>
+        <div class="card-peak">Peak: $174,420 (2001)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="landscaping">
+      <div class="card-left">
+        <div class="card-name">Landscaping</div>
+        <div class="card-desc">All exterior grounds maintenance including lawn care, plantings, seasonal cleanups, mulching, shrub trimming, and related horticultural services. Continuous spend every year of record, reflecting the ongoing nature of grounds upkeep.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$943,431</div>
+        <div class="card-peak">Peak: $68,142 (2024)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="janitorial supplies">
+      <div class="card-left">
+        <div class="card-name">Janitorial Supplies</div>
+        <div class="card-desc">Cleaning products, materials, and consumable supplies used in the day-to-day maintenance of common areas, hallways, lobbies, laundry rooms, and other shared spaces. Consistent annual expense throughout the entire period of record.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$772,178</div>
+        <div class="card-peak">Peak: $39,128 (2013)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="pool expense including supplies">
+      <div class="card-left">
+        <div class="card-name">Pool Expense Including Supplies</div>
+        <div class="card-desc">All costs associated with the operation and maintenance of the swimming pool facility — chemicals, water treatment, equipment servicing, seasonal opening/closing, and related supplies. One of the four line items present for all 35 years.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$750,288</div>
+        <div class="card-peak">Peak: $56,840 (2024)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="plumbing heating boiler">
+      <div class="card-left">
+        <div class="card-name">Plumbing, Heating & Boiler</div>
+        <div class="card-desc">Repair and maintenance of the building's plumbing infrastructure and heating systems, including boiler servicing, pipe repairs, fixtures, and HVAC-adjacent work. Near-continuous spend over 34 of 35 years, reflecting the critical importance of these systems.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (34 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$447,113</div>
+        <div class="card-peak">Peak: $56,666 (2024)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="elevator">
+      <div class="card-left">
+        <div class="card-name">Elevator</div>
+        <div class="card-desc">Service contracts, inspections, repairs, and maintenance of the building's elevator system(s). Began appearing as a separate tracked line item in 2008, having likely been previously captured within general contracting. Active in 17 of the last 17 years.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (17 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$222,529</div>
+        <div class="card-peak">Peak: $20,317 (2022)</div>
+        <div class="card-years">2008 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="painting plastering apartment repairs">
+      <div class="card-left">
+        <div class="card-name">Painting, Plastering & Apartment Repairs</div>
+        <div class="card-desc">Interior painting, wall patching, plaster repair, and unit-level renovation costs for common areas and apartments. Tracked as a distinct line item from 2011 onward; prior to that, these costs were likely folded into general contracting.</div>
+        <div class="card-tags"><span class="tag tag-periodic">Periodic (6 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$173,604</div>
+        <div class="card-peak">Peak: $54,045 (2012)</div>
+        <div class="card-years">2011 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="water damages mold remediation">
+      <div class="card-left">
+        <div class="card-name">Water Damages & Mold Remediation</div>
+        <div class="card-desc">Costs for addressing water intrusion events, leak damage repairs, and professional mold assessment and remediation. Appears selectively in years with significant moisture-related incidents. Notably large in 2015 suggesting a major event that year.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (5 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$136,936</div>
+        <div class="card-peak">Peak: $85,787 (2015)</div>
+        <div class="card-years">2014 – 2023</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="doors locks windows intercom">
+      <div class="card-left">
+        <div class="card-name">Doors, Locks, Windows & Intercom</div>
+        <div class="card-desc">Repair, replacement, and maintenance of building entry systems, interior and exterior doors, window hardware, and intercom/buzzer systems. Tracked separately from 2008 onward. Reflects the ongoing wear on access and security infrastructure.</div>
+        <div class="card-tags"><span class="tag tag-periodic">Periodic (11 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$105,671</div>
+        <div class="card-peak">Peak: $15,303 (2023)</div>
+        <div class="card-years">2008 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="laundry room">
+      <div class="card-left">
+        <div class="card-name">Laundry Room</div>
+        <div class="card-desc">Maintenance, repairs, and equipment servicing for the building's laundry room facilities. Includes washer/dryer repairs, plumbing in the laundry area, and general upkeep of the laundry space. Tracked from 2008 forward.</div>
+        <div class="card-tags"><span class="tag tag-periodic">Periodic (13 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$83,954</div>
+        <div class="card-peak">Peak: $20,031 (2024)</div>
+        <div class="card-years">2008 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="miscellaneous-a miscellaneous a">
+      <div class="card-left">
+        <div class="card-name">Miscellaneous-A</div>
+        <div class="card-desc">A secondary miscellaneous category used intermittently to capture overflow repair costs not fitting standard categories. Active in 11 scattered years between 1993 and 2016. Its use suggests periods when additional detail was needed beyond the primary miscellaneous line.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (11 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$52,972</div>
+        <div class="card-peak">Peak: $26,202 (2003)</div>
+        <div class="card-years">1993 – 2016</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="exterminating">
+      <div class="card-left">
+        <div class="card-name">Exterminating</div>
+        <div class="card-desc">Pest control services for the building and grounds, including routine preventive treatments and reactive extermination for insects, rodents, and other pests. Tracked as its own line item from 2008. Reflects a regulatory and habitability requirement for residential buildings.</div>
+        <div class="card-tags"><span class="tag tag-recurring">Recurring (16 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$51,598</div>
+        <div class="card-peak">Peak: $6,397 (2019)</div>
+        <div class="card-years">2008 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="fire water damages net">
+      <div class="card-left">
+        <div class="card-name">Fire & Water Damages, Net</div>
+        <div class="card-desc">Costs associated with fire or significant water damage incidents, reported net of any insurance recoveries received. The "net" designation indicates that insurance reimbursements are offset against the gross damage costs. Appeared for the first time in 2024 with a very large amount, suggesting a significant incident that year.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (1 yr)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$228,074</div>
+        <div class="card-peak">Peak: $228,074 (2024)</div>
+        <div class="card-years">2024 only</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="fencing">
+      <div class="card-left">
+        <div class="card-name">Fencing</div>
+        <div class="card-desc">Repair, replacement, and installation of perimeter and interior fencing on the property. Appears in only 4 years, suggesting project-based spending rather than routine maintenance — typically triggered by damage, deterioration, or property improvement needs.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (4 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$25,454</div>
+        <div class="card-peak">Peak: $15,754 (2022)</div>
+        <div class="card-years">2011 – 2023</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="roadway repairs">
+      <div class="card-left">
+        <div class="card-name">Roadway Repairs</div>
+        <div class="card-desc">Repair and resurfacing of driveways, parking areas, and internal roadways on the property. Limited to 2 years of activity (2020–2021), indicating a specific roadway rehabilitation project rather than ongoing maintenance.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (2 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$24,000</div>
+        <div class="card-peak">Peak: $20,000 (2020)</div>
+        <div class="card-years">2020 – 2021</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="electric repairs">
+      <div class="card-left">
+        <div class="card-name">Electric Repairs</div>
+        <div class="card-desc">Electrical system repairs within the building, including wiring, panel work, lighting fixtures, outlets, and other electrical infrastructure. Tracked separately in 5 years (2009–2018); outside that window, electrical work was likely classified under general contracting.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (5 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$22,821</div>
+        <div class="card-peak">Peak: $5,889 (2018)</div>
+        <div class="card-years">2009 – 2018</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="storm related damages cleanup costs net">
+      <div class="card-left">
+        <div class="card-name">Storm Related Damages & Cleanup Costs, Net</div>
+        <div class="card-desc">Expenses arising from storm events — including wind, snow, or rain damage — net of any insurance proceeds. The "net" treatment reflects partial or full insurance recovery against the gross cleanup and repair costs. Active in 3 years, reflecting episodic severe weather events.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (3 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$25,423</div>
+        <div class="card-peak">Peak: $22,367 (2021)</div>
+        <div class="card-years">2011 – 2023</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="miscellaneous-b miscellaneous b">
+      <div class="card-left">
+        <div class="card-name">Miscellaneous-B</div>
+        <div class="card-desc">A tertiary miscellaneous overflow category, used in only 2 years (2011–2014) with very small amounts. Likely a temporary sub-classification used during a period when the accounting needed further granularity within the miscellaneous bucket.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (2 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$3,296</div>
+        <div class="card-peak">Peak: $2,139 (2011)</div>
+        <div class="card-years">2011 – 2014</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="apartment repairs">
+      <div class="card-left">
+        <div class="card-name">Apartment Repairs</div>
+        <div class="card-desc">Unit-specific repair costs for individual apartments — distinct from common area repairs. Appeared only once (2013) as a standalone category; before and after this period, apartment-level repairs appear to be captured in the painting/plastering or general contracting lines.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (1 yr)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$8,450</div>
+        <div class="card-peak">Peak: $8,450 (2013)</div>
+        <div class="card-years">2013 only</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="exterior">
+      <div class="card-left">
+        <div class="card-name">Exterior</div>
+        <div class="card-desc">General exterior building maintenance and repairs not covered by more specific categories such as fencing, roofing, or painting. Appeared only once in the dataset (2023) with a small amount, suggesting selective use when exterior work needed its own classification.</div>
+        <div class="card-tags"><span class="tag tag-occasional">Occasional (1 yr)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$1,500</div>
+        <div class="card-peak">Peak: $1,500 (2023)</div>
+        <div class="card-years">2023 only</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="repairs" data-name="other insurance refunds">
+      <div class="card-left">
+        <div class="card-name">Other Insurance Refunds</div>
+        <div class="card-desc">Insurance reimbursements received that are credited back against the repairs & maintenance budget. Represents a contra-expense (negative value) — money returned from insurance claims that offsets gross repair spending. Active in 3 recent years (2022–2024).</div>
+        <div class="card-tags"><span class="tag tag-credit">Credit / Contra-Expense</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total credit">−$38,629</div>
+        <div class="card-peak">Credit: −$4,726 (2024)</div>
+        <div class="card-years">2022 – 2024</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- UTILITIES SECTION -->
+  <div class="section-header" data-section="utilities">
+    <h2>Utilities</h2>
+    <div class="line"></div>
+    <div class="section-count">2 line items</div>
+  </div>
+
+  <div class="glossary-grid" id="utilities-grid">
+
+    <div class="glossary-card" data-section="utilities" data-name="fuel oil">
+      <div class="card-left">
+        <div class="card-name">Fuel Oil</div>
+        <div class="card-desc">The cost of heating fuel oil used to power the building's boiler and heating system. By far the largest utility expense, reflecting the energy intensity of heating a large residential building in a northern climate. Highly sensitive to commodity oil prices — the 2022 spike to $292,115 reflects the post-pandemic energy price surge. Continuous spend for all 35 years of record.</div>
+        <div class="card-tags"><span class="tag tag-utility">Utility</span><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$4,766,164</div>
+        <div class="card-peak">Peak: $292,115 (2022)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+    <div class="glossary-card" data-section="utilities" data-name="electric gas">
+      <div class="card-left">
+        <div class="card-name">Electric & Gas</div>
+        <div class="card-desc">Electricity and natural gas costs for common areas, building systems, lighting, laundry equipment, and other shared infrastructure. Significantly smaller than fuel oil, reflecting that heating is the dominant energy cost. Continuous spend across all 35 years; costs have grown moderately over time.</div>
+        <div class="card-tags"><span class="tag tag-utility">Utility</span><span class="tag tag-recurring">Recurring (35 yrs)</span></div>
+      </div>
+      <div class="card-right">
+        <div class="card-total">$1,879,929</div>
+        <div class="card-peak">Peak: $74,830 (2005)</div>
+        <div class="card-years">1990 – 2024</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="no-results" class="no-results hidden">No items match your search.</div>
+
+</div>
+
+<script>
+let activeSection = 'all';
+
+function filterCards() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.glossary-card');
+  const headers = document.querySelectorAll('.section-header');
+  let anyVisible = false;
+
+  cards.forEach(card => {
+    const name = card.dataset.name || '';
+    const section = card.dataset.section || '';
+    const text = card.innerText.toLowerCase();
+    const sectionMatch = activeSection === 'all' || section === activeSection;
+    const searchMatch = !query || text.includes(query) || name.includes(query);
+    const visible = sectionMatch && searchMatch;
+    card.classList.toggle('hidden', !visible);
+    if (visible) anyVisible = true;
+  });
+
+  headers.forEach(header => {
+    const section = header.dataset.section;
+    const hasVisible = [...document.querySelectorAll(`.glossary-card[data-section="${section}"]`)]
+      .some(c => !c.classList.contains('hidden'));
+    header.classList.toggle('hidden', !hasVisible);
+  });
+
+  document.getElementById('no-results').classList.toggle('hidden', anyVisible);
+}
+
+function filterSection(section, btn) {
+  activeSection = section;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
+</script>
+</body>
+</html>
