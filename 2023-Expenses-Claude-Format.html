@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2023 Expense Breakdown</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --navy-light: #2d6faa;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 720px;
+  }
+
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .formula-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy);
+    color: #fff;
+    padding: 7px 18px;
+    border-radius: 99px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .subtitle span {
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .surplus-banner {
+    background: #d4edda;
+    border: 1px solid #7acc8a;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    color: #1a5c2a;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .main-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 36px 40px;
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .chart-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #pie-svg {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    filter: drop-shadow(0 6px 18px rgba(31,78,121,0.13));
+  }
+
+  .wedge {
+    cursor: pointer;
+    transition: opacity 0.18s, filter 0.18s;
+  }
+  .wedge:hover, .wedge.active {
+    filter: brightness(1.12) drop-shadow(0 0 8px rgba(0,0,0,0.22));
+    opacity: 1 !important;
+  }
+  .wedge.dimmed {
+    opacity: 0.35;
+  }
+
+  #tooltip {
+    position: fixed;
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip strong { font-size: 1rem; display: block; margin-bottom: 2px; }
+
+  .detail-panel {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 22px 20px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.25s;
+    border: 1.5px solid var(--border);
+  }
+
+  .detail-panel.has-data {
+    border-color: var(--navy-light);
+    background: #eef4fb;
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .detail-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--navy);
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+
+  .detail-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .val { font-weight: 600; color: var(--navy); }
+  .detail-row .pct {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    font-family: 'DM Serif Display', serif;
+  }
+
+  .bar-track {
+    height: 8px;
+    background: #dce8f5;
+    border-radius: 99px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .placeholder-text {
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .legend {
+    margin-top: 28px;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .legend-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .legend-item:hover {
+    background: #eef4fb;
+    border-color: var(--border);
+  }
+  .legend-item.active {
+    background: #eef4fb;
+    border-color: var(--navy-light);
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-text { font-size: 0.83rem; color: var(--text); }
+  .legend-pct { margin-left: auto; font-size: 0.83rem; font-weight: 600; color: var(--navy); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>2023 Expense Breakdown</h1>
+  <div class="formula-badge">Calculation is: Operating Expense ➗ Total Income</div>
+  <p class="subtitle">Total Income: <span>$1,745,779</span> &nbsp;|&nbsp; Total Expenses: <span>$1,649,127</span></p>
+  <div class="surplus-banner">✅ 2023 ran at a surplus — income exceeded expenses by <strong>$96,652</strong> (+5.5%)</div>
+</div>
+
+<div class="main-card">
+  <div class="chart-wrap">
+    <svg id="pie-svg" viewBox="-10 -10 220 220" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div>
+    <div id="detail-panel" class="detail-panel">
+      <p class="placeholder-text">👆 Hover or click a slice<br>to see details</p>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-title">All Categories — click to highlight</div>
+  <div class="legend-grid" id="legend-grid"></div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const TOTAL_INCOME = 1745779;
+
+const data = [
+  { label: "Real Estate Taxes", value: 369302,  color: "#1D6FA4" },
+  { label: "Utilities",         value: 290726,  color: "#2196F3" },
+  { label: "Payroll",           value: 249503,  color: "#43A047" },
+  { label: "Repairs",           value: 224945,  color: "#E63946" },
+  { label: "Mortgage P&I",      value: 187392,  color: "#FF9800" },
+  { label: "Insurance",         value: 86587,   color: "#8E24AA" },
+  { label: "Security",          value: 72322,   color: "#00ACC1" },
+  { label: "Water & Sewer",     value: 52920,   color: "#546E7A" },
+  { label: "Mgmt Fee",          value: 51150,   color: "#6D4C41" },
+  { label: "Legal & Audit",     value: 39560,   color: "#7CB342" },
+  { label: "Corp Tax & Misc",   value: 24720,   color: "#F4511E" },
+  { label: "Excess Maint",      value: 96652,   color: "#2ECC71", surplus: true },
+];
+
+const svg = document.getElementById('pie-svg');
+const tooltip = document.getElementById('tooltip');
+const detailPanel = document.getElementById('detail-panel');
+const legendGrid = document.getElementById('legend-grid');
+
+const cx = 100, cy = 100, r = 90;
+const total = data.reduce((s, d) => s + d.value, 0);
+
+function polarToCartesian(cx, cy, r, angleDeg) {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function makeArc(cx, cy, r, startAngle, endAngle) {
+  const s = polarToCartesian(cx, cy, r, startAngle);
+  const e = polarToCartesian(cx, cy, r, endAngle);
+  const large = (endAngle - startAngle) > 180 ? 1 : 0;
+  return `M ${cx} ${cy} L ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y} Z`;
+}
+
+let activeIdx = null;
+let startAngle = 0;
+
+data.forEach((d, i) => {
+  const sweep = (d.value / total) * 360;
+  const endAngle = startAngle + sweep;
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', makeArc(cx, cy, r, startAngle, endAngle));
+  path.setAttribute('fill', d.color);
+  path.setAttribute('stroke', '#fff');
+  path.setAttribute('stroke-width', '1.5');
+  path.classList.add('wedge');
+  path.dataset.idx = i;
+
+  if (sweep > 8) {
+    const midAngle = startAngle + sweep / 2;
+    const labelR = r * 0.65;
+    const lp = polarToCartesian(cx, cy, labelR, midAngle);
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', lp.x);
+    text.setAttribute('y', lp.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-size', sweep > 25 ? '7' : '6');
+    text.setAttribute('font-weight', 'bold');
+    text.setAttribute('font-family', 'DM Sans, sans-serif');
+    text.setAttribute('pointer-events', 'none');
+    const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
+    text.textContent = `${pct}%`;
+    svg.appendChild(text);
+  }
+
+  path.addEventListener('mouseenter', (e) => showTooltip(e, i));
+  path.addEventListener('mousemove', (e) => moveTooltip(e));
+  path.addEventListener('mouseleave', hideTooltip);
+  path.addEventListener('click', () => selectSlice(i));
+
+  svg.insertBefore(path, svg.firstChild);
+  startAngle = endAngle;
+});
+
+function showTooltip(e, i) {
+  const d = data[i];
+  const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
+  const tag = d.surplus ? ' ✅ surplus' : '';
+  tooltip.innerHTML = `<strong>${d.label}</strong>$${d.value.toLocaleString()} &nbsp;|&nbsp; ${pct}% of income${tag}`;
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+}
+function moveTooltip(e) {
+  tooltip.style.left = (e.clientX + 14) + 'px';
+  tooltip.style.top = (e.clientY - 36) + 'px';
+}
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+function selectSlice(idx) {
+  if (activeIdx === idx) {
+    activeIdx = null;
+    svg.querySelectorAll('.wedge').forEach(p => p.classList.remove('dimmed', 'active'));
+    document.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'));
+    detailPanel.innerHTML = '<p class="placeholder-text">👆 Hover or click a slice<br>to see details</p>';
+    detailPanel.classList.remove('has-data');
+    return;
+  }
+  activeIdx = idx;
+  const d = data[idx];
+  const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
+
+  svg.querySelectorAll('.wedge').forEach((p, i) => {
+    p.classList.toggle('dimmed', i !== idx);
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.legend-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+
+  const surplusNote = d.surplus
+    ? '<div class="detail-row" style="color:#1a5c2a;font-size:0.82rem;">✅ Surplus — income exceeded expenses</div>'
+    : '';
+
+  detailPanel.classList.add('has-data');
+  detailPanel.innerHTML = `
+    <div class="detail-label">Selected Category</div>
+    <div class="detail-name"><span class="detail-swatch" style="background:${d.color}"></span>${d.label}</div>
+    <div class="detail-row"><span>Amount</span><span class="val">$${d.value.toLocaleString()}</span></div>
+    <div class="detail-row"><span>% of Total Income</span><span class="pct">${pct}%</span></div>
+    <div class="detail-row"><span>Total Income</span><span class="val">$${TOTAL_INCOME.toLocaleString()}</span></div>
+    ${surplusNote}
+    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+  `;
+}
+
+// Legend
+data.forEach((d, i) => {
+  const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `
+    <div class="legend-dot" style="background:${d.color}"></div>
+    <span class="legend-text">${d.label}</span>
+    <span class="legend-pct">${pct}%</span>
+  `;
+  item.addEventListener('click', () => selectSlice(i));
+  legendGrid.appendChild(item);
+});
+</script>
+</body>
+</html>>
