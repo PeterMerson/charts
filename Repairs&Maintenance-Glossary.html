@@ -5,124 +5,198 @@
 <style>
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        line-height: 1.6;
+        line-height: 1.4;
         color: #333;
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 20px auto;
         padding: 0 20px;
+        background-color: #f0f2f5;
     }
     h2 {
         color: #2c3e50;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
     }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background-color: #fff;
+    .grid-container {
+        display: flex;
+        gap: 15px;
+        align-items: stretch;
     }
-    th {
-        background-color: #f8f9fa;
-        color: #2c3e50;
-        text-align: left;
-        padding: 12px;
-        border: 1px solid #dee2e6;
+    .column {
+        flex: 1;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
-    td {
-        padding: 12px;
-        border: 1px solid #dee2e6;
-        vertical-align: top;
-        font-size: 0.95em;
+    .header {
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        font-size: 0.85em;
+        text-transform: uppercase;
     }
-    tr:nth-child(even) {
-        background-color: #fcfcfc;
+    .content {
+        padding: 15px;
+        flex-grow: 1;
     }
-    .category-title {
+    /* Color Themes */
+    .blue   { background-color: #2980b9; }
+    .teal   { background-color: #16a085; }
+    .green  { background-color: #27ae60; }
+    .orange { background-color: #e67e22; }
+
+    .item {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+    }
+    .item:last-child { border-bottom: none; }
+
+    .title {
         font-weight: bold;
         display: block;
-        color: #0056b3;
+        font-size: 0.9em;
+        margin-bottom: 2px;
     }
-    .description {
+    /* Dynamic Text Colors */
+    .t-blue   { color: #2980b9; }
+    .t-teal   { color: #16a085; }
+    .t-green  { color: #27ae60; }
+    .t-orange { color: #d35400; }
+
+    .desc {
+        font-size: 0.8em;
+        color: #666;
         display: block;
-        margin-top: 4px;
-        color: #555;
     }
 </style>
-<title>Repairs and Maintenance Details File Directory</title>
+<title>Financial Glossary</title>
 </head>
 <body>
 
-    <h2>Repairs and Maintenance Details - File Directory 1990–2024)</h2>
+    <h2>Financial Directory & Glossary (1990–2024)</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Repair Expense Items</th>
-                <th>Utility Expense</th>
-                <th>Accounting Terms</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <span class="category-title">Pool expense including supplies</span>
-                    <span class="description">Opening/closing, chemicals, and lifeguard staffing.</span>
-                    <br>
-                    <span class="category-title">Landscaping</span>
-                    <span class="description">Groundskeeping, tree care, and snow removal.</span>
-                    <br>
-                    <span class="category-title">Janitorial supplies</span>
-                    <span class="description">Cleaning consumables for common areas.</span>
-                    <br>
-                    <span class="category-title">Miscellaneous repairs</span>
-                    <span class="description">General contracting and small non-specific repairs.</span>
-                    <br>
-                    <span class="category-title">Plumbing, heating boiler</span>
-                    <span class="description">Maintenance of water lines and the heating plant.</span>
-                    <br>
-                    <span class="category-title">Water damages & mold</span>
-                    <span class="description">Remediation and specialized moisture cleanup.</span>
-                    <br>
-                    <span class="category-title">Elevator</span>
-                    <span class="description">Service contracts, repairs, and inspections.</span>
-                    <br>
-                    <span class="category-title">Painting & plastering</span>
-                    <span class="description">Wall maintenance in hallways and apartments.</span>
-                </td>
-                <td>
-                    <span class="category-title">Fuel Oil</span>
-                    <span class="description">Heating oil for the central boiler (primary energy cost).</span>
-                    <br>
-                    <span class="category-title">Electric & Gas</span>
-                    <span class="description">Common area electricity and gas for cooking/heat.</span>
-                </td>
-                <td>
-                    <span class="category-title">Net Cost</span>
-                    <span class="description">Figures shown are total expenses minus any insurance payouts.</span>
-                    <br>
-                    <span class="category-title">Negative Values (-)</span>
-                    <span class="description">Indicates a credit or refund received (e.g., insurance).</span>
-                    <br>
-                    <span class="category-title">Zero Values (0)</span>
-                    <span class="description">Indicates no spending or activity in that specific year.</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="category-title">Doors, locks, windows & intercom</span>
-                    <span class="description">Security hardware and building entry systems.</span>
-                    <br>
-                    <span class="category-title">Laundry room</span>
-                    <span class="description">Upkeep of building-owned machines and facilities.</span>
-                    <br>
-                    <span class="category-title">Exterminating</span>
-                    <span class="description">Regular pest control and specialized treatments.</span>
-                    <br>
-                    <span class="category-title">Electric repairs</span>
-                    <span class="description">Maintenance of building electrical infrastructure.</span>
-                    <br>
-                    <span class="category-title">Apartment repairs</span>
-                    <span class="description">Building-mandated repairs within individual units.</span>
-                    <br>
-                    <span class="category-title">Storm
+    <div class="grid-container">
+        
+        <div class="column">
+            <div class="header blue">Expenses (A-L)</div>
+            <div class="content">
+                <div class="item">
+                    <span class="title t-blue">Apartment repairs</span>
+                    <span class="desc">Building-mandated repairs within units.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Doors, locks, windows & intercom</span>
+                    <span class="desc">Security hardware and entry systems.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Electric repairs</span>
+                    <span class="desc">Maintenance of electrical infrastructure.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Elevator</span>
+                    <span class="desc">Contracts, repairs, and inspections.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Exterminating</span>
+                    <span class="desc">Pest control and treatments.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Exterior</span>
+                    <span class="desc">Facade and outer shell maintenance.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Janitorial supplies</span>
+                    <span class="desc">Cleaning consumables for common areas.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-blue">Landscaping</span>
+                    <span class="desc">Grounds, trees, and snow removal.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="header teal">Expenses (M-Z)</div>
+            <div class="content">
+                <div class="item">
+                    <span class="title t-teal">Laundry room</span>
+                    <span class="desc">Upkeep of machines and facilities.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Miscellaneous repairs</span>
+                    <span class="desc">General contracting and non-specific fixes.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Painting & plastering</span>
+                    <span class="desc">Wall maintenance in halls and units.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Plumbing, heating boiler</span>
+                    <span class="desc">Water lines and central heating plant.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Pool expense & supplies</span>
+                    <span class="desc">Opening, chemicals, and lifeguards.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Roadway repairs</span>
+                    <span class="desc">Paving of parking and private roads.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Storm related damages</span>
+                    <span class="desc">Cleanup and repairs from severe weather.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-teal">Water damages & mold</span>
+                    <span class="desc">Specialized moisture remediation.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="header green">Utilities</div>
+            <div class="content">
+                <div class="item">
+                    <span class="title t-green">Fuel Oil</span>
+                    <span class="desc">Heating oil for the central boiler (Primary energy cost).</span>
+                </div>
+                <div class="item">
+                    <span class="title t-green">Electric & Gas</span>
+                    <span class="desc">Common area power and cooking/heat gas.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="header orange">Accounting Terms</div>
+            <div class="content">
+                <div class="item">
+                    <span class="title t-orange">Net Cost</span>
+                    <span class="desc">Total expenses minus insurance payouts.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-orange">Negative Values (-)</span>
+                    <span class="desc">Indicates a credit or refund received.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-orange">Zero Values (0)</span>
+                    <span class="desc">Indicates no spending in that specific year.</span>
+                </div>
+                <div class="item">
+                    <span class="title t-orange">Other Insurance Refunds</span>
+                    <span class="desc">Direct reimbursements from claims.</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
