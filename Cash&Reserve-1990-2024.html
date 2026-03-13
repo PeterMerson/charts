@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash & Reserve Funds 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --cash: #2196F3;
+    --reserve: #43A047;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 28px;
+    max-width: 820px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .badge-cash { border-color: var(--cash); color: var(--cash); background: #e8f4fe; }
+  .badge-reserve { border-color: var(--reserve); color: var(--reserve); background: #e8f5e9; }
+
+  .main-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px 24px;
+    width: 100%;
+    max-width: 1150px;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 440px;
+  }
+
+  #tooltip {
+    position: fixed;
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 999;
+    min-width: 210px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-cash { color: #82cfff; }
+  #tooltip .tt-reserve { color: #a5d6a7; }
+  #tooltip .tt-total { color: #fff; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #eef4fb;
+    border: 1px solid #b3d1f0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    color: #1F4E79;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .source-note {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Cash & Reserve Funds 1990–2024</h1>
+  <p class="subtitle">Stacked annual totals of Cash & Equivalents plus Reserve Fund &nbsp;|&nbsp; 1990–2024</p>
+  <div class="badge-row">
+    <div class="badge badge-cash"><div class="badge-dot" style="background:var(--cash)"></div>Cash & Equivalents</div>
+    <div class="badge badge-reserve"><div class="badge-dot" style="background:var(--reserve)"></div>Reserve Fund</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="barChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Peak Combined Total</div>
+      <div class="stat-value">$2,509,975</div>
+      <div class="stat-sub">2021</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Reserve Fund Started</div>
+      <div class="stat-value">2008</div>
+      <div class="stat-sub">First reserve fund balance</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 Combined Total</div>
+      <div class="stat-value">$1,976,793</div>
+      <div class="stat-sub">Cash only (no reserve)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Lowest Point</div>
+      <div class="stat-value">$177,502</div>
+      <div class="stat-sub">1993</div>
+    </div>
+  </div>
+
+  <div class="note-banner">💡 Reserve Fund first appeared in 2008. Prior to that, all funds were held as Cash & Equivalents. In 2024 the Reserve Fund shows $0 — funds may have been consolidated into Cash.</div>
+  <p class="source-note">Source: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const cashRaw =    [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,393313,608614,252599,61503,30296,274066,110834,102845,214400,115582,98755,111999,83242,145852,223965,1425016,1976793];
+const reserveRaw = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306484,470398,1006727,1083523,1120846,1303582,1338409,1462059,1354270,1667267,1877718,2118012,2335551,2364123,2231883,891297,0];
+
+const totalRaw = years.map((_, i) => cashRaw[i] + reserveRaw[i]);
+
+const ctx = document.getElementById('barChart').getContext('2d');
+
+const chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Cash & Equivalents',
+        data: cashRaw,
+        backgroundColor: 'rgba(33,150,243,0.82)',
+        borderColor: 'rgba(33,150,243,1)',
+        borderWidth: 1,
+        borderRadius: 3,
+        borderSkipped: false,
+      },
+      {
+        label: 'Reserve Fund',
+        data: reserveRaw,
+        backgroundColor: 'rgba(67,160,71,0.82)',
+        borderColor: 'rgba(67,160,71,1)',
+        borderWidth: 1,
+        borderRadius: 3,
+        borderSkipped: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { display: false },
+        ticks: {
+          font: { family: 'DM Sans', size: 10 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        stacked: true,
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : (v/1000).toFixed(0) + 'K')
+        },
+        title: {
+          display: true,
+          text: 'Total Funds ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false }
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('barChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const cash = cashRaw[idx];
+  const reserve = reserveRaw[idx];
+  const total = totalRaw[idx];
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}</div>
+    <div class="tt-row"><span class="tt-label tt-cash">Cash & Equiv</span><span class="tt-val tt-cash">$${cash.toLocaleString()}</span></div>
+    ${reserve > 0 ? `<div class="tt-row"><span class="tt-label tt-reserve">Reserve Fund</span><span class="tt-val tt-reserve">$${reserve.toLocaleString()}</span></div>` : ''}
+    <div class="tt-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.2);padding-top:4px;">
+      <span class="tt-label">Combined Total</span>
+      <span class="tt-val tt-total">$${total.toLocaleString()}</span>
+    </div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 80;
+  if (tx + 230 > window.innerWidth) tx = e.clientX - 245;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('barChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
