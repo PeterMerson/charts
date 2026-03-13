@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate Taxes vs CPI 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --navy-light: #2d6faa;
+    --retax: #E67E22;
+    --cpi: #2196F3;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --grid: #e8e4dc;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 28px;
+    max-width: 820px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .badge-retax { border-color: var(--retax); color: var(--retax); background: #fef5ec; }
+  .badge-cpi { border-color: var(--cpi); color: var(--cpi); background: #e8f4fe; }
+
+  .main-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 420px;
+  }
+
+  canvas { width: 100% !important; }
+
+  #tooltip {
+    position: fixed;
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 999;
+    min-width: 210px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.7;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-retax { color: #f0a86b; }
+  #tooltip .tt-cpi { color: #82cfff; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--navy); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .stat-value.orange { color: var(--retax); }
+  .stat-value.blue { color: var(--cpi); }
+
+  .note-banner {
+    background: #fff8ec;
+    border: 1px solid #f0c870;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    color: #7a5500;
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  .source-note {
+    margin-top: 12px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Real Estate Taxes vs. CPI</h1>
+  <p class="subtitle">Both series indexed to 100 in 1990 — showing cumulative growth relative to baseline &nbsp;|&nbsp; 1990–2024</p>
+  <div class="badge-row">
+    <div class="badge badge-retax"><div class="badge-dot" style="background:var(--retax)"></div>Riveredge RE Taxes (indexed)</div>
+    <div class="badge badge-cpi"><div class="badge-dot" style="background:var(--cpi)"></div>US CPI-U (indexed)</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">RE Tax Growth</div>
+      <div class="stat-value orange" id="stat-retax-growth">—</div>
+      <div class="stat-sub">1990 → 2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CPI Growth</div>
+      <div class="stat-value blue" id="stat-cpi-growth">—</div>
+      <div class="stat-sub">1990 → 2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">RE Taxes 1990</div>
+      <div class="stat-value" id="stat-retax-start">—</div>
+      <div class="stat-sub">Base year</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">RE Taxes 2024</div>
+      <div class="stat-value" id="stat-retax-end">—</div>
+      <div class="stat-sub">Latest year</div>
+    </div>
+  </div>
+
+  <div class="note-banner">⚠️ Notable dip in 1997 (index ~51) and 2021 (index ~90) — likely reflect successful tax appeals or abatements reducing the assessed value that year.</div>
+  <p class="source-note">CPI data: U.S. Bureau of Labor Statistics via Federal Reserve Bank of Minneapolis (CPI-U, 1982–84 = 100). RE Tax data: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const retaxRaw = [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,222318,206645,202604,216787,243043,248534,262247,267139,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242];
+
+const cpiRaw = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,271.0,292.7,304.7,313.7];
+
+const retaxBase = retaxRaw[0];
+const cpiBase = cpiRaw[0];
+const retaxIdx = retaxRaw.map(v => +(v / retaxBase * 100).toFixed(2));
+const cpiIdx = cpiRaw.map(v => +(v / cpiBase * 100).toFixed(2));
+
+document.getElementById('stat-retax-growth').textContent = `+${(retaxIdx[retaxIdx.length-1] - 100).toFixed(0)}%`;
+document.getElementById('stat-cpi-growth').textContent = `+${(cpiIdx[cpiIdx.length-1] - 100).toFixed(0)}%`;
+document.getElementById('stat-retax-start').textContent = `$${retaxRaw[0].toLocaleString()}`;
+document.getElementById('stat-retax-end').textContent = `$${retaxRaw[retaxRaw.length-1].toLocaleString()}`;
+
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+const retaxGrad = ctx.createLinearGradient(0, 0, 0, 420);
+retaxGrad.addColorStop(0, 'rgba(230,126,34,0.18)');
+retaxGrad.addColorStop(1, 'rgba(230,126,34,0.01)');
+
+const cpiGrad = ctx.createLinearGradient(0, 0, 0, 420);
+cpiGrad.addColorStop(0, 'rgba(33,150,243,0.15)');
+cpiGrad.addColorStop(1, 'rgba(33,150,243,0.01)');
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'RE Taxes (indexed)',
+        data: retaxIdx,
+        borderColor: '#E67E22',
+        backgroundColor: retaxGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#E67E22',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.35,
+      },
+      {
+        label: 'CPI-U (indexed)',
+        data: cpiIdx,
+        borderColor: '#2196F3',
+        backgroundColor: cpiGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#2196F3',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.35,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => v + ''
+        },
+        title: {
+          display: true,
+          text: 'Index (1990 = 100)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false }
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('lineChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const rIdx = retaxIdx[idx];
+  const cIdx = cpiIdx[idx];
+  const rRaw = retaxRaw[idx];
+  const gap = (rIdx - cIdx).toFixed(1);
+  const gapSign = gap > 0 ? '+' : '';
+  const gapColor = gap > 0 ? '#f0a86b' : '#82cfff';
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}</div>
+    <div class="tt-row"><span class="tt-label tt-retax">RE Tax Index</span><span class="tt-val tt-retax">${rIdx.toFixed(1)}</span></div>
+    <div class="tt-row"><span class="tt-label tt-retax">RE Tax ($)</span><span class="tt-val tt-retax">$${rRaw.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label tt-cpi">CPI Index</span><span class="tt-val tt-cpi">${cIdx.toFixed(1)}</span></div>
+    <div class="tt-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.15);padding-top:4px;">
+      <span class="tt-label">RE Tax vs CPI gap</span>
+      <span class="tt-val" style="color:${gapColor}">${gapSign}${gap}</span>
+    </div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 80;
+  if (tx + 230 > window.innerWidth) tx = e.clientX - 245;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('lineChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
