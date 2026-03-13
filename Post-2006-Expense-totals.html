@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Expenses 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --bar: #1D6FA4;
+    --bar-below: #2E7D32;
+    --bar-adj: #E67E22;
+    --refline: #E63946;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 28px;
+    max-width: 900px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .badge-above { border-color: var(--bar); color: var(--bar); background: #e8f4fe; }
+  .badge-below { border-color: var(--bar-below); color: var(--bar-below); background: #e8f5e9; }
+  .badge-adj { border-color: var(--bar-adj); color: var(--bar-adj); background: #fef5ec; }
+  .badge-ref { border-color: var(--refline); color: var(--refline); background: #fff0f0; }
+
+  .main-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px 24px;
+    width: 100%;
+    max-width: 1150px;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 460px;
+  }
+
+  #tooltip {
+    position: fixed;
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 999;
+    min-width: 230px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-note { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; font-style: italic; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .stat-value.green { color: var(--bar-below); }
+  .stat-value.red { color: var(--refline); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #fef5ec;
+    border: 1px solid #f0c870;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    color: #7a5500;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Total Annual Expenses 1990–2024</h1>
+  <p class="subtitle">2024 adjusted to exclude $228,074 Fire & Water Damages &nbsp;|&nbsp; Green bars = below 2006 expense level</p>
+  <div class="badge-row">
+    <div class="badge badge-above"><div class="badge-dot" style="background:var(--bar)"></div>Above 2006 level</div>
+    <div class="badge badge-below"><div class="badge-dot" style="background:var(--bar-below)"></div>Below 2006 level</div>
+    <div class="badge badge-adj"><div class="badge-dot" style="background:var(--bar-adj)"></div>2024 Adjusted</div>
+    <div class="badge badge-ref"><div class="badge-dot" style="background:var(--refline); border-radius:0; height:3px; width:16px;"></div>2006 Total Expenses: $1,462,139</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="barChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">2006 Baseline</div>
+      <div class="stat-value red">$1,462,139</div>
+      <div class="stat-sub">Reference line</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Highest Year (adj.)</div>
+      <div class="stat-value">$1,752,936</div>
+      <div class="stat-sub">2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Lowest Year</div>
+      <div class="stat-value green">$1,026,243</div>
+      <div class="stat-sub">1998</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Years Below 2006</div>
+      <div class="stat-value green" id="below-count">—</div>
+      <div class="stat-sub">Out of 35 years</div>
+    </div>
+  </div>
+
+  <div class="note-banner">⚠️ 2024 gross expenses of $1,981,010 include $228,074 in Fire & Water Damages — excluded as a one-time item. The red dashed line marks 2006 total expenses of $1,462,139.</div>
+  <p class="source-note">Source: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const expensesRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187103,1290682,1234194,1340742,1417321,1484831,1462139,1485259,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1391928,1435712,1477320,1350723,1463423,1626411,1649127,1752936];
+
+const grossRaw = [...expensesRaw];
+grossRaw[34] = 1981010; // 2024 gross before adjustment
+
+const REF_LINE = 1462139;
+const ADJ_IDX = years.indexOf(2024);
+
+const belowCount = expensesRaw.filter(v => v < REF_LINE).length;
+document.getElementById('below-count').textContent = belowCount;
+
+const colors = expensesRaw.map((v, i) => {
+  if (i === ADJ_IDX) return 'rgba(230,126,34,0.85)';
+  return v < REF_LINE ? 'rgba(46,125,50,0.82)' : 'rgba(29,111,164,0.82)';
+});
+const borderColors = expensesRaw.map((v, i) => {
+  if (i === ADJ_IDX) return 'rgba(230,126,34,1)';
+  return v < REF_LINE ? 'rgba(46,125,50,1)' : 'rgba(29,111,164,1)';
+});
+
+const ctx = document.getElementById('barChart').getContext('2d');
+
+const chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Total Expenses',
+      data: expensesRaw,
+      backgroundColor: colors,
+      borderColor: borderColors,
+      borderWidth: 1,
+      borderRadius: 3,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+      annotation: {
+        annotations: {
+          refLine: {
+            type: 'line',
+            yMin: REF_LINE,
+            yMax: REF_LINE,
+            borderColor: '#E63946',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: '2006 Expenses: $1,462,139',
+              position: 'start',
+              backgroundColor: '#E63946',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 11, weight: '600' },
+              padding: { x: 8, y: 4 },
+              borderRadius: 4,
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { family: 'DM Sans', size: 10 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v/1000000 >= 1 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
+        },
+        title: {
+          display: true,
+          text: 'Total Expenses ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false },
+        min: 800000
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('barChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const val = expensesRaw[idx];
+  const isAdj = idx === ADJ_IDX;
+  const isBelow = val < REF_LINE;
+  const diff = val - REF_LINE;
+  const diffSign = diff >= 0 ? '+' : '−';
+  const diffColor = diff >= 0 ? '#ef9a9a' : '#a5d6a7';
+  const valColor = isAdj ? '#f0a86b' : (isBelow ? '#a5d6a7' : '#82cfff');
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}${isAdj ? ' ⚠️ Adjusted' : ''}</div>
+    ${isAdj ? `<div class="tt-row"><span class="tt-label">Gross Expenses</span><span class="tt-val">$${grossRaw[idx].toLocaleString()}</span></div>` : ''}
+    ${isAdj ? `<div class="tt-row"><span class="tt-label">Less: Fire & Water</span><span class="tt-val" style="color:#f0a86b">−$228,074</span></div>` : ''}
+    <div class="tt-row"><span class="tt-label">${isAdj ? 'Adjusted Expenses' : 'Total Expenses'}</span><span class="tt-val" style="color:${valColor}">$${val.toLocaleString()}</span></div>
+    <div class="tt-row" style="margin-top:4px;border-top:1px solid rgba(255,255,255,0.2);padding-top:4px;">
+      <span class="tt-label">vs 2006 line</span>
+      <span class="tt-val" style="color:${diffColor}">${diffSign}$${Math.abs(diff).toLocaleString()}</span>
+    </div>
+    ${isAdj ? `<div class="tt-note">Fire & Water Damages excluded as one-time item</div>` : ''}
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 100;
+  if (tx + 250 > window.innerWidth) tx = e.clientX - 265;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('barChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
