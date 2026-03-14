@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash & Reserve Funds 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --cash: #2196F3;
+    --reserve: #43A047;
+    --low: #E63946;
+    --high: #9C27B0;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header { text-align: center; margin-bottom: 28px; max-width: 900px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+  .badge-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 12px; border-radius: 99px; font-size: 0.82rem;
+    font-weight: 500; border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .badge-cash { border-color: var(--cash); color: var(--cash); background: #e8f4fe; }
+  .badge-reserve { border-color: var(--reserve); color: var(--reserve); background: #e8f5e9; }
+  .badge-low { border-color: var(--low); color: var(--low); background: #fff0f0; }
+  .badge-high { border-color: var(--high); color: var(--high); background: #f9f0ff; }
+
+  .main-card {
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 32px 36px 24px; width: 100%; max-width: 1150px;
+  }
+  .chart-container { position: relative; width: 100%; height: 460px; }
+
+  #tooltip {
+    position: fixed; background: var(--navy); color: #fff;
+    padding: 12px 16px; border-radius: 12px; font-size: 0.86rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 999; min-width: 240px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-divider { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; padding-top: 4px; }
+  #tooltip .tt-status { font-size: 0.8rem; font-weight: 600; margin-top: 4px; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+  .status-above { background: rgba(67,160,71,0.3); color: #a5d6a7; }
+  .status-within { background: rgba(33,150,243,0.3); color: #82cfff; }
+  .status-below { background: rgba(230,57,70,0.3); color: #ef9a9a; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+  .stat-card { background: var(--bg); border-radius: 12px; padding: 16px; border: 1px solid var(--border); text-align: center; }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #f3e8ff; border: 1px solid #ce93d8; border-radius: 8px;
+    padding: 8px 16px; font-size: 0.8rem; color: #6a1b9a; margin-top: 16px; text-align: center;
+  }
+  .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Total Liquidity 1990–2024</h1>
+  <p class="subtitle">Cash & Equivalents plus Reserve Fund vs. Westchester Standard inflation-adjusted recommended range (158 units) &nbsp;|&nbsp; $3,500–$5,000 per unit in 2025 dollars</p>
+  <div class="badge-row">
+    <div class="badge badge-cash"><div class="badge-dot" style="background:#1D6FA4"></div>Total Liquidity</div>
+    <div class="badge badge-low"><div class="badge-dot" style="background:var(--low); border-radius:0; height:3px; width:14px;"></div>Westchester Low ($3,500/unit)</div>
+    <div class="badge badge-high"><div class="badge-dot" style="background:var(--high); border-radius:0; height:3px; width:14px;"></div>Westchester High ($5,000/unit)</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="barChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Peak Combined Total</div>
+      <div class="stat-value">$2,509,975</div>
+      <div class="stat-sub">2021</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 vs Low Benchmark</div>
+      <div class="stat-value" style="color:#2E7D32">+$1,432,981</div>
+      <div class="stat-sub">$1,976,793 vs $543,812</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 vs High Benchmark</div>
+      <div class="stat-value" style="color:#2E7D32">+$1,199,918</div>
+      <div class="stat-sub">$1,976,793 vs $776,875</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">First Year Above High</div>
+      <div class="stat-value">2009</div>
+      <div class="stat-sub">$1,079,012 vs $531,207</div>
+    </div>
+  </div>
+
+  <div class="note-banner">📊 Westchester Standard: $3,500–$5,000 per unit (2025 dollars), inflation-adjusted backward using CPI-U. At 158 units this equals $553,000–$790,000 in 2025 dollars. Riveredge has exceeded the high benchmark every year since 2009.</div>
+  <p class="source-note">Westchester cooperative reserve standard. CPI-U: U.S. Bureau of Labor Statistics. Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const cashRaw =    [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,393313,608614,252599,61503,30296,274066,110834,102845,214400,115582,98755,111999,83242,145852,223965,1425016,1976793];
+const reserveRaw = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306484,470398,1006727,1083523,1120846,1303582,1338409,1462059,1354270,1667267,1877718,2118012,2335551,2364123,2231883,891297,0];
+
+const totalRaw = years.map((_, i) => cashRaw[i] + reserveRaw[i]);
+
+// Inflation-adjusted Westchester standard lines (CPI deflated from 2025)
+const lowAdj =  [226574,236108,243216,250497,256911,264192,271993,278234,282567,288808,298516,307010,311864,318972,327466,338561,349482,359363,373232,371845,378086,389874,398021,403915,410329,410850,416050,424891,435292,443267,448641,469790,507408,528210,543812];
+const highAdj = [323677,337298,347451,357853,367016,377417,388561,397476,403668,412583,426451,438586,445520,455674,467809,483658,499260,513376,533188,531207,540122,556962,568602,577022,586185,586928,594357,606987,621846,633238,640915,671129,724868,754586,776875];
+
+const ctx = document.getElementById('barChart').getContext('2d');
+
+const chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Total Liquidity',
+        data: totalRaw,
+        backgroundColor: 'rgba(29,111,164,0.82)',
+        borderColor: 'rgba(29,111,164,1)',
+        borderWidth: 1,
+        borderRadius: 3,
+        borderSkipped: false,
+        order: 2,
+      },
+      {
+        label: 'Westchester Low',
+        data: lowAdj,
+        type: 'line',
+        borderColor: '#E63946',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: false,
+        tension: 0.3,
+        order: 1,
+      },
+      {
+        label: 'Westchester High',
+        data: highAdj,
+        type: 'line',
+        borderColor: '#9C27B0',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: false,
+        tension: 0.3,
+        order: 1,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { family: 'DM Sans', size: 10 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K')
+        },
+        title: {
+          display: true,
+          text: 'Total Funds ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false }
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('barChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const cash = cashRaw[idx];
+  const reserve = reserveRaw[idx];
+  const total = totalRaw[idx];
+  const lo = lowAdj[idx];
+  const hi = highAdj[idx];
+
+  let statusLabel, statusClass;
+  if (total >= hi) {
+    statusLabel = '✅ Above Westchester High';
+    statusClass = 'status-above';
+  } else if (total >= lo) {
+    statusLabel = '✔ Within Westchester Range';
+    statusClass = 'status-within';
+  } else {
+    statusLabel = '⚠️ Below Westchester Low';
+    statusClass = 'status-below';
+  }
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}</div>
+    <div class="tt-row"><span class="tt-label" style="color:#82cfff">Total Liquidity</span><span class="tt-val" style="color:#82cfff">$${total.toLocaleString()}</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-label" style="color:#ef9a9a">Westchester Low</span><span class="tt-val" style="color:#ef9a9a">$${lo.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label" style="color:#ce93d8">Westchester High</span><span class="tt-val" style="color:#ce93d8">$${hi.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label">vs Low</span><span class="tt-val" style="color:${total>=lo?'#a5d6a7':'#ef9a9a'}">${total>=lo?'+':'-'}$${Math.abs(total-lo).toLocaleString()}</span></div>
+    <div><span class="tt-status ${statusClass}">${statusLabel}</span></div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 120;
+  if (tx + 260 > window.innerWidth) tx = e.clientX - 275;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('barChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
