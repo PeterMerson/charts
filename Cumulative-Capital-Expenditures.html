@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cumulative Capital Expenditures 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --p1: #1D6FA4;
+    --p2: #E67E22;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header { text-align: center; margin-bottom: 28px; max-width: 820px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+  .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 14px; border-radius: 99px; font-size: 0.85rem;
+    font-weight: 500; border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .badge-p1 { border-color: var(--p1); color: var(--p1); background: #e8f4fe; }
+  .badge-p2 { border-color: var(--p2); color: var(--p2); background: #fef5ec; }
+
+  .main-card {
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 32px 36px 24px; width: 100%; max-width: 1150px;
+  }
+  .chart-container { position: relative; width: 100%; height: 440px; }
+
+  #tooltip {
+    position: fixed; background: var(--navy); color: #fff;
+    padding: 12px 16px; border-radius: 12px; font-size: 0.86rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 999; min-width: 240px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-divider { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; padding-top: 4px; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px;
+  }
+  .stat-card {
+    background: var(--bg); border-radius: 12px; padding: 16px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .stat-value.blue { color: var(--p1); }
+  .stat-value.orange { color: var(--p2); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #eef4fb; border: 1px solid #b3d1f0; border-radius: 8px;
+    padding: 8px 16px; font-size: 0.8rem; color: #1F4E79;
+    margin-top: 16px; text-align: center;
+  }
+  .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Cumulative Capital Expenditures</h1>
+  <p class="subtitle">Two separate cumulative totals building year by year &nbsp;|&nbsp; Period 1: 1990–2005 &nbsp;|&nbsp; Period 2: 2006–2024</p>
+  <div class="badge-row">
+    <div class="badge badge-p1"><div class="badge-dot" style="background:var(--p1)"></div>Period 1: 1990–2005 (cumulative)</div>
+    <div class="badge badge-p2"><div class="badge-dot" style="background:var(--p2)"></div>Period 2: 2006–2024 (cumulative)</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Period 1 Final Total</div>
+      <div class="stat-value blue">$1,920,214</div>
+      <div class="stat-sub">1990–2005 (16 years)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Period 2 Final Total</div>
+      <div class="stat-value orange">$2,572,743</div>
+      <div class="stat-sub">2006–2024 (19 years)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">35-Year Grand Total</div>
+      <div class="stat-value">$4,492,957</div>
+      <div class="stat-sub">1990–2024 combined</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Period 2 Exceeded P1</div>
+      <div class="stat-value orange">2021</div>
+      <div class="stat-sub">Period 2 surpassed Period 1 total</div>
+    </div>
+  </div>
+
+  <div class="note-banner">💡 Each line builds cumulatively year by year within its period. Hover over any point to see the annual spend and the running cumulative total for that period.</div>
+  <p class="source-note">Source: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// Period 1: 1990–2005
+const years1 = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005];
+const annual1 = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459];
+
+// Period 2: 2006–2024
+const years2 = [2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const annual2 = [32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
+
+// Build cumulative arrays
+const cum1 = [], cum2 = [];
+let r1 = 0, r2 = 0;
+annual1.forEach(v => { r1 += v; cum1.push(r1); });
+annual2.forEach(v => { r2 += v; cum2.push(r2); });
+
+// Find when Period 2 exceeded Period 1 final
+const p1Final = cum1[cum1.length - 1];
+const crossIdx = cum2.findIndex(v => v >= p1Final);
+const crossYear = crossIdx >= 0 ? years2[crossIdx] : null;
+
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+const p1Grad = ctx.createLinearGradient(0, 0, 0, 440);
+p1Grad.addColorStop(0, 'rgba(29,111,164,0.18)');
+p1Grad.addColorStop(1, 'rgba(29,111,164,0.01)');
+
+const p2Grad = ctx.createLinearGradient(0, 0, 0, 440);
+p2Grad.addColorStop(0, 'rgba(230,126,34,0.18)');
+p2Grad.addColorStop(1, 'rgba(230,126,34,0.01)');
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    datasets: [
+      {
+        label: 'Period 1: 1990–2005',
+        data: years1.map((yr, i) => ({ x: yr, y: cum1[i] })),
+        borderColor: '#1D6FA4',
+        backgroundColor: p1Grad,
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#1D6FA4',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'Period 2: 2006–2024',
+        data: years2.map((yr, i) => ({ x: yr, y: cum2[i] })),
+        borderColor: '#E67E22',
+        backgroundColor: p2Grad,
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#E67E22',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.3,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false, axis: 'x' },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          stepSize: 1,
+          callback: v => (v % 5 === 0 || v === 1990 || v === 2005 || v === 2006 || v === 2024) ? v : ''
+        },
+        title: {
+          display: true,
+          text: 'Year',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
+        },
+        title: {
+          display: true,
+          text: 'Cumulative Capital Expenditures ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false }
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+
+document.getElementById('lineChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: false, axis: 'x' }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+
+  // Find which dataset was hovered
+  const dsIdx = points[0].datasetIndex;
+  const ptIdx = points[0].index;
+
+  const isP1 = dsIdx === 0;
+  const yr = isP1 ? years1[ptIdx] : years2[ptIdx];
+  const annualVal = isP1 ? annual1[ptIdx] : annual2[ptIdx];
+  const cumVal = isP1 ? cum1[ptIdx] : cum2[ptIdx];
+  const color = isP1 ? '#82cfff' : '#f0a86b';
+  const periodLabel = isP1 ? 'Period 1: 1990–2005' : 'Period 2: 2006–2024';
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr} &nbsp;<span style="font-size:0.78rem;opacity:0.7">${periodLabel}</span></div>
+    <div class="tt-row"><span class="tt-label">Annual Spend</span><span class="tt-val" style="color:${color}">$${annualVal.toLocaleString()}</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-label">Cumulative Total</span><span class="tt-val" style="color:${color}">$${cumVal.toLocaleString()}</span></div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 80;
+  if (tx + 260 > window.innerWidth) tx = e.clientX - 275;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('lineChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
