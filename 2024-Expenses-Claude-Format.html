@@ -266,8 +266,8 @@
 <div class="page-header">
   <h1>2024 Expense Breakdown</h1>
   <div class="formula-badge">Calculation is: Operating Expense ➗ Total Income</div>
-  <p class="subtitle">Total Income: <span>$1,846,671</span> &nbsp;|&nbsp; Total Expenses: <span>$1,981,010</span></p>
-  <div class="deficit-banner">⚠️ 2024 ran at a deficit — expenses exceeded income by <strong>$134,339</strong> (−7.3%)</div>
+  <p class="subtitle">Total Income: <span>$1,846,671</span> &nbsp;|&nbsp; Total Expenses: <span>$1,910,958</span></p>
+  <div class="deficit-banner">⚠️ 2024 ran at a deficit — expenses exceeded income by <strong>$64,287</strong> (−3.5%)</div>
 </div>
 
 <div class="main-card">
@@ -293,18 +293,18 @@
 const TOTAL_INCOME = 1846671;
 
 const data = [
-  { label: "Repairs",          value: 495817,  color: "#E63946" },
-  { label: "Real Estate Taxes",value: 384242,  color: "#1D6FA4" },
-  { label: "Utilities",        value: 328592,  color: "#2196F3" },
-  { label: "Payroll",          value: 262939,  color: "#43A047" },
-  { label: "Mortgage P&I",     value: 185476,  color: "#FF9800" },
-  { label: "Insurance",        value: 99094,   color: "#8E24AA" },
-  { label: "Security",         value: 77374,   color: "#00ACC1" },
-  { label: "Mgmt Fee",         value: 52725,   color: "#6D4C41" },
-  { label: "Water & Sewer",    value: 52221,   color: "#546E7A" },
-  { label: "Corp Tax & Misc",  value: 31577,   color: "#F4511E" },
-  { label: "Legal & Audit",    value: 10953,   color: "#7CB342" },
-  { label: "Excess Maint (Deficit)", value: 134339, color: "#B0BEC5", deficit: true },
+  { label: "Repairs",               value: 495817, color: "#E63946" },
+  { label: "Real Estate Taxes",     value: 384242, color: "#1D6FA4" },
+  { label: "Utilities",             value: 328592, color: "#2196F3" },
+  { label: "Payroll",               value: 262939, color: "#43A047" },
+  { label: "Insurance",             value: 99094,  color: "#8E24AA" },
+  { label: "Security",              value: 77374,  color: "#00ACC1" },
+  { label: "Mgmt Fee",              value: 52725,  color: "#6D4C41" },
+  { label: "Water & Sewer",         value: 52221,  color: "#546E7A" },
+  { label: "Corp Tax & Misc",       value: 31577,  color: "#F4511E" },
+  { label: "Mortgage Interest",     value: 115424, color: "#FF9800" },
+  { label: "Legal & Audit",         value: 10953,  color: "#7CB342" },
+  { label: "Excess Maint (Deficit)",value: 64287,  color: "#B0BEC5", deficit: true },
 ];
 
 const svg = document.getElementById('pie-svg');
