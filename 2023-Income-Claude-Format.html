@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -288,6 +288,7 @@ function makeArc(cx, cy, r, startAngle, endAngle) {
 
 let activeIdx = null;
 let startAngle = 0;
+const textNodes = [];
 
 data.forEach((d, i) => {
   const sweep = (d.value / total) * 360;
@@ -317,7 +318,7 @@ data.forEach((d, i) => {
     text.setAttribute('pointer-events', 'none');
     const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
     text.textContent = `${pct}%`;
-    svg.appendChild(text);
+    textNodes.push(text);
   }
 
   path.addEventListener('mouseenter', (e) => showTooltip(e, i));
@@ -325,9 +326,12 @@ data.forEach((d, i) => {
   path.addEventListener('mouseleave', hideTooltip);
   path.addEventListener('click', () => selectSlice(i));
 
-  svg.insertBefore(path, svg.firstChild);
+  svg.appendChild(path);
   startAngle = endAngle;
 });
+
+// Append all text labels on top of all slices
+textNodes.forEach(t => svg.appendChild(t));
 
 function showTooltip(e, i) {
   const d = data[i];
@@ -355,9 +359,10 @@ function selectSlice(idx) {
   const d = data[idx];
   const pct = (d.value / TOTAL_INCOME * 100).toFixed(1);
 
-  svg.querySelectorAll('.wedge').forEach((p, i) => {
-    p.classList.toggle('dimmed', i !== idx);
-    p.classList.toggle('active', i === idx);
+  svg.querySelectorAll('.wedge').forEach((p) => {
+    const pi = parseInt(p.dataset.idx);
+    p.classList.toggle('dimmed', pi !== idx);
+    p.classList.toggle('active', pi === idx);
   });
   document.querySelectorAll('.legend-item').forEach((el, i) => {
     el.classList.toggle('active', i === idx);
