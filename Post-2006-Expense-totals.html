@@ -30,34 +30,14 @@
     align-items: center;
     padding: 36px 20px 48px;
   }
-  .page-header {
-    text-align: center;
-    margin-bottom: 28px;
-    max-width: 900px;
-  }
-  .page-header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    color: var(--navy);
-    margin-bottom: 8px;
-  }
+  .page-header { text-align: center; margin-bottom: 28px; max-width: 900px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 8px; }
   .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
-  .badge-row {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
+  .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
   .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 14px;
-    border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 2px solid;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 14px; border-radius: 99px; font-size: 0.85rem;
+    font-weight: 500; border: 2px solid;
   }
   .badge-dot { width: 10px; height: 10px; border-radius: 3px; }
   .badge-above { border-color: var(--bar); color: var(--bar); background: #e8f4fe; }
@@ -66,32 +46,16 @@
   .badge-ref { border-color: var(--refline); color: var(--refline); background: #fff0f0; }
 
   .main-card {
-    background: var(--card);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 32px 36px 24px;
-    width: 100%;
-    max-width: 1150px;
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 32px 36px 24px; width: 100%; max-width: 1150px;
   }
-  .chart-container {
-    position: relative;
-    width: 100%;
-    height: 460px;
-  }
+  .chart-container { position: relative; width: 100%; height: 460px; }
 
   #tooltip {
-    position: fixed;
-    background: var(--navy);
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 0.86rem;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 999;
-    min-width: 230px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    position: fixed; background: var(--navy); color: #fff;
+    padding: 12px 16px; border-radius: 12px; font-size: 0.86rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 999; min-width: 230px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     line-height: 1.8;
   }
   #tooltip.visible { opacity: 1; }
@@ -101,18 +65,10 @@
   #tooltip .tt-val { font-weight: 600; }
   #tooltip .tt-note { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; font-style: italic; }
 
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-top: 24px;
-  }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
   .stat-card {
-    background: var(--bg);
-    border-radius: 12px;
-    padding: 16px;
-    border: 1px solid var(--border);
-    text-align: center;
+    background: var(--bg); border-radius: 12px; padding: 16px;
+    border: 1px solid var(--border); text-align: center;
   }
   .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
   .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
@@ -121,14 +77,9 @@
   .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
   .note-banner {
-    background: #fef5ec;
-    border: 1px solid #f0c870;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    color: #7a5500;
-    margin-top: 16px;
-    text-align: center;
+    background: #fef5ec; border: 1px solid #f0c870; border-radius: 8px;
+    padding: 8px 16px; font-size: 0.8rem; color: #7a5500;
+    margin-top: 16px; text-align: center;
   }
   .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
 </style>
@@ -137,12 +88,12 @@
 
 <div class="page-header">
   <h1>Total Annual Expenses 1990–2024</h1>
-  <p class="subtitle">2024 adjusted to exclude $228,074 Fire & Water Damages &nbsp;|&nbsp; Green bars = below 2006 expense level</p>
+  <p class="subtitle">Mortgage Interest only (Principal excluded) &nbsp;|&nbsp; 2024 adjusted to exclude $228,074 Fire & Water Damages &nbsp;|&nbsp; Green bars = below 2006 level</p>
   <div class="badge-row">
     <div class="badge badge-above"><div class="badge-dot" style="background:var(--bar)"></div>Above 2006 level</div>
     <div class="badge badge-below"><div class="badge-dot" style="background:var(--bar-below)"></div>Below 2006 level</div>
     <div class="badge badge-adj"><div class="badge-dot" style="background:var(--bar-adj)"></div>2024 Adjusted</div>
-    <div class="badge badge-ref"><div class="badge-dot" style="background:var(--refline); border-radius:0; height:3px; width:16px;"></div>2006 Total Expenses: $1,462,139</div>
+    <div class="badge badge-ref"><div class="badge-dot" style="background:var(--refline); border-radius:0; height:3px; width:16px;"></div>2006 Total Expenses: $1,353,243</div>
   </div>
 </div>
 
@@ -154,17 +105,17 @@
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-label">2006 Baseline</div>
-      <div class="stat-value red">$1,462,139</div>
+      <div class="stat-value red">$1,353,243</div>
       <div class="stat-sub">Reference line</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Highest Year (adj.)</div>
-      <div class="stat-value">$1,752,936</div>
+      <div class="stat-value">$1,682,884</div>
       <div class="stat-sub">2024</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Lowest Year</div>
-      <div class="stat-value green">$1,026,243</div>
+      <div class="stat-value green">$970,285</div>
       <div class="stat-sub">1998</div>
     </div>
     <div class="stat-card">
@@ -174,7 +125,7 @@
     </div>
   </div>
 
-  <div class="note-banner">⚠️ 2024 gross expenses of $1,981,010 include $228,074 in Fire & Water Damages — excluded as a one-time item. The red dashed line marks 2006 total expenses of $1,462,139.</div>
+  <div class="note-banner">⚠️ Mortgage Principal excluded from all years — Expenses now reflect operating costs only. 2024 gross expenses of $1,910,958 include $228,074 Fire & Water Damages excluded as a one-time item. Red dashed line marks 2006 total expenses of $1,353,243.</div>
   <p class="source-note">Source: Riveredge financial records.</p>
 </div>
 
@@ -185,12 +136,12 @@
 <script>
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
 
-const expensesRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187103,1290682,1234194,1340742,1417321,1484831,1462139,1485259,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1391928,1435712,1477320,1350723,1463423,1626411,1649127,1752936];
+const expensesRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,970285,979500,1116862,1215116,1162898,1253284,1323232,1383608,1353243,1377536,1418629,1324150,1306689,1352311,1365778,1274576,1470884,1413565,1271145,1346109,1384578,1423195,1293732,1403415,1563226,1582597,1682884];
 
 const grossRaw = [...expensesRaw];
-grossRaw[34] = 1981010; // 2024 gross before adjustment
+grossRaw[34] = 1910958; // 2024 gross before adjustment
 
-const REF_LINE = 1462139;
+const REF_LINE = 1353243;
 const ADJ_IDX = years.indexOf(2024);
 
 const belowCount = expensesRaw.filter(v => v < REF_LINE).length;
@@ -239,7 +190,7 @@ const chart = new Chart(ctx, {
             borderDash: [6, 4],
             label: {
               display: true,
-              content: '2006 Expenses: $1,462,139',
+              content: '2006 Expenses: $1,353,243',
               position: 'start',
               backgroundColor: '#E63946',
               color: '#fff',
@@ -267,7 +218,7 @@ const chart = new Chart(ctx, {
         ticks: {
           font: { family: 'DM Sans', size: 11 },
           color: '#6b6b80',
-          callback: v => '$' + (v/1000000 >= 1 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
         },
         title: {
           display: true,
@@ -276,7 +227,7 @@ const chart = new Chart(ctx, {
           color: '#6b6b80'
         },
         border: { display: false },
-        min: 800000
+        min: 700000
       }
     }
   }
