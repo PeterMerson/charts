@@ -1,6 +1,3 @@
-pie chart interactive · HTML
-Copy
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -265,8 +262,8 @@ Copy
 <div class="page-header">
   <h1>2023 Expense Breakdown</h1>
   <div class="formula-badge">Calculation is: Operating Expense ➗ Total Income</div>
-  <p class="subtitle">Total Income: <span>$1,745,779</span> &nbsp;|&nbsp; Total Expenses: <span>$1,649,127</span></p>
-  <div class="surplus-banner">✅ 2023 ran at a surplus — income exceeded expenses by <strong>$96,652</strong> (+5.5%)</div>
+  <p class="subtitle">Total Income: <span>$1,745,779</span> &nbsp;|&nbsp; Total Expenses: <span>$1,582,597</span></p>
+  <div class="surplus-banner">✅ 2023 ran at a surplus — income exceeded expenses by <strong>$163,182</strong> (+9.4%)</div>
 </div>
 
 <div class="main-card">
@@ -296,14 +293,14 @@ const data = [
   { label: "Utilities",         value: 290726,  color: "#2196F3" },
   { label: "Payroll",           value: 249503,  color: "#43A047" },
   { label: "Repairs",           value: 224945,  color: "#E63946" },
-  { label: "Mortgage P&I",      value: 187392,  color: "#FF9800" },
   { label: "Insurance",         value: 86587,   color: "#8E24AA" },
   { label: "Security",          value: 72322,   color: "#00ACC1" },
   { label: "Water & Sewer",     value: 52920,   color: "#546E7A" },
   { label: "Mgmt Fee",          value: 51150,   color: "#6D4C41" },
+  { label: "Mortgage Interest", value: 120862,  color: "#FF9800" },
   { label: "Legal & Audit",     value: 39560,   color: "#7CB342" },
   { label: "Corp Tax & Misc",   value: 24720,   color: "#F4511E" },
-  { label: "Excess Maint",      value: 96652,   color: "#2ECC71", surplus: true },
+  { label: "Excess Maint",      value: 163182,  color: "#2ECC71", surplus: true },
 ];
 
 const svg = document.getElementById('pie-svg');
@@ -318,7 +315,6 @@ function polarToCartesian(cx, cy, r, angleDeg) {
   const rad = (angleDeg - 90) * Math.PI / 180;
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
-
 
 function makeArc(cx, cy, r, startAngle, endAngle) {
   const s = polarToCartesian(cx, cy, r, startAngle);
