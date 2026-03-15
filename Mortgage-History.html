@@ -1,4 +1,4 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -268,5 +268,118 @@ document.getElementById('lineChart').addEventListener('mouseleave', () => {
   tooltip.classList.remove('visible');
 });
 </script>
+
+<style>
+  .refi-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 32px 36px;
+    width: 100%;
+    max-width: 1150px;
+    margin-top: 28px;
+  }
+  .refi-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .refi-subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .refi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .refi-table th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 10px 16px;
+    text-align: right;
+    border-bottom: 2px solid var(--border);
+  }
+  .refi-table th:first-child { text-align: left; }
+  .refi-table td {
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  .refi-table td:first-child { text-align: left; font-weight: 500; }
+  .refi-table tr:last-child td {
+    border-bottom: none;
+    font-weight: 700;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    background: #f0f6ff;
+    border-top: 2px solid var(--border);
+  }
+  .refi-table tr:hover td { background: #f8f6f2; }
+  .refi-table tr:last-child:hover td { background: #e8f0fb; }
+  .val-interest { color: var(--interest); font-weight: 600; }
+  .val-principal { color: var(--principal); font-weight: 600; }
+  .val-saving { color: #2E7D32; font-weight: 700; }
+  .refi-footer {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #1b5e20;
+    text-align: center;
+  }
+  .refi-footer strong { font-weight: 700; }
+</style>
+
+<div class="refi-card">
+  <div class="refi-title">2013 Refinancing — Impact Summary</div>
+  <div class="refi-subtitle">Annual and monthly changes in debt service from 2012 to 2013</div>
+  <table class="refi-table">
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>2012</th>
+        <th>2013</th>
+        <th>Annual Change</th>
+        <th>Monthly Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mortgage Interest</td>
+        <td>$197,128</td>
+        <td>$147,614</td>
+        <td class="val-saving">−$49,514</td>
+        <td class="val-saving">−$4,126</td>
+      </tr>
+      <tr>
+        <td>Mortgage Principal</td>
+        <td>$168,738</td>
+        <td>$33,488</td>
+        <td class="val-saving">−$135,250</td>
+        <td class="val-saving">−$11,271</td>
+      </tr>
+      <tr>
+        <td>Combined Payment</td>
+        <td>$365,866</td>
+        <td>$181,102</td>
+        <td class="val-saving">−$184,764</td>
+        <td class="val-saving">−$15,397</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="refi-footer">
+    ✅ The 2013 refinancing cut the combined annual debt service nearly in half — saving <strong>$184,764 per year</strong> or <strong>$15,397 per month</strong>. The bulk of the saving came from the principal component resetting to a much lower balance on the new loan.
+  </div>
+</div>
+
 </body>
 </html>
