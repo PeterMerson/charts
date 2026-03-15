@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Income vs Total Expenses 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --income: #43A047;
+    --expenses: #E63946;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header { text-align: center; margin-bottom: 28px; max-width: 820px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+  .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 14px; border-radius: 99px; font-size: 0.85rem;
+    font-weight: 500; border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .badge-income  { border-color: var(--income);   color: var(--income);   background: #e8f5e9; }
+  .badge-expense { border-color: var(--expenses);  color: var(--expenses); background: #fff0f0; }
+
+  .main-card {
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 32px 36px 24px; width: 100%; max-width: 1150px;
+  }
+  .chart-container { position: relative; width: 100%; height: 460px; }
+
+  #tooltip {
+    position: fixed; background: var(--navy); color: #fff;
+    padding: 12px 16px; border-radius: 12px; font-size: 0.86rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 999; min-width: 240px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-divider { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; padding-top: 4px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+  .stat-card {
+    background: var(--bg); border-radius: 12px; padding: 16px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .stat-value.green { color: var(--income); }
+  .stat-value.red   { color: var(--expenses); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #eef4fb; border: 1px solid #b3d1f0; border-radius: 8px;
+    padding: 8px 16px; font-size: 0.8rem; color: #1F4E79;
+    margin-top: 16px; text-align: center;
+  }
+  .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Total Income vs. Total Operating Expenses</h1>
+  <p class="subtitle">Step chart — Total Income (excl. Special Assessments) vs. Total Operating Expenses &nbsp;|&nbsp; 1990–2024</p>
+  <div class="badge-row">
+    <div class="badge badge-income"><div class="badge-dot" style="background:var(--income)"></div>Total Income (excl. Special Assessments)</div>
+    <div class="badge badge-expense"><div class="badge-dot" style="background:var(--expenses)"></div>Total Operating Expenses</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">2024 Total Income</div>
+      <div class="stat-value green">$1,846,671</div>
+      <div class="stat-sub">Excl. Special Assessments</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 Total Expenses</div>
+      <div class="stat-value red">$1,682,884</div>
+      <div class="stat-sub">Excl. Fire & Water $228,074</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 Net Surplus</div>
+      <div class="stat-value green">$163,787</div>
+      <div class="stat-sub">Income − Expenses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Deficit Years</div>
+      <div class="stat-value red">8</div>
+      <div class="stat-sub">All before 2006</div>
+    </div>
+  </div>
+
+  <div class="note-banner">💡 When the green line is above the red line the building is operating at a surplus. The dramatic 2006 jump in income pushed the green line decisively above the red, where it has remained ever since. 2024 expenses adjusted to exclude $228,074 Fire &amp; Water Damages. Hover over any point for full detail.</div>
+  <p class="source-note">Source: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const incRaw = [1175653,1150811,1133735,1148098,1176289,1199091,1205655,1207776,1219649,1201838,1235657,1223933,1215986,1226535,1309588,1454039,1720108,1722145,1736837,1784540,1758926,1769448,1760891,1702178,1659232,1664369,1652452,1670183,1694196,1708893,1684945,1678636,1677006,1745779,1846671];
+const expRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,970285,979500,1116862,1215116,1162898,1253284,1323232,1383608,1353243,1377536,1418629,1324150,1306689,1352311,1365778,1274576,1470884,1413565,1271145,1346109,1384578,1423195,1293732,1403415,1563226,1582597,1682884];
+
+const incGrad = document.createElement('canvas').getContext('2d');
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+const greenGrad = ctx.createLinearGradient(0, 0, 0, 460);
+greenGrad.addColorStop(0, 'rgba(67,160,71,0.15)');
+greenGrad.addColorStop(1, 'rgba(67,160,71,0.01)');
+
+const redGrad = ctx.createLinearGradient(0, 0, 0, 460);
+redGrad.addColorStop(0, 'rgba(230,57,70,0.10)');
+redGrad.addColorStop(1, 'rgba(230,57,70,0.01)');
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Total Income',
+        data: incRaw,
+        borderColor: '#43A047',
+        backgroundColor: greenGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#43A047',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        stepped: true,
+      },
+      {
+        label: 'Total Expenses',
+        data: expRaw,
+        borderColor: '#E63946',
+        backgroundColor: redGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#E63946',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        stepped: true,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    scales: {
+      x: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
+        },
+        title: {
+          display: true,
+          text: 'Annual Amount ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false },
+        min: 800000
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('lineChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const inc = incRaw[idx];
+  const exp = expRaw[idx];
+  const net = inc - exp;
+  const netColor = net >= 0 ? '#a5d6a7' : '#ef9a9a';
+  const netSign = net >= 0 ? '+' : '−';
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}</div>
+    <div class="tt-row"><span class="tt-label" style="color:#a5d6a7">Total Income</span><span class="tt-val" style="color:#a5d6a7">$${inc.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label" style="color:#ef9a9a">Total Expenses</span><span class="tt-val" style="color:#ef9a9a">$${exp.toLocaleString()}</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-label">Net (Income − Exp)</span><span class="tt-val" style="color:${netColor}">${netSign}$${Math.abs(net).toLocaleString()}</span></div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 90;
+  if (tx + 260 > window.innerWidth) tx = e.clientX - 275;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('lineChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
