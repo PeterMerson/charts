@@ -45,6 +45,7 @@
   .chart-card:nth-child(1) { animation-delay: 0.1s; }
   .chart-card:nth-child(2) { animation-delay: 0.25s; }
   .chart-card:nth-child(3) { animation-delay: 0.4s; }
+  .chart-card:nth-child(4) { animation-delay: 0.55s; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
   .card-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
@@ -118,6 +119,32 @@
       <div class="chart-wrap"><canvas id="chart1"></canvas></div>
     </div>
     <div class="card-footer">Green = Total Income (excl. Special Assessments) &nbsp;·&nbsp; Red = Total Operating Expenses (gross) &nbsp;·&nbsp; Orange dashed = Expenses + Mortgage Principal (full cash requirement)</div>
+  </div>
+
+
+  <!-- CHART 2: Net Surplus / Deficit -->
+  <div class="chart-card" style="animation-delay:0.25s;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Net Income per Year (Surplus / Deficit)</div>
+        <div class="card-subtitle">Total Income (excl. Special Assessments) minus Total Operating Expenses + Mortgage Principal &nbsp;|&nbsp; 1990–2024</div>
+      </div>
+      <div class="card-badges">
+        <div class="cbadge" style="border-color:#3fb950;color:#3fb950;"><div class="cbadge-dot" style="background:#3fb950"></div>Surplus</div>
+        <div class="cbadge" style="border-color:#f85149;color:#f85149;"><div class="cbadge-dot" style="background:#f85149"></div>Deficit</div>
+        <div class="cbadge" style="border-color:#d29922;color:#d29922;"><div class="cbadge-dot" style="background:#d29922"></div>2024 (gross)</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="stat-strip">
+        <div class="strip-stat"><div class="strip-label">Best Year</div><div class="strip-value green">$394,114</div><div class="strip-sub">2013</div></div>
+        <div class="strip-stat"><div class="strip-label">Worst Year</div><div class="strip-value red">−$134,339</div><div class="strip-sub">2024</div></div>
+        <div class="strip-stat"><div class="strip-label">35-Year Cumulative</div><div class="strip-value green">$4,613,283</div><div class="strip-sub">1990–2024</div></div>
+        <div class="strip-stat"><div class="strip-label">Deficit Years</div><div class="strip-value red">8</div><div class="strip-sub">1992–94, 2001–05, 2024</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart_net"></canvas></div>
+    </div>
+    <div class="card-footer">Green = surplus years &nbsp;·&nbsp; Red = deficit years &nbsp;·&nbsp; Orange = 2024 &nbsp;·&nbsp; Includes Mortgage Principal in full cash requirement &nbsp;·&nbsp; Red dashed line = 2006 surplus of $257,969</div>
   </div>
 
   <!-- CHART 2 -->
@@ -289,6 +316,63 @@ document.getElementById('chart3').addEventListener('mousemove',e=>{
     <div class="tt-row"><span class="tt-lbl">Cumulative Total</span><span class="tt-val" style="color:${col}">$${cv.toLocaleString()}</span></div>`);
 });
 document.getElementById('chart3').addEventListener('mouseleave',hideTT);
+
+// CHART NET: Surplus / Deficit
+const netRaw = [69749,35848,-22655,-9870,-5771,72442,89682,127037,193406,157205,48554,-66749,-28208,-114207,-107733,-30792,257969,227457,192182,324794,306368,260210,226375,394114,146776,206770,334945,275255,258214,231573,334222,215213,50595,96652,-134339];
+const REF_NET = 257969;
+const netColors = netRaw.map((v,i) => {
+  if(i===34) return 'rgba(210,153,34,0.85)';
+  return v>=0 ? 'rgba(63,185,80,0.82)' : 'rgba(248,81,73,0.82)';
+});
+const netBorders = netRaw.map((v,i) => {
+  if(i===34) return 'rgba(210,153,34,1)';
+  return v>=0 ? 'rgba(63,185,80,1)' : 'rgba(248,81,73,1)';
+});
+const ctxNet = document.getElementById('chart_net').getContext('2d');
+const chartNet = new Chart(ctxNet, {
+  type:'bar',
+  data:{labels:years, datasets:[{
+    label:'Net', data:netRaw,
+    backgroundColor:netColors, borderColor:netBorders,
+    borderWidth:1, borderRadius:3, borderSkipped:false
+  }]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false}, tooltip:{enabled:false},
+      annotation:{annotations:{
+        refLine:{
+          type:'line', yMin:REF_NET, yMax:REF_NET,
+          borderColor:'#f85149', borderWidth:2, borderDash:[6,4],
+          label:{display:true, content:'2006 Surplus: $257,969', position:'start',
+            backgroundColor:'#f85149', color:'#fff',
+            font:{family:'Source Sans 3',size:10,weight:'600'},
+            padding:{x:7,y:3}, borderRadius:4}
+        },
+        zeroLine:{type:'line', yMin:0, yMax:0, borderColor:'rgba(139,148,158,0.4)', borderWidth:1}
+      }}
+    },
+    scales:{
+      x:{grid:{display:false}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''}, border:{display:false}},
+      y:{grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>(v<0?'−$':'$')+Math.abs(v/1000).toFixed(0)+'K'}, border:{display:false}}
+    }
+  }
+});
+document.getElementById('chart_net').addEventListener('mousemove', e => {
+  const pts = chartNet.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(!pts.length) return hideTT();
+  const i=pts[0].index, yr=years[i], net=netRaw[i];
+  const isAdj=i===34, isDeficit=net<0;
+  const nc=isAdj?'#d29922':(isDeficit?'#f85149':'#3fb950');
+  const ns=isDeficit?'−':'+'
+  const vs=net-REF_NET, vsc=vs>=0?'#3fb950':'#f85149', vss=vs>=0?'+':'−';
+  showTT(e,`<div class="tt-yr">${yr}${isAdj?' ⚠️':''}</div>
+    <div class="tt-row"><span class="tt-lbl">${isDeficit?'Deficit':'Surplus'}</span><span class="tt-val" style="color:${nc}">${ns}$${Math.abs(net).toLocaleString()}</span></div>
+    <div class="tt-div"></div>
+    <div class="tt-row"><span class="tt-lbl">vs 2006 line</span><span class="tt-val" style="color:${vsc}">${vss}$${Math.abs(vs).toLocaleString()}</span></div>
+    ${isAdj?'<div style="font-size:0.76rem;color:#8b949e;margin-top:3px;">Incl. Fire & Water + Principal</div>':''}`);
+});
+document.getElementById('chart_net').addEventListener('mouseleave', hideTT);
 </script>
 </body>
 </html>
