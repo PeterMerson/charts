@@ -7,217 +7,65 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #1c2230;
-    --border: #30363d;
-    --navy: #1F4E79;
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --text: #e6edf3;
-    --muted: #8b949e;
-    --green: #3fb950;
-    --red: #f85149;
-    --orange: #d29922;
-    --blue: #58a6ff;
-    --purple: #bc8cff;
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2230;
+    --border: #30363d; --gold: #c9a84c; --gold-light: #e8c96a;
+    --text: #e6edf3; --muted: #8b949e;
+    --green: #3fb950; --red: #f85149; --orange: #d29922; --blue: #58a6ff; --purple: #bc8cff;
     --shadow: 0 8px 32px rgba(0,0,0,0.4);
   }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  body {
-    font-family: 'Source Sans 3', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── HEADER ── */
   .dashboard-header {
     background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 32px 48px 28px;
-    position: relative;
-    overflow: hidden;
+    border-bottom: 1px solid var(--border); padding: 32px 48px 28px; position: relative; overflow: hidden;
   }
   .dashboard-header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
     background: radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
                 radial-gradient(ellipse at 80% 50%, rgba(31,78,121,0.08) 0%, transparent 60%);
     pointer-events: none;
   }
-  .header-inner {
-    max-width: 1300px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-    position: relative;
-  }
-  .header-title-block h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
+  .header-inner { max-width: 1300px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; position: relative; }
+  .header-title-block h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: var(--text); letter-spacing: -0.02em; line-height: 1.1; }
   .header-title-block h1 span { color: var(--gold-light); }
-  .header-subtitle {
-    font-size: 0.88rem;
-    color: var(--muted);
-    margin-top: 6px;
-    letter-spacing: 0.04em;
-  }
-  .header-kpis {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  .kpi {
-    text-align: right;
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    min-width: 130px;
-  }
+  .header-subtitle { font-size: 0.88rem; color: var(--muted); margin-top: 6px; letter-spacing: 0.04em; }
+  .header-kpis { display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+  .kpi { text-align: right; padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); min-width: 130px; }
   .kpi-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 3px; }
   .kpi-value { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
-  .kpi-value.green { color: var(--green); }
-  .kpi-value.gold  { color: var(--gold-light); }
-  .kpi-value.blue  { color: var(--blue); }
+  .kpi-value.green { color: var(--green); } .kpi-value.gold { color: var(--gold-light); } .kpi-value.red { color: var(--red); } .kpi-value.blue { color: var(--blue); }
   .kpi-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
 
-  /* ── GOLD RULE ── */
-  .gold-rule {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
-    margin: 0;
-  }
+  .gold-rule { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); }
 
-  /* ── MAIN CONTENT ── */
-  .dashboard-body {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 40px 48px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
+  .dashboard-body { max-width: 1300px; margin: 0 auto; padding: 40px 48px 60px; display: flex; flex-direction: column; gap: 40px; }
 
-  /* ── CHART CARD ── */
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    animation: fadeUp 0.6s ease forwards;
-    opacity: 0;
-  }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); animation: fadeUp 0.6s ease forwards; opacity: 0; }
   .chart-card:nth-child(1) { animation-delay: 0.1s; }
   .chart-card:nth-child(2) { animation-delay: 0.25s; }
   .chart-card:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .card-header {
-    padding: 20px 28px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .card-subtitle {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-top: 3px;
-  }
-  .card-badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .cbadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid;
-  }
+  .card-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--text); }
+  .card-subtitle { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+  .card-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cbadge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 500; border: 1px solid; }
   .cbadge-dot { width: 8px; height: 8px; border-radius: 50%; }
 
   .card-body { padding: 24px 28px 20px; }
   .chart-wrap { position: relative; width: 100%; height: 380px; }
+  .card-footer { padding: 12px 28px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); background: rgba(0,0,0,0.15); }
 
-  .card-footer {
-    padding: 12px 28px;
-    border-top: 1px solid var(--border);
-    font-size: 0.75rem;
-    color: var(--muted);
-    background: rgba(0,0,0,0.15);
-  }
-
-  /* ── STAT ROW inside cards ── */
-  .stat-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .strip-stat {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    text-align: center;
-  }
+  .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .strip-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; text-align: center; }
   .strip-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 3px; }
   .strip-value { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--text); }
-  .strip-value.green  { color: var(--green); }
-  .strip-value.red    { color: var(--red); }
-  .strip-value.gold   { color: var(--gold-light); }
-  .strip-value.blue   { color: var(--blue); }
-  .strip-value.orange { color: var(--orange); }
+  .strip-value.green { color: var(--green); } .strip-value.red { color: var(--red); } .strip-value.gold { color: var(--gold-light); } .strip-value.blue { color: var(--blue); } .strip-value.orange { color: var(--orange); }
   .strip-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
 
-  /* ── TOOLTIP ── */
-  #tooltip {
-    position: fixed;
-    background: #1c2230;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.84rem;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.12s;
-    z-index: 9999;
-    min-width: 220px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    line-height: 1.8;
-  }
+  #tooltip { position: fixed; background: #1c2230; color: var(--text); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; font-size: 0.84rem; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 9999; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); line-height: 1.8; }
   #tooltip.visible { opacity: 1; }
   #tooltip .tt-yr { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gold-light); margin-bottom: 4px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
   #tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; }
@@ -225,55 +73,34 @@
   #tooltip .tt-val { font-weight: 600; }
   #tooltip .tt-div { border-top: 1px solid var(--border); margin: 4px 0; padding-top: 4px; }
 
-  /* ── FOOTER ── */
-  .page-footer {
-    text-align: center;
-    padding: 24px 48px;
-    border-top: 1px solid var(--border);
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
+  .page-footer { text-align: center; padding: 24px 48px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="dashboard-header">
   <div class="header-inner">
     <div class="header-title-block">
       <h1>Riveredge <span>Financial Dashboard</span></h1>
-      <div class="header-subtitle">35-Year Financial Analysis &nbsp;·&nbsp; 1990–2024 &nbsp;·&nbsp; Mortgage Interest Only &nbsp;·&nbsp; 2024 adjusted excl. Fire & Water Damages $228,074</div>
+      <div class="header-subtitle">35-Year Financial Analysis &nbsp;·&nbsp; 1990–2024 &nbsp;·&nbsp; Mortgage Interest Only &nbsp;·&nbsp; 2024 includes Fire & Water Damages $228,074</div>
     </div>
     <div class="header-kpis">
-      <div class="kpi">
-        <div class="kpi-label">2024 Net Surplus</div>
-        <div class="kpi-value green">$163,787</div>
-        <div class="kpi-sub">Income − Expenses</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Total Liquidity</div>
-        <div class="kpi-value gold">$1,976,793</div>
-        <div class="kpi-sub">2024 year-end</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">CapEx Invested</div>
-        <div class="kpi-value blue">$4,492,957</div>
-        <div class="kpi-sub">35-year total</div>
-      </div>
+      <div class="kpi"><div class="kpi-label">2024 Net Deficit</div><div class="kpi-value red">−$64,287</div><div class="kpi-sub">Income − Expenses</div></div>
+      <div class="kpi"><div class="kpi-label">Total Liquidity</div><div class="kpi-value gold">$1,976,793</div><div class="kpi-sub">2024 year-end</div></div>
+      <div class="kpi"><div class="kpi-label">CapEx Invested</div><div class="kpi-value blue">$4,492,957</div><div class="kpi-sub">35-year total</div></div>
     </div>
   </div>
 </div>
 <div class="gold-rule"></div>
 
-<!-- DASHBOARD BODY -->
 <div class="dashboard-body">
 
-  <!-- ── CHART 1: Total Income vs Expenses ── -->
+  <!-- CHART 1 -->
   <div class="chart-card">
     <div class="card-header">
       <div>
         <div class="card-title">Total Income vs. Total Operating Expenses</div>
-        <div class="card-subtitle">Step chart — Income excl. Special Assessments vs. Operating Expenses &nbsp;|&nbsp; 1990–2024</div>
+        <div class="card-subtitle">Step chart — Income excl. Special Assessments vs. Gross Operating Expenses &nbsp;|&nbsp; 1990–2024</div>
       </div>
       <div class="card-badges">
         <div class="cbadge" style="border-color:#3fb950;color:#3fb950;"><div class="cbadge-dot" style="background:#3fb950"></div>Total Income</div>
@@ -284,16 +111,16 @@
     <div class="card-body">
       <div class="stat-strip">
         <div class="strip-stat"><div class="strip-label">2024 Income</div><div class="strip-value green">$1,846,671</div><div class="strip-sub">Excl. Special Assess.</div></div>
-        <div class="strip-stat"><div class="strip-label">2024 Expenses</div><div class="strip-value red">$1,682,884</div><div class="strip-sub">Excl. Fire & Water</div></div>
-        <div class="strip-stat"><div class="strip-label">2024 Net Surplus</div><div class="strip-value green">$163,787</div><div class="strip-sub">Income − Expenses</div></div>
-        <div class="strip-stat"><div class="strip-label">Deficit Years</div><div class="strip-value red">8</div><div class="strip-sub">All before 2006</div></div>
+        <div class="strip-stat"><div class="strip-label">2024 Expenses</div><div class="strip-value red">$1,910,958</div><div class="strip-sub">Incl. Fire & Water</div></div>
+        <div class="strip-stat"><div class="strip-label">2024 Net Deficit</div><div class="strip-value red">−$64,287</div><div class="strip-sub">Income − Expenses</div></div>
+        <div class="strip-stat"><div class="strip-label">Deficit Years</div><div class="strip-value red">9</div><div class="strip-sub">2024 added to prior 8</div></div>
       </div>
       <div class="chart-wrap"><canvas id="chart1"></canvas></div>
     </div>
-    <div class="card-footer">Green = Total Income (excl. Special Assessments) &nbsp;·&nbsp; Red = Total Operating Expenses &nbsp;·&nbsp; Orange dashed = Expenses + Mortgage Principal (full cash requirement)</div>
+    <div class="card-footer">Green = Total Income (excl. Special Assessments) &nbsp;·&nbsp; Red = Total Operating Expenses (gross) &nbsp;·&nbsp; Orange dashed = Expenses + Mortgage Principal (full cash requirement)</div>
   </div>
 
-  <!-- ── CHART 2: Total Liquidity ── -->
+  <!-- CHART 2 -->
   <div class="chart-card">
     <div class="card-header">
       <div>
@@ -318,7 +145,7 @@
     <div class="card-footer">Westchester Standard CPI-adjusted backward from 2025 using CPI-U &nbsp;·&nbsp; Reserve Fund first appeared 2008 &nbsp;·&nbsp; 2024 Reserve = $0 (consolidated into Cash)</div>
   </div>
 
-  <!-- ── CHART 3: Cumulative CapEx ── -->
+  <!-- CHART 3 -->
   <div class="chart-card">
     <div class="card-header">
       <div>
@@ -339,25 +166,23 @@
       </div>
       <div class="chart-wrap"><canvas id="chart3"></canvas></div>
     </div>
-    <div class="card-footer">Each line builds cumulatively from $0 at the start of its period along actual calendar years &nbsp;·&nbsp; Blue = 1990–2005 &nbsp;·&nbsp; Orange = 2006–2024 &nbsp;·&nbsp; Hover for annual spend and running cumulative total</div>
+    <div class="card-footer">Each line builds cumulatively from $0 at the start of its period along actual calendar years &nbsp;·&nbsp; Blue = 1990–2005 &nbsp;·&nbsp; Orange = 2006–2024</div>
   </div>
 
 </div>
-
 <div class="gold-rule"></div>
 <div class="page-footer">Riveredge Financial Dashboard &nbsp;·&nbsp; Personal Use &nbsp;·&nbsp; Data: Audited Annual Reports 1990–2024 &nbsp;·&nbsp; Mortgage Principal excluded from Operating Expenses</div>
-
 <div id="tooltip"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script>
-// ── DATA ──
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
 
+// GROSS expenses — no adjustments to 2024
 const incRaw     = [1175653,1150811,1133735,1148098,1176289,1199091,1205655,1207776,1219649,1201838,1235657,1223933,1215986,1226535,1309588,1454039,1720108,1722145,1736837,1784540,1758926,1769448,1760891,1702178,1659232,1664369,1652452,1670183,1694196,1708893,1684945,1678636,1677006,1745779,1846671];
-const expRaw     = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,970285,979500,1116862,1215116,1162898,1253284,1323232,1383608,1353243,1377536,1418629,1324150,1306689,1352311,1365778,1274576,1470884,1413565,1271145,1346109,1384578,1423195,1293732,1403415,1563226,1582597,1682884];
-const expPrinRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187103,1290682,1244194,1340742,1417321,1484831,1462139,1494688,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1394928,1435982,1477320,1350723,1463423,1626411,1649127,1752936];
+const expRaw     = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,970285,979500,1116862,1215116,1162898,1253284,1323232,1383608,1353243,1377536,1418629,1324150,1306689,1352311,1365778,1274576,1470884,1413565,1271145,1346109,1384578,1423195,1293732,1403415,1563226,1582597,1910958];
+const expPrinRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187103,1290682,1244194,1340742,1417321,1484831,1462139,1494688,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1394928,1435982,1477320,1350723,1463423,1626411,1649127,1981010];
 
 const cashRaw    = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,393313,608614,252599,61503,30296,274066,110834,102845,214400,115582,98755,111999,83242,145852,223965,1425016,1976793];
 const reserveRaw = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306484,470398,1006727,1083523,1120846,1303582,1338409,1462059,1354270,1667267,1877718,2118012,2335551,2364123,2231883,891297,0];
@@ -366,103 +191,67 @@ const totalLiq   = years.map((_,i) => cashRaw[i] + reserveRaw[i]);
 const lowAdj  = [226574,236108,243216,250497,256911,264192,271993,278234,282567,288808,298516,307010,311864,318972,327466,338561,349482,359363,373232,371845,378086,389874,398021,403915,410329,410850,416050,424891,435292,443267,448641,469790,507408,528210,543812];
 const highAdj = [323677,337298,347451,357853,367016,377417,388561,397476,403668,412583,426451,438586,445520,455674,467809,483658,499260,513376,533188,531207,540122,556962,568602,577022,586185,586928,594357,606987,621846,633238,640915,671129,724868,754586,776875];
 
-const years1   = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005];
-const annual1  = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459];
-const years2   = [2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
-const annual2  = [32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
+const years1  = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005];
+const annual1 = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459];
+const years2  = [2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const annual2 = [32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
 
-const cum1 = [], cum2 = [];
-let r1=0, r2=0;
-annual1.forEach(v => { r1+=v; cum1.push(r1); });
-annual2.forEach(v => { r2+=v; cum2.push(r2); });
+const cum1=[], cum2=[];
+let r1=0,r2=0;
+annual1.forEach(v=>{r1+=v;cum1.push(r1);});
+annual2.forEach(v=>{r2+=v;cum2.push(r2);});
 
 const tooltip = document.getElementById('tooltip');
+function showTT(e,html){ tooltip.innerHTML=html; tooltip.classList.add('visible'); let tx=e.clientX+16,ty=e.clientY-100; if(tx+250>window.innerWidth)tx=e.clientX-265; if(ty<10)ty=10; tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px'; }
+function hideTT(){ tooltip.classList.remove('visible'); }
 
-function showTT(e, html) {
-  tooltip.innerHTML = html;
-  tooltip.classList.add('visible');
-  let tx = e.clientX + 16, ty = e.clientY - 100;
-  if (tx + 250 > window.innerWidth) tx = e.clientX - 265;
-  if (ty < 10) ty = 10;
-  tooltip.style.left = tx+'px';
-  tooltip.style.top = ty+'px';
-}
-function hideTT() { tooltip.classList.remove('visible'); }
-
-// ── CHART 1: Income vs Expenses ──
-const ctx1 = document.getElementById('chart1').getContext('2d');
-const gGrad = ctx1.createLinearGradient(0,0,0,380);
-gGrad.addColorStop(0,'rgba(63,185,80,0.18)'); gGrad.addColorStop(1,'rgba(63,185,80,0.01)');
-const rGrad = ctx1.createLinearGradient(0,0,0,380);
-rGrad.addColorStop(0,'rgba(248,81,73,0.12)'); rGrad.addColorStop(1,'rgba(248,81,73,0.01)');
-
-const chart1 = new Chart(ctx1, {
-  type: 'line',
-  data: { labels: years, datasets: [
-    { label:'Income', data:incRaw, borderColor:'#3fb950', backgroundColor:gGrad, borderWidth:2.5, pointRadius:2.5, pointHoverRadius:6, pointBackgroundColor:'#3fb950', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:true, stepped:true },
-    { label:'Expenses', data:expRaw, borderColor:'#f85149', backgroundColor:rGrad, borderWidth:2.5, pointRadius:2.5, pointHoverRadius:6, pointBackgroundColor:'#f85149', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:true, stepped:true },
-    { label:'Exp+Principal', data:expPrinRaw, borderColor:'#d29922', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:2, pointHoverRadius:5, pointBackgroundColor:'#d29922', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:false, stepped:true }
-  ]},
-  options: {
-    responsive:true, maintainAspectRatio:false,
-    interaction:{ mode:'index', intersect:false },
-    plugins:{ legend:{display:false}, tooltip:{enabled:false} },
-    scales:{
-      x:{ grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''}, border:{display:false} },
-      y:{ grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v/1000000>=1?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, border:{display:false}, min:700000 }
-    }
-  }
-});
-document.getElementById('chart1').addEventListener('mousemove', e => {
-  const pts = chart1.getElementsAtEventForMode(e,'index',{intersect:false},true);
-  if (!pts.length) return hideTT();
-  const i = pts[0].index, yr=years[i], inc=incRaw[i], exp=expRaw[i], ep=expPrinRaw[i];
-  const net=inc-exp, nc=net>=0?'#3fb950':'#f85149', ns=net>=0?'+':'−';
-  const netFull=inc-ep, nfc=netFull>=0?'#3fb950':'#f85149', nfs=netFull>=0?'+':'−';
+// CHART 1
+const ctx1=document.getElementById('chart1').getContext('2d');
+const gGrad=ctx1.createLinearGradient(0,0,0,380); gGrad.addColorStop(0,'rgba(63,185,80,0.18)'); gGrad.addColorStop(1,'rgba(63,185,80,0.01)');
+const rGrad=ctx1.createLinearGradient(0,0,0,380); rGrad.addColorStop(0,'rgba(248,81,73,0.12)'); rGrad.addColorStop(1,'rgba(248,81,73,0.01)');
+const chart1=new Chart(ctx1,{type:'line',data:{labels:years,datasets:[
+  {label:'Income',data:incRaw,borderColor:'#3fb950',backgroundColor:gGrad,borderWidth:2.5,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:'#3fb950',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,stepped:true},
+  {label:'Expenses',data:expRaw,borderColor:'#f85149',backgroundColor:rGrad,borderWidth:2.5,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:'#f85149',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,stepped:true},
+  {label:'Exp+Principal',data:expPrinRaw,borderColor:'#d29922',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#d29922',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:false,stepped:true}
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+  x:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''},border:{display:false}},
+  y:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v/1000000>=1?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},border:{display:false},min:700000}
+}}});
+document.getElementById('chart1').addEventListener('mousemove',e=>{
+  const pts=chart1.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(!pts.length)return hideTT();
+  const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
+  const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
+  const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
   showTT(e,`<div class="tt-yr">${yr}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-lbl" style="color:#f85149">Total Expenses</span><span class="tt-val" style="color:#f85149">$${exp.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-lbl" style="color:#d29922">Exp + Principal</span><span class="tt-val" style="color:#d29922">$${ep.toLocaleString()}</span></div>
     <div class="tt-div"></div>
     <div class="tt-row"><span class="tt-lbl">Net (Inc−Exp)</span><span class="tt-val" style="color:${nc}">${ns}$${Math.abs(net).toLocaleString()}</span></div>
-    <div class="tt-row"><span class="tt-lbl">Net incl. Principal</span><span class="tt-val" style="color:${nfc}">${nfs}$${Math.abs(netFull).toLocaleString()}</span></div>`);
+    <div class="tt-row"><span class="tt-lbl">Net incl. Principal</span><span class="tt-val" style="color:${nfc}">${nfs}$${Math.abs(nf).toLocaleString()}</span></div>`);
 });
-document.getElementById('chart1').addEventListener('mouseleave', hideTT);
+document.getElementById('chart1').addEventListener('mouseleave',hideTT);
 
-// ── CHART 2: Total Liquidity ──
-const ctx2 = document.getElementById('chart2').getContext('2d');
-const liqGrad = ctx2.createLinearGradient(0,0,0,380);
-liqGrad.addColorStop(0,'rgba(88,166,255,0.22)'); liqGrad.addColorStop(1,'rgba(88,166,255,0.02)');
-
-const chart2 = new Chart(ctx2, {
-  type:'bar',
-  data:{ labels:years, datasets:[
-    { label:'Total Liquidity', data:totalLiq, backgroundColor:'rgba(88,166,255,0.75)', borderColor:'rgba(88,166,255,1)', borderWidth:1, borderRadius:3 },
-    { label:'Low', data:lowAdj, type:'line', borderColor:'#f85149', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false, tension:0.3 },
-    { label:'High', data:highAdj, type:'line', borderColor:'#bc8cff', borderWidth:1.5, borderDash:[5,4], pointRadius:0, fill:false, tension:0.3 }
-  ]},
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    interaction:{mode:'index',intersect:false},
-    plugins:{ legend:{display:false}, tooltip:{enabled:false},
-      annotation:{ annotations:{
-        lowLine:{ type:'line', yMin:lowAdj[34], yMax:lowAdj[34], borderColor:'rgba(248,81,73,0)', borderWidth:0 }
-      }}
-    },
-    scales:{
-      x:{ grid:{display:false}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''}, border:{display:false} },
-      y:{ grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')}, border:{display:false} }
-    }
-  }
-});
-document.getElementById('chart2').addEventListener('mousemove', e => {
-  const pts = chart2.getElementsAtEventForMode(e,'index',{intersect:false},true);
-  if (!pts.length) return hideTT();
-  const i=pts[0].index, yr=years[i], liq=totalLiq[i], lo=lowAdj[i], hi=highAdj[i];
-  let status, sc;
-  if(liq>=hi){ status='✅ Above Westchester High'; sc='#3fb950'; }
-  else if(liq>=lo){ status='✔ Within Westchester Range'; sc='#58a6ff'; }
-  else{ status='⚠️ Below Westchester Low'; sc='#f85149'; }
+// CHART 2
+const ctx2=document.getElementById('chart2').getContext('2d');
+const lGrad=ctx2.createLinearGradient(0,0,0,380); lGrad.addColorStop(0,'rgba(88,166,255,0.22)'); lGrad.addColorStop(1,'rgba(88,166,255,0.02)');
+const chart2=new Chart(ctx2,{type:'bar',data:{labels:years,datasets:[
+  {label:'Liquidity',data:totalLiq,backgroundColor:'rgba(88,166,255,0.75)',borderColor:'rgba(88,166,255,1)',borderWidth:1,borderRadius:3},
+  {label:'Low',data:lowAdj,type:'line',borderColor:'#f85149',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false,tension:0.3},
+  {label:'High',data:highAdj,type:'line',borderColor:'#bc8cff',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false,tension:0.3}
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+  x:{grid:{display:false},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''},border:{display:false}},
+  y:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},border:{display:false}}
+}}});
+document.getElementById('chart2').addEventListener('mousemove',e=>{
+  const pts=chart2.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(!pts.length)return hideTT();
+  const i=pts[0].index,yr=years[i],liq=totalLiq[i],lo=lowAdj[i],hi=highAdj[i];
+  let status,sc;
+  if(liq>=hi){status='✅ Above Westchester High';sc='#3fb950';}
+  else if(liq>=lo){status='✔ Within Westchester Range';sc='#58a6ff';}
+  else{status='⚠️ Below Westchester Low';sc='#f85149';}
   showTT(e,`<div class="tt-yr">${yr}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#58a6ff">Total Liquidity</span><span class="tt-val" style="color:#58a6ff">$${liq.toLocaleString()}</span></div>
     <div class="tt-div"></div>
@@ -471,47 +260,35 @@ document.getElementById('chart2').addEventListener('mousemove', e => {
     <div class="tt-row"><span class="tt-lbl">vs Low</span><span class="tt-val" style="color:${liq>=lo?'#3fb950':'#f85149'}">${liq>=lo?'+':'−'}$${Math.abs(liq-lo).toLocaleString()}</span></div>
     <div style="margin-top:5px;font-size:0.78rem;color:${sc}">${status}</div>`);
 });
-document.getElementById('chart2').addEventListener('mouseleave', hideTT);
+document.getElementById('chart2').addEventListener('mouseleave',hideTT);
 
-// ── CHART 3: Cumulative CapEx Line Chart ──
-const ctx3 = document.getElementById('chart3').getContext('2d');
-const c1Grad = ctx3.createLinearGradient(0,0,0,380);
-c1Grad.addColorStop(0,'rgba(88,166,255,0.18)'); c1Grad.addColorStop(1,'rgba(88,166,255,0.01)');
-const c2Grad = ctx3.createLinearGradient(0,0,0,380);
-c2Grad.addColorStop(0,'rgba(210,153,34,0.18)'); c2Grad.addColorStop(1,'rgba(210,153,34,0.01)');
-
-const chart3 = new Chart(ctx3, {
-  type:'line',
-  data:{ datasets:[
-    { label:'Period 1: 1990–2005', data:years1.map((yr,i)=>({x:yr,y:cum1[i]})), borderColor:'#58a6ff', backgroundColor:c1Grad, borderWidth:2.5, pointRadius:3, pointHoverRadius:6, pointBackgroundColor:'#58a6ff', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:true, tension:0.3 },
-    { label:'Period 2: 2006–2024', data:years2.map((yr,i)=>({x:yr,y:cum2[i]})), borderColor:'#d29922', backgroundColor:c2Grad, borderWidth:2.5, pointRadius:3, pointHoverRadius:6, pointBackgroundColor:'#d29922', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:true, tension:0.3 }
-  ]},
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    interaction:{mode:'nearest',intersect:false,axis:'x'},
-    plugins:{ legend:{display:false}, tooltip:{enabled:false} },
-    scales:{
-      x:{ type:'linear', grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',stepSize:1,callback:v=>(v%5===0||v===1990||v===2005||v===2006||v===2024)?v:''}, border:{display:false} },
-      y:{ grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, border:{display:false} }
-    }
-  }
-});
-document.getElementById('chart3').addEventListener('mousemove', e => {
-  const pts = chart3.getElementsAtEventForMode(e,'nearest',{intersect:false,axis:'x'},true);
-  if (!pts.length) return hideTT();
-  const dsIdx=pts[0].datasetIndex, ptIdx=pts[0].index;
-  const isP1=dsIdx===0;
-  const yr=isP1?years1[ptIdx]:years2[ptIdx];
-  const annualVal=isP1?annual1[ptIdx]:annual2[ptIdx];
-  const cumVal=isP1?cum1[ptIdx]:cum2[ptIdx];
-  const color=isP1?'#58a6ff':'#d29922';
-  const periodLabel=isP1?'Period 1: 1990–2005':'Period 2: 2006–2024';
-  showTT(e,`<div class="tt-yr">${yr} <span style="font-size:0.75rem;color:#8b949e">${periodLabel}</span></div>
-    <div class="tt-row"><span class="tt-lbl">Annual Spend</span><span class="tt-val" style="color:${color}">$${annualVal.toLocaleString()}</span></div>
+// CHART 3
+const ctx3=document.getElementById('chart3').getContext('2d');
+const c1g=ctx3.createLinearGradient(0,0,0,380); c1g.addColorStop(0,'rgba(88,166,255,0.18)'); c1g.addColorStop(1,'rgba(88,166,255,0.01)');
+const c2g=ctx3.createLinearGradient(0,0,0,380); c2g.addColorStop(0,'rgba(210,153,34,0.18)'); c2g.addColorStop(1,'rgba(210,153,34,0.01)');
+const chart3=new Chart(ctx3,{type:'line',data:{datasets:[
+  {label:'P1',data:years1.map((yr,i)=>({x:yr,y:cum1[i]})),borderColor:'#58a6ff',backgroundColor:c1g,borderWidth:2.5,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:'#58a6ff',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,tension:0.3},
+  {label:'P2',data:years2.map((yr,i)=>({x:yr,y:cum2[i]})),borderColor:'#d29922',backgroundColor:c2g,borderWidth:2.5,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:'#d29922',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,tension:0.3}
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:false,axis:'x'},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+  x:{type:'linear',grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',stepSize:1,callback:v=>(v%5===0||v===1990||v===2005||v===2006||v===2024)?v:''},border:{display:false}},
+  y:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},border:{display:false}}
+}}});
+document.getElementById('chart3').addEventListener('mousemove',e=>{
+  const pts=chart3.getElementsAtEventForMode(e,'nearest',{intersect:false,axis:'x'},true);
+  if(!pts.length)return hideTT();
+  const di=pts[0].datasetIndex,pi=pts[0].index;
+  const isP1=di===0;
+  const yr=isP1?years1[pi]:years2[pi];
+  const av=isP1?annual1[pi]:annual2[pi];
+  const cv=isP1?cum1[pi]:cum2[pi];
+  const col=isP1?'#58a6ff':'#d29922';
+  const pl=isP1?'Period 1: 1990–2005':'Period 2: 2006–2024';
+  showTT(e,`<div class="tt-yr">${yr} <span style="font-size:0.75rem;color:#8b949e">${pl}</span></div>
+    <div class="tt-row"><span class="tt-lbl">Annual Spend</span><span class="tt-val" style="color:${col}">$${av.toLocaleString()}</span></div>
     <div class="tt-div"></div>
-    <div class="tt-row"><span class="tt-lbl">Cumulative Total</span><span class="tt-val" style="color:${color}">$${cumVal.toLocaleString()}</span></div>`);
+    <div class="tt-row"><span class="tt-lbl">Cumulative Total</span><span class="tt-val" style="color:${col}">$${cv.toLocaleString()}</span></div>`);
 });
-document.getElementById('chart3').addEventListener('mouseleave', hideTT);
+document.getElementById('chart3').addEventListener('mouseleave',hideTT);
 </script>
 </body>
 </html>
