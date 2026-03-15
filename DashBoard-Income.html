@@ -172,6 +172,31 @@
     <div class="card-footer">Westchester Standard CPI-adjusted backward from 2025 using CPI-U &nbsp;·&nbsp; Reserve Fund first appeared 2008 &nbsp;·&nbsp; 2024 Reserve = $0 (consolidated into Cash)</div>
   </div>
 
+
+  <!-- CHART: Reserves per Unit vs Westchester -->
+  <div class="chart-card" style="animation-delay:0.55s;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Reserves & Cash per Unit vs. Westchester "Solid Adequate" Range</div>
+        <div class="card-subtitle">Actual year-end Cash & Reserves per unit (158 units) vs. inflation-adjusted Westchester range ($3,500–$5,000/unit in 2025 dollars) &nbsp;|&nbsp; 1990–2024</div>
+      </div>
+      <div class="card-badges">
+        <div class="cbadge" style="border-color:#58a6ff;color:#58a6ff;"><div class="cbadge-dot" style="background:#58a6ff;border-radius:50%;"></div>Actual per Unit</div>
+        <div class="cbadge" style="border-color:#d29922;color:#d29922;"><div class="cbadge-dot" style="background:rgba(210,153,34,0.4);border-radius:3px;width:16px;height:8px;"></div>Westchester Range</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="stat-strip">
+        <div class="strip-stat"><div class="strip-label">2024 per Unit</div><div class="strip-value gold">$12,511</div><div class="strip-sub">vs. high of $4,917</div></div>
+        <div class="strip-stat"><div class="strip-label">Peak per Unit</div><div class="strip-value blue">$15,886</div><div class="strip-sub">2021</div></div>
+        <div class="strip-stat"><div class="strip-label">Above High Since</div><div class="strip-value green">2009</div><div class="strip-sub">Every year since</div></div>
+        <div class="strip-stat"><div class="strip-label">2024 vs High</div><div class="strip-value green">+$7,594</div><div class="strip-sub">2.5× the benchmark</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart_perunit"></canvas></div>
+    </div>
+    <div class="card-footer">Orange shaded band = Westchester "solid adequate" range &nbsp;·&nbsp; Blue line = actual cash & reserves per unit &nbsp;·&nbsp; Red dashed line = 2006 &nbsp;·&nbsp; CPI-U backward adjusted from 2025</div>
+  </div>
+
   <!-- CHART 3 -->
   <div class="chart-card">
     <div class="card-header">
@@ -373,6 +398,111 @@ document.getElementById('chart_net').addEventListener('mousemove', e => {
     ${isAdj?'<div style="font-size:0.76rem;color:#8b949e;margin-top:3px;">Incl. Fire & Water + Principal</div>':''}`);
 });
 document.getElementById('chart_net').addEventListener('mouseleave', hideTT);
+
+// CHART: Reserves per Unit vs Westchester Range
+const actualPerUnit = [2427,1899,1144,1123,1324,1826,1948,2139,3586,3999,4154,4253,4565,3312,2346,1987,1717,3249,4429,6829,7970,7247,7286,9985,9172,9904,9928,11284,12509,14114,15309,15886,15543,14660,12511];
+const lowerPerUnit  = [1434,1494,1539,1585,1626,1672,1721,1761,1788,1828,1889,1943,1974,2019,2073,2143,2212,2274,2362,2353,2393,2468,2519,2556,2597,2600,2633,2689,2755,2805,2839,2973,3211,3343,3442];
+const upperPerUnit  = [2049,2135,2199,2265,2323,2389,2459,2516,2555,2611,2699,2776,2820,2884,2961,3061,3160,3249,3375,3362,3418,3525,3599,3652,3710,3715,3762,3842,3936,4008,4056,4248,4588,4776,4917];
+
+const ctxPU = document.getElementById('chart_perunit').getContext('2d');
+const chartPU = new Chart(ctxPU, {
+  type: 'line',
+  data: { labels: years, datasets: [
+    {
+      label: 'Lower Bound',
+      data: lowerPerUnit,
+      borderColor: '#d29922',
+      borderWidth: 1,
+      borderDash: [4,4],
+      pointRadius: 0,
+      fill: false,
+      order: 1
+    },
+    {
+      label: 'Upper Bound (Westchester Range)',
+      data: upperPerUnit,
+      borderColor: '#d29922',
+      backgroundColor: 'rgba(210,153,34,0.18)',
+      borderWidth: 1,
+      borderDash: [4,4],
+      pointRadius: 0,
+      fill: '-1',
+      order: 1
+    },
+    {
+      label: 'Actual per Unit',
+      data: actualPerUnit,
+      borderColor: '#58a6ff',
+      backgroundColor: 'rgba(88,166,255,0.12)',
+      borderWidth: 2.5,
+      pointRadius: 2.5,
+      pointHoverRadius: 6,
+      pointBackgroundColor: '#58a6ff',
+      pointBorderColor: '#0d1117',
+      pointBorderWidth: 1.5,
+      fill: false,
+      tension: 0.12,
+      order: 2
+    }
+  ]},
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+      annotation: {
+        annotations: {
+          vline2006: {
+            type: 'line',
+            xMin: years.indexOf(2006),
+            xMax: years.indexOf(2006),
+            borderColor: '#f85149',
+            borderWidth: 2,
+            borderDash: [6,4],
+            label: {
+              display: true,
+              content: '2006',
+              position: 'start',
+              backgroundColor: '#f85149',
+              color: '#fff',
+              font: { family: 'Source Sans 3', size: 10, weight: '600' },
+              padding: { x: 6, y: 3 },
+              borderRadius: 4
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#21262d' }, ticks: { font: { family: 'Source Sans 3', size: 10 }, color: '#8b949e', maxRotation: 45, callback: (v,i) => years[i]%5===0?years[i]:'' }, border: { display: false } },
+      y: { grid: { color: '#21262d' }, beginAtZero: true,
+        ticks: { font: { family: 'Source Sans 3', size: 10 }, color: '#8b949e', callback: v => '$'+v.toLocaleString() },
+        title: { display: true, text: 'Dollars per Unit', font: { family: 'Source Sans 3', size: 11 }, color: '#8b949e' },
+        border: { display: false }
+      }
+    }
+  }
+});
+document.getElementById('chart_perunit').addEventListener('mousemove', e => {
+  const pts = chartPU.getElementsAtEventForMode(e,'index',{intersect:false},true);
+  if(!pts.length) return hideTT();
+  const i = pts[0].index, yr = years[i];
+  const actual = actualPerUnit[i], lo = lowerPerUnit[i], hi = upperPerUnit[i];
+  let status, sc;
+  if(actual>=hi){ status='✅ Above Westchester High'; sc='#3fb950'; }
+  else if(actual>=lo){ status='✔ Within Westchester Range'; sc='#58a6ff'; }
+  else{ status='⚠️ Below Westchester Low'; sc='#f85149'; }
+  showTT(e, `<div class="tt-yr">${yr}</div>
+    <div class="tt-row"><span class="tt-lbl" style="color:#58a6ff">Actual per Unit</span><span class="tt-val" style="color:#58a6ff">$${actual.toLocaleString()}</span></div>
+    <div class="tt-div"></div>
+    <div class="tt-row"><span class="tt-lbl" style="color:#d29922">Westchester Low</span><span class="tt-val" style="color:#d29922">$${lo.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-lbl" style="color:#d29922">Westchester High</span><span class="tt-val" style="color:#d29922">$${hi.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-lbl">vs High</span><span class="tt-val" style="color:${actual>=hi?'#3fb950':'#f85149'}">${actual>=hi?'+':'-'}$${Math.abs(actual-hi).toLocaleString()}</span></div>
+    <div style="margin-top:5px;font-size:0.78rem;color:${sc}">${status}</div>`);
+});
+document.getElementById('chart_perunit').addEventListener('mouseleave', hideTT);
 </script>
 </body>
 </html>
