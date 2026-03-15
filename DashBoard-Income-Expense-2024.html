@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge 2024 Financial Breakdown</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #30363d;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .dashboard-header {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 48px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dashboard-header::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; bottom:0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(31,78,121,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 1300px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 24px; position: relative;
+  }
+  .header-title-block h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 900; color: var(--text);
+    letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .header-title-block h1 span { color: var(--gold-light); }
+  .header-subtitle { font-size: 0.88rem; color: var(--muted); margin-top: 6px; letter-spacing: 0.04em; }
+  .header-kpis { display: flex; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+  .kpi {
+    text-align: right; padding: 8px 16px; border-radius: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border); min-width: 130px;
+  }
+  .kpi-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 3px; }
+  .kpi-value { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.gold  { color: var(--gold-light); }
+  .kpi-value.red   { color: var(--red); }
+  .kpi-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  .gold-rule { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); }
+
+  /* ── BODY ── */
+  .dashboard-body {
+    max-width: 1300px; margin: 0 auto;
+    padding: 40px 48px 60px;
+    display: flex; flex-direction: column; gap: 40px;
+  }
+
+  /* ── PIE CARDS ROW ── */
+  .pie-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.6s ease forwards;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .chart-card:nth-child(1) { animation-delay: 0.1s; }
+  .chart-card:nth-child(2) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); }
+  .card-subtitle { font-size: 0.76rem; color: var(--muted); margin-top: 3px; }
+
+  .card-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── PIE ── */
+  .pie-layout { display: flex; gap: 20px; align-items: flex-start; }
+  .pie-svg-wrap { flex-shrink: 0; width: 200px; }
+  #income-svg, #expense-svg {
+    width: 100%; height: auto;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+  }
+  .wedge { cursor: pointer; transition: opacity 0.18s, filter 0.18s; }
+  .wedge:hover, .wedge.active { filter: brightness(1.18) drop-shadow(0 0 8px rgba(255,255,255,0.15)); opacity: 1 !important; }
+  .wedge.dimmed { opacity: 0.25; }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .detail-panel.has-data { border-color: #58a6ff44; background: #161f2e; }
+  .detail-placeholder { color: var(--muted); font-size: 0.88rem; text-align: center; line-height: 1.6; }
+  .detail-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 5px; }
+  .detail-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 12px; line-height: 1.2; display: flex; align-items: center; gap: 8px; }
+  .detail-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .detail-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .dval { font-weight: 600; color: var(--text); }
+  .detail-row .dpct { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--gold-light); }
+  .bar-track { height: 6px; background: #21262d; border-radius: 99px; margin-top: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+  /* ── LEGEND ── */
+  .legend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 8px; border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent; transition: background 0.15s;
+    font-size: 0.78rem;
+  }
+  .legend-item:hover { background: #21262d; border-color: var(--border); }
+  .legend-item.active { background: #1c2a3a; border-color: #58a6ff44; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .legend-text { color: var(--text); flex: 1; }
+  .legend-pct { color: var(--gold-light); font-weight: 600; margin-left: auto; }
+
+  /* ── FORMULA BADGE ── */
+  .formula-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(201,168,76,0.12); color: var(--gold-light);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 4px 12px; border-radius: 99px; font-size: 0.76rem; font-weight: 500;
+  }
+
+  /* ── STAT STRIP ── */
+  .stat-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px;
+  }
+  .strip-stat {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; text-align: center;
+  }
+  .strip-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 3px; }
+  .strip-value { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--text); }
+  .strip-value.green { color: var(--green); }
+  .strip-value.red   { color: var(--red); }
+  .strip-value.gold  { color: var(--gold-light); }
+  .strip-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── TOOLTIP ── */
+  #tooltip {
+    position: fixed; background: #1c2230; color: var(--text);
+    border: 1px solid var(--border); padding: 10px 14px; border-radius: 9px;
+    font-size: 0.82rem; pointer-events: none; opacity: 0; transition: opacity 0.12s;
+    z-index: 9999; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip strong { display: block; color: var(--gold-light); margin-bottom: 2px; }
+
+  .card-footer {
+    padding: 10px 24px; border-top: 1px solid var(--border);
+    font-size: 0.73rem; color: var(--muted); background: rgba(0,0,0,0.15);
+  }
+
+  .page-footer {
+    text-align: center; padding: 20px 48px;
+    border-top: 1px solid var(--border);
+    font-size: 0.74rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="dashboard-header">
+  <div class="header-inner">
+    <div class="header-title-block">
+      <h1>Riveredge <span>2024 Financial Breakdown</span></h1>
+      <div class="header-subtitle">Income & Expense Analysis &nbsp;·&nbsp; Fiscal Year 2024 &nbsp;·&nbsp; Mortgage Principal excluded from Expenses &nbsp;·&nbsp; Fire & Water Damages $228,074 excluded</div>
+    </div>
+    <div class="header-kpis">
+      <div class="kpi">
+        <div class="kpi-label">Total Income</div>
+        <div class="kpi-value gold">$1,846,671</div>
+        <div class="kpi-sub">Excl. Special Assessments</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Total Expenses</div>
+        <div class="kpi-value red">$1,682,884</div>
+        <div class="kpi-sub">Adjusted</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Net Surplus</div>
+        <div class="kpi-value green">$163,787</div>
+        <div class="kpi-sub">+8.9% of income</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="gold-rule"></div>
+
+<div class="dashboard-body">
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <div class="strip-stat"><div class="strip-label">Maintenance Charges</div><div class="strip-value gold">$1,644,840</div><div class="strip-sub">89.1% of income</div></div>
+    <div class="strip-stat"><div class="strip-label">Largest Expense</div><div class="strip-value red">$384,242</div><div class="strip-sub">Real Estate Taxes (22.8%)</div></div>
+    <div class="strip-stat"><div class="strip-label">Mortgage Interest</div><div class="strip-value">$115,424</div><div class="strip-sub">6.9% of expenses</div></div>
+    <div class="strip-stat"><div class="strip-label">Repairs (adj.)</div><div class="strip-value red">$267,743</div><div class="strip-sub">Excl. $228,074 fire/water</div></div>
+  </div>
+
+  <!-- PIE CHARTS ROW -->
+  <div class="pie-row">
+
+    <!-- INCOME PIE -->
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">2024 Income Breakdown</div>
+        <div class="card-subtitle" style="display:flex;align-items:center;gap:10px;margin-top:5px;">
+          <div class="formula-badge">Income Source ➗ Total Income</div>
+          <span>Total: $1,846,671</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pie-layout">
+          <div class="pie-svg-wrap">
+            <svg id="income-svg" viewBox="-10 -10 220 220" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div id="income-detail" class="detail-panel">
+            <p class="detail-placeholder">👆 Hover or click a slice<br>to see details</p>
+          </div>
+        </div>
+        <div class="legend-grid" id="income-legend"></div>
+      </div>
+      <div class="card-footer">Click any slice or legend item to highlight &nbsp;·&nbsp; Special Assessments excluded</div>
+    </div>
+
+    <!-- EXPENSE PIE -->
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="card-title">2024 Expense Breakdown</div>
+        <div class="card-subtitle" style="display:flex;align-items:center;gap:10px;margin-top:5px;">
+          <div class="formula-badge">Expense Item ➗ Total Income</div>
+          <span>Total: $1,682,884 &nbsp;·&nbsp; Surplus: $163,787</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pie-layout">
+          <div class="pie-svg-wrap">
+            <svg id="expense-svg" viewBox="-10 -10 220 220" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div id="expense-detail" class="detail-panel">
+            <p class="detail-placeholder">👆 Hover or click a slice<br>to see details</p>
+          </div>
+        </div>
+        <div class="legend-grid" id="expense-legend"></div>
+      </div>
+      <div class="card-footer">Repairs adjusted to exclude $228,074 Fire & Water Damages &nbsp;·&nbsp; Mortgage Principal excluded</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="gold-rule"></div>
+<div class="page-footer">Riveredge Financial Dashboard &nbsp;·&nbsp; Personal Use &nbsp;·&nbsp; Fiscal Year 2024 &nbsp;·&nbsp; Data: Audited Annual Report</div>
+
+<div id="tooltip"></div>
+
+<script>
+const TOTAL_INCOME = 1846671;
+
+// ── INCOME DATA ──
+const incomeData = [
+  { label: "Maintenance Charges", value: 1644840, color: "#1D6FA4" },
+  { label: "Parking",             value: 80383,   color: "#2196F3" },
+  { label: "Interest",            value: 53776,   color: "#43A047" },
+  { label: "Storage",             value: 31023,   color: "#FF9800" },
+  { label: "Laundry",             value: 25850,   color: "#8E24AA" },
+  { label: "Miscellaneous",       value: 6421,    color: "#00ACC1" },
+  { label: "Transfer Fees",       value: 4378,    color: "#F4511E" },
+];
+
+// ── EXPENSE DATA ──
+const expenseData = [
+  { label: "Real Estate Taxes",   value: 384242,  color: "#E63946" },
+  { label: "Repairs",             value: 267743,  color: "#d29922" },
+  { label: "Utilities",           value: 328592,  color: "#2196F3" },
+  { label: "Payroll",             value: 262939,  color: "#43A047" },
+  { label: "Insurance",           value: 99094,   color: "#8E24AA" },
+  { label: "Security",            value: 77374,   color: "#00ACC1" },
+  { label: "Mortgage Interest",   value: 115424,  color: "#FF9800" },
+  { label: "Mgmt Fee",            value: 52725,   color: "#6D4C41" },
+  { label: "Water & Sewer",       value: 52221,   color: "#546E7A" },
+  { label: "Corp Tax & Misc",     value: 31577,   color: "#F4511E" },
+  { label: "Legal & Audit",       value: 10953,   color: "#7CB342" },
+  { label: "Excess Maint",        value: 163787,  color: "#3fb950", surplus: true },
+];
+
+// ── PIE BUILDER ──
+function buildPie(svgId, legendId, detailId, data, totalIncome) {
+  const svg = document.getElementById(svgId);
+  const legendGrid = document.getElementById(legendId);
+  const detailPanel = document.getElementById(detailId);
+  const cx = 100, cy = 100, r = 90;
+  const total = data.reduce((s,d) => s + d.value, 0);
+  let activeIdx = null;
+  const textNodes = [];
+
+  function polar(cx, cy, r, deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function arc(cx, cy, r, s, e) {
+    const sp = polar(cx,cy,r,s), ep = polar(cx,cy,r,e);
+    const lg = (e-s) > 180 ? 1 : 0;
+    return `M ${cx} ${cy} L ${sp.x} ${sp.y} A ${r} ${r} 0 ${lg} 1 ${ep.x} ${ep.y} Z`;
+  }
+
+  let startAngle = 0;
+  data.forEach((d, i) => {
+    const sweep = (d.value / total) * 360;
+    const endAngle = startAngle + sweep;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', arc(cx,cy,r,startAngle,endAngle));
+    path.setAttribute('fill', d.color);
+    path.setAttribute('stroke', '#161b22');
+    path.setAttribute('stroke-width', '2');
+    path.classList.add('wedge');
+    path.dataset.idx = i;
+
+    if (sweep > 6) {
+      const mid = startAngle + sweep/2;
+      const lp = polar(cx,cy,r*0.65,mid);
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', lp.x); txt.setAttribute('y', lp.y);
+      txt.setAttribute('text-anchor','middle'); txt.setAttribute('dominant-baseline','central');
+      txt.setAttribute('fill','#fff'); txt.setAttribute('font-size', sweep>30?'7':'5.5');
+      txt.setAttribute('font-weight','bold'); txt.setAttribute('font-family','Source Sans 3, sans-serif');
+      txt.setAttribute('pointer-events','none');
+      txt.textContent = `${(d.value/totalIncome*100).toFixed(1)}%`;
+      textNodes.push(txt);
+    }
+
+    const tooltip = document.getElementById('tooltip');
+    path.addEventListener('mouseenter', e => {
+      const pct = (d.value/totalIncome*100).toFixed(1);
+      const sign = d.surplus ? '+' : '';
+      tooltip.innerHTML = `<strong>${d.label}</strong>${sign}$${d.value.toLocaleString()} &nbsp;|&nbsp; ${sign}${pct}% of income`;
+      tooltip.classList.add('visible');
+      tooltip.style.left = (e.clientX+14)+'px';
+      tooltip.style.top  = (e.clientY-36)+'px';
+    });
+    path.addEventListener('mousemove', e => {
+      tooltip.style.left = (e.clientX+14)+'px';
+      tooltip.style.top  = (e.clientY-36)+'px';
+    });
+    path.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    path.addEventListener('click', () => selectSlice(i));
+
+    svg.appendChild(path);
+    startAngle = endAngle;
+  });
+  textNodes.forEach(t => svg.appendChild(t));
+
+  function selectSlice(idx) {
+    if (activeIdx === idx) {
+      activeIdx = null;
+      svg.querySelectorAll('.wedge').forEach(p => p.classList.remove('dimmed','active'));
+      legendGrid.querySelectorAll('.legend-item').forEach(el => el.classList.remove('active'));
+      detailPanel.innerHTML = '<p class="detail-placeholder">👆 Hover or click a slice<br>to see details</p>';
+      detailPanel.classList.remove('has-data');
+      return;
+    }
+    activeIdx = idx;
+    const d = data[idx];
+    const pct = (d.value/totalIncome*100).toFixed(1);
+    const sign = d.surplus ? '+' : '';
+    svg.querySelectorAll('.wedge').forEach(p => {
+      const pi = parseInt(p.dataset.idx);
+      p.classList.toggle('dimmed', pi !== idx);
+      p.classList.toggle('active', pi === idx);
+    });
+    legendGrid.querySelectorAll('.legend-item').forEach((el,i) => el.classList.toggle('active', i===idx));
+    detailPanel.classList.add('has-data');
+    detailPanel.innerHTML = `
+      <div class="detail-label">${d.surplus ? 'Surplus' : 'Selected'}</div>
+      <div class="detail-name"><span class="detail-swatch" style="background:${d.color}"></span>${d.label}</div>
+      <div class="detail-row"><span>Amount</span><span class="dval">${sign}$${d.value.toLocaleString()}</span></div>
+      <div class="detail-row"><span>% of Total Income</span><span class="dpct">${sign}${pct}%</span></div>
+      <div class="detail-row"><span>Total Income</span><span class="dval">$${totalIncome.toLocaleString()}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+    `;
+  }
+
+  data.forEach((d, i) => {
+    const pct = (d.value/totalIncome*100).toFixed(1);
+    const sign = d.surplus ? '+' : '';
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<div class="legend-dot" style="background:${d.color}"></div><span class="legend-text">${d.label}</span><span class="legend-pct">${sign}${pct}%</span>`;
+    item.addEventListener('click', () => selectSlice(i));
+    legendGrid.appendChild(item);
+  });
+}
+
+buildPie('income-svg',  'income-legend',  'income-detail',  incomeData,  TOTAL_INCOME);
+buildPie('expense-svg', 'expense-legend', 'expense-detail', expenseData, TOTAL_INCOME);
+</script>
+</body>
+</html>
