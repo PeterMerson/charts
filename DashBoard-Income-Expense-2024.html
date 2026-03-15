@@ -218,7 +218,7 @@
   <div class="header-inner">
     <div class="header-title-block">
       <h1>Riveredge <span>2024 Financial Breakdown</span></h1>
-      <div class="header-subtitle">Income & Expense Analysis &nbsp;·&nbsp; Fiscal Year 2024 &nbsp;·&nbsp; Mortgage Principal excluded from Expenses &nbsp;·&nbsp; Fire & Water Damages $228,074 excluded</div>
+      <div class="header-subtitle">Income & Expense Analysis &nbsp;·&nbsp; Fiscal Year 2024 &nbsp;·&nbsp; Mortgage Principal excluded from Expenses &nbsp;·&nbsp; Repairs include $228,074 Fire & Water Damages</div>
     </div>
     <div class="header-kpis">
       <div class="kpi">
@@ -228,13 +228,13 @@
       </div>
       <div class="kpi">
         <div class="kpi-label">Total Expenses</div>
-        <div class="kpi-value red">$1,682,884</div>
-        <div class="kpi-sub">Adjusted</div>
+        <div class="kpi-value red">$1,910,958</div>
+        <div class="kpi-sub">Gross expenses</div>
       </div>
       <div class="kpi">
-        <div class="kpi-label">Net Surplus</div>
-        <div class="kpi-value green">$163,787</div>
-        <div class="kpi-sub">+8.9% of income</div>
+        <div class="kpi-label">Net Deficit</div>
+        <div class="kpi-value red">−$64,287</div>
+        <div class="kpi-sub">−3.5% of income</div>
       </div>
     </div>
   </div>
@@ -246,9 +246,9 @@
   <!-- STAT STRIP -->
   <div class="stat-strip">
     <div class="strip-stat"><div class="strip-label">Maintenance Charges</div><div class="strip-value gold">$1,644,840</div><div class="strip-sub">89.1% of income</div></div>
-    <div class="strip-stat"><div class="strip-label">Largest Expense</div><div class="strip-value red">$384,242</div><div class="strip-sub">Real Estate Taxes (22.8%)</div></div>
+    <div class="strip-stat"><div class="strip-label">Largest Expense</div><div class="strip-value red">$495,817</div><div class="strip-sub">Repairs incl. fire/water (26.8%)</div></div>
     <div class="strip-stat"><div class="strip-label">Mortgage Interest</div><div class="strip-value">$115,424</div><div class="strip-sub">6.9% of expenses</div></div>
-    <div class="strip-stat"><div class="strip-label">Repairs (adj.)</div><div class="strip-value red">$267,743</div><div class="strip-sub">Excl. $228,074 fire/water</div></div>
+    <div class="strip-stat"><div class="strip-label">Repairs (gross)</div><div class="strip-value red">$495,817</div><div class="strip-sub">Incl. $228,074 fire/water</div></div>
   </div>
 
   <!-- PIE CHARTS ROW -->
@@ -283,7 +283,7 @@
         <div class="card-title">2024 Expense Breakdown</div>
         <div class="card-subtitle" style="display:flex;align-items:center;gap:10px;margin-top:5px;">
           <div class="formula-badge">Expense Item ➗ Total Income</div>
-          <span>Total: $1,682,884 &nbsp;·&nbsp; Surplus: $163,787</span>
+          <span>Total: $1,910,958 &nbsp;·&nbsp; Deficit: −$64,287</span>
         </div>
       </div>
       <div class="card-body">
@@ -297,7 +297,7 @@
         </div>
         <div class="legend-grid" id="expense-legend"></div>
       </div>
-      <div class="card-footer">Repairs adjusted to exclude $228,074 Fire & Water Damages &nbsp;·&nbsp; Mortgage Principal excluded</div>
+      <div class="card-footer">Repairs include $228,074 Fire & Water Damages (one-time event) &nbsp;·&nbsp; Mortgage Principal excluded</div>
     </div>
 
   </div>
@@ -325,7 +325,7 @@ const incomeData = [
 // ── EXPENSE DATA ──
 const expenseData = [
   { label: "Real Estate Taxes",   value: 384242,  color: "#E63946" },
-  { label: "Repairs",             value: 267743,  color: "#d29922" },
+  { label: "Repairs",             value: 495817,  color: "#d29922" },
   { label: "Utilities",           value: 328592,  color: "#2196F3" },
   { label: "Payroll",             value: 262939,  color: "#43A047" },
   { label: "Insurance",           value: 99094,   color: "#8E24AA" },
@@ -335,7 +335,7 @@ const expenseData = [
   { label: "Water & Sewer",       value: 52221,   color: "#546E7A" },
   { label: "Corp Tax & Misc",     value: 31577,   color: "#F4511E" },
   { label: "Legal & Audit",       value: 10953,   color: "#7CB342" },
-  { label: "Excess Maint",        value: 163787,  color: "#3fb950", surplus: true },
+  { label: "Excess Maint (Deficit)", value: 64287, color: "#B0BEC5", deficit: true },
 ];
 
 // ── PIE BUILDER ──
@@ -386,7 +386,7 @@ function buildPie(svgId, legendId, detailId, data, totalIncome) {
     const tooltip = document.getElementById('tooltip');
     path.addEventListener('mouseenter', e => {
       const pct = (d.value/totalIncome*100).toFixed(1);
-      const sign = d.surplus ? '+' : '';
+      const sign = d.surplus ? '+' : (d.deficit ? '−' : '');
       tooltip.innerHTML = `<strong>${d.label}</strong>${sign}$${d.value.toLocaleString()} &nbsp;|&nbsp; ${sign}${pct}% of income`;
       tooltip.classList.add('visible');
       tooltip.style.left = (e.clientX+14)+'px';
@@ -416,7 +416,7 @@ function buildPie(svgId, legendId, detailId, data, totalIncome) {
     activeIdx = idx;
     const d = data[idx];
     const pct = (d.value/totalIncome*100).toFixed(1);
-    const sign = d.surplus ? '+' : '';
+    const sign = d.surplus ? '+' : (d.deficit ? '−' : '');
     svg.querySelectorAll('.wedge').forEach(p => {
       const pi = parseInt(p.dataset.idx);
       p.classList.toggle('dimmed', pi !== idx);
@@ -436,7 +436,7 @@ function buildPie(svgId, legendId, detailId, data, totalIncome) {
 
   data.forEach((d, i) => {
     const pct = (d.value/totalIncome*100).toFixed(1);
-    const sign = d.surplus ? '+' : '';
+    const sign = d.surplus ? '+' : (d.deficit ? '−' : '');
     const item = document.createElement('div');
     item.className = 'legend-item';
     item.innerHTML = `<div class="legend-dot" style="background:${d.color}"></div><span class="legend-text">${d.label}</span><span class="legend-pct">${sign}${pct}%</span>`;
