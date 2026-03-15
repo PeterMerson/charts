@@ -1,0 +1,272 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mortgage Interest vs Principal 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --navy: #1F4E79;
+    --interest: #E67E22;
+    --principal: #2196F3;
+    --combined: #9C27B0;
+    --text: #1a1a2e;
+    --muted: #6b6b80;
+    --border: #e0ddd6;
+    --shadow: 0 4px 24px rgba(31,78,121,0.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+  .page-header { text-align: center; margin-bottom: 28px; max-width: 820px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 8px; }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+  .badge-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 14px; border-radius: 99px; font-size: 0.85rem;
+    font-weight: 500; border: 2px solid;
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .badge-interest { border-color: var(--interest); color: var(--interest); background: #fef5ec; }
+  .badge-principal { border-color: var(--principal); color: var(--principal); background: #e8f4fe; }
+  .badge-combined { border-color: var(--combined); color: var(--combined); background: #f9f0ff; }
+
+  .main-card {
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 32px 36px 24px; width: 100%; max-width: 1150px;
+  }
+  .chart-container { position: relative; width: 100%; height: 460px; }
+
+  #tooltip {
+    position: fixed; background: var(--navy); color: #fff;
+    padding: 12px 16px; border-radius: 12px; font-size: 0.86rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 999; min-width: 240px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    line-height: 1.8;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-year { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; }
+  #tooltip .tt-label { opacity: 0.8; }
+  #tooltip .tt-val { font-weight: 600; }
+  #tooltip .tt-divider { border-top: 1px solid rgba(255,255,255,0.15); margin: 4px 0; padding-top: 4px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+  .stat-card {
+    background: var(--bg); border-radius: 12px; padding: 16px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .stat-value.orange { color: var(--interest); }
+  .stat-value.blue { color: var(--principal); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .note-banner {
+    background: #eef4fb; border: 1px solid #b3d1f0; border-radius: 8px;
+    padding: 8px 16px; font-size: 0.8rem; color: #1F4E79;
+    margin-top: 16px; text-align: center;
+  }
+  .source-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Mortgage Interest vs. Principal 1990–2024</h1>
+  <p class="subtitle">Step chart showing the shifting composition of annual debt service &nbsp;|&nbsp; 1990–2024</p>
+  <div class="badge-row">
+    <div class="badge badge-interest"><div class="badge-dot" style="background:var(--interest)"></div>Mortgage Interest</div>
+    <div class="badge badge-principal"><div class="badge-dot" style="background:var(--principal)"></div>Mortgage Principal</div>
+    <div class="badge badge-combined"><div class="badge-dot" style="background:var(--combined)"></div>Combined Payment</div>
+  </div>
+</div>
+
+<div class="main-card">
+  <div class="chart-container">
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Peak Interest</div>
+      <div class="stat-value orange">$433,000</div>
+      <div class="stat-sub">1990–1996 (interest only)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 Interest</div>
+      <div class="stat-value orange">$115,424</div>
+      <div class="stat-sub">−73% from peak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Peak Principal</div>
+      <div class="stat-value blue">$168,738</div>
+      <div class="stat-sub">2012 (pre-refi high)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">2024 Principal</div>
+      <div class="stat-value blue">$70,052</div>
+      <div class="stat-sub">Growing each year</div>
+    </div>
+  </div>
+
+  <div class="note-banner">💡 Two refinancings clearly visible: <strong>1998</strong> — interest-only $4M mortgage converted to amortizing loan (interest drops, principal begins). <strong>2013</strong> — second refinance resets both components to lower levels. Hover over any point for full detail.</div>
+  <p class="source-note">Source: Riveredge financial records.</p>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const interestRaw = [433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,141555,139217,136748,134153,131439,128522,125512,122321,120862,115424];
+const principalRaw = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052];
+const combinedRaw = interestRaw.map((v, i) => v + principalRaw[i]);
+
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+const interestGrad = ctx.createLinearGradient(0, 0, 0, 460);
+interestGrad.addColorStop(0, 'rgba(230,126,34,0.15)');
+interestGrad.addColorStop(1, 'rgba(230,126,34,0.01)');
+
+const principalGrad = ctx.createLinearGradient(0, 0, 0, 460);
+principalGrad.addColorStop(0, 'rgba(33,150,243,0.15)');
+principalGrad.addColorStop(1, 'rgba(33,150,243,0.01)');
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Mortgage Interest',
+        data: interestRaw,
+        borderColor: '#E67E22',
+        backgroundColor: interestGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#E67E22',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        stepped: true,
+      },
+      {
+        label: 'Mortgage Principal',
+        data: principalRaw,
+        borderColor: '#2196F3',
+        backgroundColor: principalGrad,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#2196F3',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: true,
+        stepped: true,
+      },
+      {
+        label: 'Combined Payment',
+        data: combinedRaw,
+        borderColor: '#9C27B0',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5, 4],
+        pointRadius: 2,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#9C27B0',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        fill: false,
+        stepped: true,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    scales: {
+      x: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          maxRotation: 45,
+          callback: (val, i) => years[i] % 5 === 0 ? years[i] : ''
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: '#e8e4dc', lineWidth: 1 },
+        ticks: {
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80',
+          callback: v => '$' + (v/1000).toFixed(0) + 'K'
+        },
+        title: {
+          display: true,
+          text: 'Annual Amount ($)',
+          font: { family: 'DM Sans', size: 11 },
+          color: '#6b6b80'
+        },
+        border: { display: false },
+        min: 0
+      }
+    }
+  }
+});
+
+const tooltip = document.getElementById('tooltip');
+document.getElementById('lineChart').addEventListener('mousemove', (e) => {
+  const points = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+  if (!points.length) { tooltip.classList.remove('visible'); return; }
+  const idx = points[0].index;
+  const yr = years[idx];
+  const interest = interestRaw[idx];
+  const principal = principalRaw[idx];
+  const combined = combinedRaw[idx];
+  const intPct = combined > 0 ? (interest / combined * 100).toFixed(1) : '0.0';
+  const prinPct = combined > 0 ? (principal / combined * 100).toFixed(1) : '0.0';
+
+  tooltip.innerHTML = `
+    <div class="tt-year">${yr}</div>
+    <div class="tt-row"><span class="tt-label" style="color:#f0a86b">Mortgage Interest</span><span class="tt-val" style="color:#f0a86b">$${interest.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label" style="color:#82cfff">Mortgage Principal</span><span class="tt-val" style="color:#82cfff">$${principal.toLocaleString()}</span></div>
+    <div class="tt-divider"></div>
+    <div class="tt-row"><span class="tt-label">Combined Payment</span><span class="tt-val" style="color:#ce93d8">$${combined.toLocaleString()}</span></div>
+    <div class="tt-row"><span class="tt-label">Interest %</span><span class="tt-val" style="color:#f0a86b">${intPct}%</span></div>
+    <div class="tt-row"><span class="tt-label">Principal %</span><span class="tt-val" style="color:#82cfff">${prinPct}%</span></div>
+  `;
+  tooltip.classList.add('visible');
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 110;
+  if (tx + 260 > window.innerWidth) tx = e.clientX - 275;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+document.getElementById('lineChart').addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
