@@ -1,3 +1,7 @@
+<
+Retaxes vs cpi 1990 2024 v2 · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,6 +178,7 @@
 <div id="tooltip"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script>
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
 
@@ -242,7 +247,71 @@ const chart = new Chart(ctx, {
     interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { display: false },
-      tooltip: { enabled: false }
+      tooltip: { enabled: false },
+      annotation: {
+        annotations: {
+          tc1997: {
+            type: 'point',
+            xValue: years.indexOf(1997),
+            yValue: retaxIdx[years.indexOf(1997)],
+            backgroundColor: '#E63946',
+            borderColor: '#fff',
+            borderWidth: 2,
+            radius: 8,
+            label: {
+              display: true,
+              content: '⚖ Tax Certiorari',
+              position: 'top',
+              backgroundColor: '#E63946',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 10, weight: '600' },
+              padding: { x: 7, y: 4 },
+              borderRadius: 4,
+              yAdjust: -8
+            }
+          },
+          tc2009: {
+            type: 'point',
+            xValue: years.indexOf(2009),
+            yValue: retaxIdx[years.indexOf(2009)],
+            backgroundColor: '#E63946',
+            borderColor: '#fff',
+            borderWidth: 2,
+            radius: 8,
+            label: {
+              display: true,
+              content: '⚖ Tax Certiorari',
+              position: 'top',
+              backgroundColor: '#E63946',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 10, weight: '600' },
+              padding: { x: 7, y: 4 },
+              borderRadius: 4,
+              yAdjust: -8
+            }
+          },
+          tc2021: {
+            type: 'point',
+            xValue: years.indexOf(2021),
+            yValue: retaxIdx[years.indexOf(2021)],
+            backgroundColor: '#E63946',
+            borderColor: '#fff',
+            borderWidth: 2,
+            radius: 8,
+            label: {
+              display: true,
+              content: '⚖ Tax Certiorari',
+              position: 'top',
+              backgroundColor: '#E63946',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 10, weight: '600' },
+              padding: { x: 7, y: 4 },
+              borderRadius: 4,
+              yAdjust: -8
+            }
+          }
+        }
+      }
     },
     scales: {
       x: {
@@ -287,8 +356,11 @@ document.getElementById('lineChart').addEventListener('mousemove', (e) => {
   const gapSign = gap > 0 ? '+' : '';
   const gapColor = gap > 0 ? '#f0a86b' : '#82cfff';
 
+  const certiorariYears = [1997, 2009, 2021];
+  const isCertiorari = certiorariYears.includes(yr);
+
   tooltip.innerHTML = `
-    <div class="tt-year">${yr}</div>
+    <div class="tt-year">${yr}${isCertiorari ? ' &nbsp;<span style="background:#E63946;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;">⚖ Tax Certiorari</span>' : ''}</div>
     <div class="tt-row"><span class="tt-label tt-retax" style="color:#f0a86b">RE Tax Index</span><span class="tt-val" style="color:#f0a86b">${rIdx.toFixed(1)}</span></div>
     <div class="tt-row"><span class="tt-label" style="color:#f0a86b">RE Tax ($)</span><span class="tt-val" style="color:#f0a86b">$${rRaw.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-label" style="color:#82cfff">CPI Index</span><span class="tt-val" style="color:#82cfff">${cIdx.toFixed(1)}</span></div>
