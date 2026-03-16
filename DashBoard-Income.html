@@ -171,7 +171,7 @@
       </div>
       <div class="chart-wrap"><canvas id="chart_totexp"></canvas></div>
     </div>
-    <div class="card-footer">Blue = total cash requirement (expenses + principal) &nbsp;·&nbsp; Green extension = surplus &nbsp;·&nbsp; Red extension = deficit &nbsp;·&nbsp; ▼ marks 2006 as the financial turning point &nbsp;·&nbsp; Special Assessments excluded</div>
+    <div class="card-footer">Blue = total cash requirement (expenses + principal) &nbsp;·&nbsp; Green extension = surplus &nbsp;·&nbsp; Red extension = deficit &nbsp;·&nbsp; ▼ marks 2006 reference year &nbsp;·&nbsp; ⭐ = years where total cash requirement was below the 2006 level</div>
   </div>
 
   <!-- CHART 2 -->
@@ -577,12 +577,18 @@ const IDX_2024b = years.indexOf(2024);
 const baseColors2 = cashReqRaw2.map((_,i) => i===IDX_2024b ? 'rgba(210,153,34,0.82)' : 'rgba(29,111,164,0.82)');
 const baseBorders2 = cashReqRaw2.map((_,i) => i===IDX_2024b ? 'rgba(210,153,34,1)' : 'rgba(29,111,164,1)');
 
-// Arrow plugin for 2006
+// Years post-2006 where cash requirement was below 2006 level
+const below2006Idx = [19,20,23,25,26,27,28,30]; // indices of 2009,2010,2013,2015,2016,2017,2018,2020
+const REF_2006 = 1462139;
+
+// Arrow + gold star plugin
 const arrow2006b = {
   id: 'arrow2006b',
   afterDatasetsDraw(chart) {
     if (chart.canvas.id !== 'chart_totexp') return;
     const { ctx, scales: { x, y } } = chart;
+
+    // Draw ▼ arrow and 2006 label
     const xPos = x.getPixelForValue(IDX_2006b);
     const topVal = cashReqRaw2[IDX_2006b] + surplusRaw2[IDX_2006b];
     const yPos = y.getPixelForValue(topVal);
@@ -602,6 +608,18 @@ const arrow2006b = {
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'bottom';
     ctx.fillText('2006', xPos, yPos - 19);
+
+    // Draw ⭐ gold stars above bars below 2006 level
+    below2006Idx.forEach(i => {
+      const bx = x.getPixelForValue(i);
+      const topV = cashReqRaw2[i] + surplusRaw2[i];
+      const by = y.getPixelForValue(topV);
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('⭐', bx, by - 3);
+    });
+
     ctx.restore();
   }
 };
@@ -638,6 +656,7 @@ document.getElementById('chart_totexp').addEventListener('mousemove', e => {
     <div class="tt-row"><span class="tt-lbl">Operating Expenses</span><span class="tt-val" style="color:#82cfff">$${exp.toLocaleString()}</span></div>
     ${prin>0?`<div class="tt-row"><span class="tt-lbl">Mortgage Principal</span><span class="tt-val" style="color:#f0a86b">$${prin.toLocaleString()}</span></div>`:''}
     <div class="tt-row"><span class="tt-lbl">Total Cash Requirement</span><span class="tt-val">$${cashReq.toLocaleString()}</span></div>
+    ${below2006Idx.includes(i)?`<div style="margin-top:3px;font-size:0.8rem;color:#e8c96a;font-weight:600;">⭐ Below 2006 level (ref: $1,462,139)</div>`:''}
     <div class="tt-div"></div>
     <div class="tt-row"><span class="tt-lbl">${isDeficit?'Deficit':'Surplus'}</span><span class="tt-val" style="color:${nc}">${ns}$${nv.toLocaleString()}</span></div>
     ${is2024?`<div style="font-size:0.76rem;color:#8b949e;margin-top:3px;">Incl. $228,074 Fire & Water</div>`:''}`)
