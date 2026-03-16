@@ -66,7 +66,7 @@
   .strip-value.green { color: var(--green); } .strip-value.red { color: var(--red); } .strip-value.gold { color: var(--gold-light); } .strip-value.blue { color: var(--blue); } .strip-value.orange { color: var(--orange); }
   .strip-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
 
-  #tooltip { position: fixed; background: #1c2230; color: var(--text); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; font-size: 0.84rem; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 9999; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); line-height: 1.8; }
+  #tooltip { position: fixed; background: #1c2230; color: var(--text); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; font-size: 0.84rem; pointer-events: auto; opacity: 0; transition: opacity 0.12s; z-index: 9999; min-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); line-height: 1.8; }
   #tooltip.visible { opacity: 1; }
   #tooltip .tt-yr { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--gold-light); margin-bottom: 4px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
   #tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; }
@@ -296,7 +296,7 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
-  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004'},2005:{pct:'+13.5%',date:'Apr 1, 2005'},2006:{pct:'+17%',date:'Jan 1, 2006'},2008:{pct:'+3%',date:'Sep 1, 2008'},2013:{pct:'+5%',date:'Mar 1, 2013'},2024:{pct:'+9%',date:'Jan 1, 2024'}};
+  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004'},2005:{pct:'+13.5%',date:'Apr 1, 2005'},2006:{pct:'+17%',date:'Jan 1, 2006'},2008:{pct:'+3%',date:'Sep 1, 2008'},2013:{pct:'+5%',date:'Mar 1, 2013'},2024:{pct:'+9%',date:'Jan 1, 2024',pdf:'maintenance_increase_2024.pdf'}};
   const mi=maintIncreases[yr];
   showTT(e,`<div class="tt-yr">${yr}${mi?` &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;white-space:nowrap;">📈 Maint. ${mi.pct} — ${mi.date}</span>`:''}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
@@ -304,7 +304,8 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
     <div class="tt-row"><span class="tt-lbl" style="color:#d29922">Exp + Principal</span><span class="tt-val" style="color:#d29922">$${ep.toLocaleString()}</span></div>
     <div class="tt-div"></div>
     <div class="tt-row"><span class="tt-lbl">Net (Inc−Exp)</span><span class="tt-val" style="color:${nc}">${ns}$${Math.abs(net).toLocaleString()}</span></div>
-    <div class="tt-row"><span class="tt-lbl">Net incl. Principal</span><span class="tt-val" style="color:${nfc}">${nfs}$${Math.abs(nf).toLocaleString()}</span></div>`);
+    <div class="tt-row"><span class="tt-lbl">Net incl. Principal</span><span class="tt-val" style="color:${nfc}">${nfs}$${Math.abs(nf).toLocaleString()}</span></div>
+    ${mi && mi.pdf ? `<div class="tt-div"></div><div style="text-align:center;margin-top:2px;"><a href="${mi.pdf}" target="_blank" style="color:#e8c96a;font-size:0.82rem;font-weight:600;text-decoration:none;">📄 View Maintenance Memo</a></div>` : ''}`);
 });
 document.getElementById('chart1').addEventListener('mouseleave',hideTT);
 
