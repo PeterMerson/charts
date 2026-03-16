@@ -29,7 +29,6 @@
     min-height: 100vh;
   }
 
-  /* ── HEADER ── */
   .dashboard-header {
     background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
     border-bottom: 1px solid var(--border);
@@ -70,14 +69,12 @@
 
   .gold-rule { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); }
 
-  /* ── BODY ── */
   .dashboard-body {
     max-width: 1300px; margin: 0 auto;
     padding: 40px 48px 60px;
     display: flex; flex-direction: column; gap: 40px;
   }
 
-  /* ── PIE CARDS ROW ── */
   .pie-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -103,37 +100,22 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .card-header {
-    padding: 18px 24px 14px;
-    border-bottom: 1px solid var(--border);
-  }
+  .card-header { padding: 18px 24px 14px; border-bottom: 1px solid var(--border); }
   .card-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); }
   .card-subtitle { font-size: 0.76rem; color: var(--muted); margin-top: 3px; }
-
   .card-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
-  /* ── PIE ── */
   .pie-layout { display: flex; gap: 20px; align-items: flex-start; }
   .pie-svg-wrap { flex-shrink: 0; width: 200px; }
-  #income-svg, #expense-svg {
-    width: 100%; height: auto;
-    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
-  }
+  #income-svg, #expense-svg { width: 100%; height: auto; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
   .wedge { cursor: pointer; transition: opacity 0.18s, filter 0.18s; }
   .wedge:hover, .wedge.active { filter: brightness(1.18) drop-shadow(0 0 8px rgba(255,255,255,0.15)); opacity: 1 !important; }
   .wedge.dimmed { opacity: 0.25; }
 
-  /* ── DETAIL PANEL ── */
   .detail-panel {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    min-height: 160px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; min-height: 160px;
+    display: flex; flex-direction: column; justify-content: center;
   }
   .detail-panel.has-data { border-color: #58a6ff44; background: #161f2e; }
   .detail-placeholder { color: var(--muted); font-size: 0.88rem; text-align: center; line-height: 1.6; }
@@ -147,18 +129,11 @@
   .bar-track { height: 6px; background: #21262d; border-radius: 99px; margin-top: 10px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
 
-  /* ── LEGEND ── */
-  .legend-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 4px;
-  }
+  .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
   .legend-item {
     display: flex; align-items: center; gap: 7px;
     padding: 5px 8px; border-radius: 6px; cursor: pointer;
-    border: 1px solid transparent; transition: background 0.15s;
-    font-size: 0.78rem;
+    border: 1px solid transparent; transition: background 0.15s; font-size: 0.78rem;
   }
   .legend-item:hover { background: #21262d; border-color: var(--border); }
   .legend-item.active { background: #1c2a3a; border-color: #58a6ff44; }
@@ -166,7 +141,6 @@
   .legend-text { color: var(--text); flex: 1; }
   .legend-pct { color: var(--gold-light); font-weight: 600; margin-left: auto; }
 
-  /* ── FORMULA BADGE ── */
   .formula-badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: rgba(201,168,76,0.12); color: var(--gold-light);
@@ -175,12 +149,14 @@
   }
 
   /* ── STAT STRIP ── */
-  .stat-strip {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px;
-  }
+  .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px; }
   .strip-stat {
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 8px; padding: 12px 14px; text-align: center;
+  }
+  .strip-stat.info-only {
+    border-color: rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.06);
   }
   .strip-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 3px; }
   .strip-value { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--text); }
@@ -188,8 +164,14 @@
   .strip-value.red   { color: var(--red); }
   .strip-value.gold  { color: var(--gold-light); }
   .strip-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .strip-info-tag {
+    display: inline-block; margin-top: 5px;
+    font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gold-light); background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.3); border-radius: 99px;
+    padding: 1px 8px;
+  }
 
-  /* ── TOOLTIP ── */
   #tooltip {
     position: fixed; background: #1c2230; color: var(--text);
     border: 1px solid var(--border); padding: 10px 14px; border-radius: 9px;
@@ -203,7 +185,6 @@
     padding: 10px 24px; border-top: 1px solid var(--border);
     font-size: 0.73rem; color: var(--muted); background: rgba(0,0,0,0.15);
   }
-
   .page-footer {
     text-align: center; padding: 20px 48px;
     border-top: 1px solid var(--border);
@@ -218,7 +199,7 @@
   <div class="header-inner">
     <div class="header-title-block">
       <h1>Riveredge <span>2023 Financial Breakdown</span></h1>
-      <div class="header-subtitle">Income & Expense Analysis &nbsp;·&nbsp; Fiscal Year 2023 &nbsp;·&nbsp; Mortgage Principal excluded from Expenses</div>
+      <div class="header-subtitle">Income &amp; Expense Analysis &nbsp;·&nbsp; Fiscal Year 2023 &nbsp;·&nbsp; Mortgage Principal excluded from Expenses</div>
     </div>
     <div class="header-kpis">
       <div class="kpi">
@@ -245,10 +226,27 @@
 
   <!-- STAT STRIP -->
   <div class="stat-strip">
-    <div class="strip-stat"><div class="strip-label">Maintenance Charges</div><div class="strip-value gold">$1,513,404</div><div class="strip-sub">86.7% of income</div></div>
-    <div class="strip-stat"><div class="strip-label">Largest Expense</div><div class="strip-value red">$369,302</div><div class="strip-sub">Real Estate Taxes (21.2%)</div></div>
-    <div class="strip-stat"><div class="strip-label">Mortgage Interest</div><div class="strip-value">$120,862</div><div class="strip-sub">7.6% of expenses</div></div>
-    <div class="strip-stat"><div class="strip-label">Repairs</div><div class="strip-value">$224,945</div><div class="strip-sub">14.2% of expenses</div></div>
+    <div class="strip-stat">
+      <div class="strip-label">Maintenance Charges</div>
+      <div class="strip-value gold">$1,513,404</div>
+      <div class="strip-sub">86.7% of income</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-label">Largest Expense</div>
+      <div class="strip-value red">$369,302</div>
+      <div class="strip-sub">Real Estate Taxes (21.2%)</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-label">Repairs</div>
+      <div class="strip-value">$224,945</div>
+      <div class="strip-sub">14.2% of expenses</div>
+    </div>
+    <div class="strip-stat info-only">
+      <div class="strip-label">Mortgage Principal</div>
+      <div class="strip-value gold">$66,530</div>
+      <div class="strip-sub">2023 principal payment</div>
+      <div class="strip-info-tag">⚠ Not included in numbers — information only</div>
+    </div>
   </div>
 
   <!-- PIE CHARTS ROW -->
@@ -304,14 +302,13 @@
 </div>
 
 <div class="gold-rule"></div>
-<div class="page-footer">Riveredge Financial Dashboard &nbsp;·&nbsp; Personal Use &nbsp;·&nbsp; Fiscal Year 2023 &nbsp;·&nbsp; Data: Audited Annual Report</div>
+<div class="page-footer">Riveredge Financial Dashboard &nbsp;·&nbsp; Personal Use &nbsp;·&nbsp; Fiscal Year 2023 &nbsp;·&nbsp; Data: Audited Annual Report &nbsp;·&nbsp; Prepared with Claude AI (Anthropic)</div>
 
 <div id="tooltip"></div>
 
 <script>
 const TOTAL_INCOME = 1745779;
 
-// ── INCOME DATA ──
 const incomeData = [
   { label: "Maintenance Charges", value: 1513404, color: "#1D6FA4" },
   { label: "Parking",             value: 81329,   color: "#2196F3" },
@@ -322,7 +319,6 @@ const incomeData = [
   { label: "Transfer Fees",       value: 7599,    color: "#F4511E" },
 ];
 
-// ── EXPENSE DATA ──
 const expenseData = [
   { label: "Real Estate Taxes",   value: 369302,  color: "#E63946" },
   { label: "Utilities",           value: 290726,  color: "#2196F3" },
@@ -338,7 +334,6 @@ const expenseData = [
   { label: "Excess Maint",        value: 163182,  color: "#3fb950", surplus: true },
 ];
 
-// ── PIE BUILDER ──
 function buildPie(svgId, legendId, detailId, data, totalIncome) {
   const svg = document.getElementById(svgId);
   const legendGrid = document.getElementById(legendId);
