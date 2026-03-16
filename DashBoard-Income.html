@@ -267,7 +267,16 @@ annual2.forEach(v=>{r2+=v;cum2.push(r2);});
 
 const tooltip = document.getElementById('tooltip');
 function showTT(e,html){ tooltip.innerHTML=html; tooltip.classList.add('visible'); let tx=e.clientX+16,ty=e.clientY-100; if(tx+250>window.innerWidth)tx=e.clientX-265; if(ty<10)ty=10; tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px'; }
-function hideTT(){ tooltip.classList.remove('visible'); }
+let hideTTTimer = null;
+function hideTT(){
+  hideTTTimer = setTimeout(() => { tooltip.classList.remove('visible'); }, 300);
+}
+function cancelHideTT(){
+  if(hideTTTimer) { clearTimeout(hideTTTimer); hideTTTimer = null; }
+}
+// Keep tooltip visible when mouse is over it
+tooltip.addEventListener('mouseenter', cancelHideTT);
+tooltip.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
 
 // CHART 1
 const ctx1=document.getElementById('chart1').getContext('2d');
@@ -292,7 +301,7 @@ const chart1=new Chart(ctx1,{type:'line',data:{labels:years,datasets:[
 }}});
 document.getElementById('chart1').addEventListener('mousemove',e=>{
   const pts=chart1.getElementsAtEventForMode(e,'index',{intersect:false},true);
-  if(!pts.length)return hideTT();
+  cancelHideTT(); if(!pts.length)return hideTT();
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
@@ -322,7 +331,7 @@ const chart2=new Chart(ctx2,{type:'bar',data:{labels:years,datasets:[
 }}});
 document.getElementById('chart2').addEventListener('mousemove',e=>{
   const pts=chart2.getElementsAtEventForMode(e,'index',{intersect:false},true);
-  if(!pts.length)return hideTT();
+  cancelHideTT(); if(!pts.length)return hideTT();
   const i=pts[0].index,yr=years[i],liq=totalLiq[i],lo=lowAdj[i],hi=highAdj[i];
   let status,sc;
   if(liq>=hi){status='✅ Above Westchester High';sc='#3fb950';}
@@ -351,7 +360,7 @@ const chart3=new Chart(ctx3,{type:'line',data:{datasets:[
 }}});
 document.getElementById('chart3').addEventListener('mousemove',e=>{
   const pts=chart3.getElementsAtEventForMode(e,'nearest',{intersect:false,axis:'x'},true);
-  if(!pts.length)return hideTT();
+  cancelHideTT(); if(!pts.length)return hideTT();
   const di=pts[0].datasetIndex,pi=pts[0].index;
   const isP1=di===0;
   const yr=isP1?years1[pi]:years2[pi];
