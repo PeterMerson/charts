@@ -305,7 +305,7 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
-  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004'},2005:{pct:'+13.5%',date:'Apr 1, 2005'},2006:{pct:'+17%',date:'Jan 1, 2006'},2008:{pct:'+3%',date:'Sep 1, 2008'},2013:{pct:'+5%',date:'Mar 1, 2013'},2024:{pct:'+9%',date:'Jan 1, 2024',pdf:'maintenance_increase_2024.pdf'}};
+  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004'},2005:{pct:'+13.5%',date:'Apr 1, 2005'},2006:{pct:'+17%',date:'Jan 1, 2006',pdf:'maintenance_increase_2006.pdf'},2008:{pct:'+3%',date:'Sep 1, 2008'},2013:{pct:'+5%',date:'Mar 1, 2013'},2024:{pct:'+9%',date:'Jan 1, 2024',pdf:'maintenance_increase_2024.pdf'}};
   const mi=maintIncreases[yr];
   showTT(e,`<div class="tt-yr">${yr}${mi?` &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;white-space:nowrap;">📈 Maint. ${mi.pct} — ${mi.date}</span>`:''}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
