@@ -3,164 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Surplus Per Share Analysis 2006–2024</title>
+<title>Per Share Surplus 2006–2024</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #f4f1eb; font-family: 'Courier New', Courier, monospace; color: #1a1a1a; padding: 28px 20px; }
-  .wrapper { max-width: 980px; margin: 0 auto; }
-  .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-  .title-block h1 { font-family: Georgia, serif; font-size: 22px; color: #2d4a3e; margin-bottom: 4px; }
-  .title-block .sub { font-size: 11px; color: #7a7570; }
-  .badge { display: flex; align-items: center; gap: 8px; background: #1a1a2e; border: 1px solid #3a3a5c; border-radius: 8px; padding: 8px 14px; font-size: 11px; color: #a8b4d8; white-space: nowrap; }
-  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #c77dff, #7b5ea7); display: inline-block; flex-shrink: 0; box-shadow: 0 0 6px #c77dff88; }
+  body { background: #f4f1eb; font-family: 'Courier New', Courier, monospace; color: #1a1a1a; padding: 24px 18px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  .topbar { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  h1 { font-family: Georgia, serif; font-size: 22px; color: #2d4a3e; margin-bottom: 3px; }
+  .sub { font-size: 11px; color: #7a7570; }
+  .badge { display: flex; align-items: center; gap: 7px; background: #1a1a2e; border: 1px solid #3a3a5c; border-radius: 8px; padding: 7px 13px; font-size: 11px; color: #a8b4d8; white-space: nowrap; }
+  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg,#c77dff,#7b5ea7); flex-shrink:0; box-shadow:0 0 6px #c77dff88; }
   .badge strong { color: #c77dff; }
-  .notes { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-  .n1 { background: #e8f4ef; border-left: 3px solid #2d7a5e; padding: 5px 11px; font-size: 11px; color: #1a4a35; border-radius: 0 4px 4px 0; }
-  .n2 { background: #fff8e7; border-left: 3px solid #e6a817; padding: 5px 11px; font-size: 11px; color: #7a5c00; border-radius: 0 4px 4px 0; }
+  .note { background: #e8f4ef; border-left: 3px solid #2d7a5e; padding: 5px 11px; font-size: 11px; color: #1a4a35; border-radius: 0 4px 4px 0; margin-bottom: 16px; display: inline-block; }
 
-  .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
-  .card { flex: 1; min-width: 150px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 14px 16px; border-top: 3px solid #2d7a5e; }
-  .card.amber { border-top-color: #e6a817; }
-  .card.red   { border-top-color: #b03020; }
+  .cards { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .card { flex: 1; min-width: 160px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 14px 16px; border-top: 3px solid #2d7a5e; }
   .card.blue  { border-top-color: #3a6fa5; }
+  .card.amber { border-top-color: #e6a817; }
   .card-label { font-size: 10px; color: #7a7570; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-  .card-val   { font-family: Georgia, serif; font-size: 20px; color: #2d4a3e; font-weight: bold; }
-  .card.amber .card-val { color: #b07a00; }
-  .card.red   .card-val { color: #b03020; }
+  .card-val   { font-family: Georgia, serif; font-size: 22px; color: #2d4a3e; font-weight: bold; }
   .card.blue  .card-val { color: #3a6fa5; }
+  .card.amber .card-val { color: #b07a00; }
+  .card-sub { font-size: 10px; color: #9a9590; margin-top: 3px; }
 
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .chart-wrap { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.09); padding: 20px; margin-bottom: 18px; }
+
+  .table-wrap { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 18px; }
+  table { width: 100%; border-collapse: collapse; }
   thead tr { background: #2d4a3e; }
-  thead th { padding: 11px 12px; font-size: 10px; font-weight: bold; color: #f0ebe0; text-transform: uppercase; letter-spacing: 1px; text-align: right; white-space: nowrap; }
+  thead th { padding: 10px 14px; font-size: 10px; font-weight: bold; color: #f0ebe0; text-transform: uppercase; letter-spacing: 1.2px; text-align: right; }
   thead th:first-child { text-align: left; }
   tbody tr { border-bottom: 1px solid #e8e4dc; }
   tbody tr:nth-child(even) { background: #f9f7f3; }
   tbody tr:hover { background: #eef5f1; }
-  td { padding: 9px 12px; font-size: 12px; text-align: right; }
+  td { padding: 8px 14px; font-size: 12px; text-align: right; }
   td:first-child { text-align: left; font-weight: bold; color: #2d4a3e; }
-  .pos { color: #1a6b3c; }
+  .pos { color: #1a6b3c; font-weight: bold; }
   .neg { color: #b03020; font-weight: bold; }
   tfoot tr { background: #2d4a3e; }
-  tfoot td { padding: 12px 12px; font-size: 12px; font-weight: bold; color: #f0ebe0; text-align: right; border-top: 2px solid #4a7a6a; }
-  tfoot td:first-child { text-align: left; font-family: Georgia, serif; font-size: 13px; }
+  tfoot td { padding: 11px 14px; font-size: 12px; font-weight: bold; color: #f0ebe0; text-align: right; border-top: 2px solid #4a7a6a; }
+  tfoot td:first-child { text-align: left; font-family: Georgia, serif; }
   .t-pos { color: #a8ffc4; }
-  .t-neg { color: #ffb3a8; }
 
-  .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #9a9590; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .footer .dot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #c77dff, #7b5ea7); display: inline-block; box-shadow: 0 0 4px #c77dff88; }
+  .footer { text-align: center; font-size: 10px; color: #9a9590; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; }
+  .fdot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg,#c77dff,#7b5ea7); box-shadow: 0 0 4px #c77dff88; }
   .footer a { color: #a87ddf; text-decoration: none; }
 </style>
 </head>
 <body>
-<div class="wrapper">
-  <div class="top-bar">
-    <div class="title-block">
-      <h1>Surplus Income Per Share Analysis (2006–2024)</h1>
-      <p class="sub">Total Income (ex. Special Assessments) minus Total Expenses including Mortgage Principal &divide; 85,027 shares</p>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <h1>Annual Surplus Per Share (2006–2024)</h1>
+      <p class="sub">Total Income (ex. Special Assessments) minus Total Expenses incl. Mortgage Principal &divide; 85,027 shares</p>
     </div>
     <div class="badge"><span class="dot"></span>Generated by <strong>Claude AI</strong> &mdash; Anthropic</div>
   </div>
 
-  <div class="notes">
-    <div class="n1">&#9432; Income excludes Special Assessments &middot; Expenses include Mortgage Interest AND Mortgage Principal &middot; 85,027 total shares</div>
-    <div class="n2">&#9888; 2024 is the only deficit year, driven by elevated Repairs &amp; Maintenance</div>
-  </div>
+  <div class="note">&#9432; Income excludes Special Assessments &middot; Expenses include Mortgage Interest &amp; Principal &middot; Red bar = deficit year</div>
 
   <div class="cards">
-    <div class="card"><div class="card-label">Total Surplus (19 yrs)</div><div class="card-val">$4,205,345</div></div>
-    <div class="card amber"><div class="card-label">Total Shares</div><div class="card-val">85,027</div></div>
-    <div class="card blue"><div class="card-label">Surplus Per Share (total)</div><div class="card-val">$49.46</div></div>
-    <div class="card red"><div class="card-label">Per Share Per Year</div><div class="card-val">$2.60</div></div>
+    <div class="card"><div class="card-label">Total Surplus (19 yrs)</div><div class="card-val">$4,205,345</div><div class="card-sub">2006 through 2024</div></div>
+    <div class="card blue"><div class="card-label">Total Per Share</div><div class="card-val">$49.46</div><div class="card-sub">over 19 years</div></div>
+    <div class="card amber"><div class="card-label">Avg Per Share / Year</div><div class="card-val">$2.60</div><div class="card-sub">annual average</div></div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Year</th>
-        <th>Total Income<br>(ex. SA)</th>
-        <th>Mort. Principal</th>
-        <th>Total Expenses<br>(incl. Principal)</th>
-        <th>Annual Surplus</th>
-        <th>Per Share<br>(annual)</th>
-        <th>Cumulative<br>Per Share</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-    <tfoot id="tfoot"></tfoot>
-  </table>
-
-  <div class="footer">
-    <span class="dot"></span>
-    Prepared by <a href="https://claude.ai" target="_blank">Claude AI</a> (Anthropic) &middot; claude.ai
+  <div class="chart-wrap">
+    <canvas id="chart" height="100"></canvas>
   </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Annual Surplus</th>
+          <th>Per Share</th>
+          <th>Cumulative Per Share</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+      <tfoot id="tfoot"></tfoot>
+    </table>
+  </div>
+
+  <div class="footer"><span class="fdot"></span>Prepared by <a href="https://claude.ai" target="_blank">Claude AI</a> (Anthropic) &middot; claude.ai</div>
+
 </div>
-
 <script>
 var rows = [
-  {y:"2006", inc:1720108, exp:1462139, mp:108896},
-  {y:"2007", inc:1722145, exp:1494688, mp:117152},
-  {y:"2008", inc:1736837, exp:1544655, mp:126026},
-  {y:"2009", inc:1784540, exp:1459746, mp:135596},
-  {y:"2010", inc:1758926, exp:1452558, mp:145869},
-  {y:"2011", inc:1769448, exp:1509238, mp:156927},
-  {y:"2012", inc:1760891, exp:1534516, mp:168738},
-  {y:"2013", inc:1702178, exp:1308064, mp:33488},
-  {y:"2014", inc:1659232, exp:1512456, mp:41572},
-  {y:"2015", inc:1664369, exp:1457599, mp:44034},
-  {y:"2016", inc:1652452, exp:1317507, mp:46362},
-  {y:"2017", inc:1670183, exp:1394928, mp:48819},
-  {y:"2018", inc:1694196, exp:1435982, mp:51404},
-  {y:"2019", inc:1708893, exp:1477320, mp:54125},
-  {y:"2020", inc:1684945, exp:1350723, mp:56991},
-  {y:"2021", inc:1678636, exp:1463423, mp:60008},
-  {y:"2022", inc:1677006, exp:1626411, mp:63185},
-  {y:"2023", inc:1745779, exp:1649127, mp:66530},
-  {y:"2024", inc:1846671, exp:1981010, mp:70052}
+  {y:"2006", surplus:257969},
+  {y:"2007", surplus:227457},
+  {y:"2008", surplus:192182},
+  {y:"2009", surplus:324794},
+  {y:"2010", surplus:306368},
+  {y:"2011", surplus:260210},
+  {y:"2012", surplus:226375},
+  {y:"2013", surplus:394114},
+  {y:"2014", surplus:146776},
+  {y:"2015", surplus:206770},
+  {y:"2016", surplus:334945},
+  {y:"2017", surplus:275255},
+  {y:"2018", surplus:258214},
+  {y:"2019", surplus:231573},
+  {y:"2020", surplus:334222},
+  {y:"2021", surplus:215213},
+  {y:"2022", surplus:50595},
+  {y:"2023", surplus:96652},
+  {y:"2024", surplus:-134339}
 ];
 
 var SHARES = 85027;
-var fmt  = function(n){ return '$' + Math.abs(n).toLocaleString('en-US'); };
-var fmtD = function(n){ return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US'); };
-var fmtPS = function(n){ return (n < 0 ? '-$' : '$') + Math.abs(n).toFixed(2); };
+var labels=[], psArr=[], colors=[];
+var totalSurplus=0, cumPS=0, avgPS=0;
 
-var tbody = document.getElementById('tbody');
-var totalSurplus = 0, cumPerShare = 0;
-var totalInc = 0, totalExp = 0;
+for(var i=0;i<rows.length;i++){
+  var ps = rows[i].surplus / SHARES;
+  labels.push(rows[i].y);
+  psArr.push(parseFloat(ps.toFixed(2)));
+  colors.push(rows[i].surplus >= 0 ? 'rgba(45,122,94,0.82)' : 'rgba(176,48,32,0.82)');
+  totalSurplus += rows[i].surplus;
+}
+avgPS = (totalSurplus / SHARES) / rows.length;
 
-for(var i = 0; i < rows.length; i++){
-  var r = rows[i];
-  var surplus = r.inc - r.exp;
-  var perShare = surplus / SHARES;
-  totalSurplus += surplus;
-  totalInc += r.inc;
-  totalExp += r.exp;
-  cumPerShare += perShare;
-
-  var tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td>' + r.y + '</td>' +
-    '<td>' + fmt(r.inc) + '</td>' +
-    '<td>' + fmt(r.mp) + '</td>' +
-    '<td>' + fmt(r.exp) + '</td>' +
-    '<td class="' + (surplus >= 0 ? 'pos' : 'neg') + '">' + fmtD(surplus) + '</td>' +
-    '<td class="' + (perShare >= 0 ? 'pos' : 'neg') + '">' + fmtPS(perShare) + '</td>' +
-    '<td class="' + (cumPerShare >= 0 ? 'pos' : 'neg') + '">' + fmtPS(cumPerShare) + '</td>';
+// Table
+var tbody=document.getElementById('tbody');
+var cumPS2=0;
+for(var j=0;j<rows.length;j++){
+  var ps2 = rows[j].surplus / SHARES;
+  cumPS2 += ps2;
+  var tr=document.createElement('tr');
+  tr.innerHTML=
+    '<td>'+rows[j].y+'</td>'+
+    '<td class="'+(rows[j].surplus>=0?'pos':'neg')+'">'+(rows[j].surplus>=0?'$':'-$')+Math.abs(rows[j].surplus).toLocaleString('en-US')+'</td>'+
+    '<td class="'+(ps2>=0?'pos':'neg')+'">'+(ps2>=0?'$':'-$')+Math.abs(ps2).toFixed(2)+'</td>'+
+    '<td class="'+(cumPS2>=0?'pos':'neg')+'">'+(cumPS2>=0?'$':'-$')+Math.abs(cumPS2).toFixed(2)+'</td>';
   tbody.appendChild(tr);
 }
 
 var totalPS = totalSurplus / SHARES;
-var perYear = totalPS / rows.length;
-
-document.getElementById('tfoot').innerHTML =
-  '<tr>' +
-  '<td>Totals / Avg</td>' +
-  '<td>' + fmt(totalInc) + '</td>' +
-  '<td></td>' +
-  '<td>' + fmt(totalExp) + '</td>' +
-  '<td class="' + (totalSurplus >= 0 ? 't-pos' : 't-neg') + '">' + fmtD(totalSurplus) + '</td>' +
-  '<td class="' + (perYear >= 0 ? 't-pos' : 't-neg') + '">' + fmtPS(perYear) + ' / yr</td>' +
-  '<td class="' + (totalPS >= 0 ? 't-pos' : 't-neg') + '">' + fmtPS(totalPS) + '</td>' +
+document.getElementById('tfoot').innerHTML=
+  '<tr>'+
+  '<td>Total / Avg</td>'+
+  '<td class="t-pos">$'+totalSurplus.toLocaleString('en-US')+'</td>'+
+  '<td class="t-pos">$'+avgPS.toFixed(2)+' / yr</td>'+
+  '<td class="t-pos">$'+totalPS.toFixed(2)+'</td>'+
   '</tr>';
+
+// Chart - bars only
+var ctx=document.getElementById('chart').getContext('2d');
+new Chart(ctx,{
+  type:'bar',
+  data:{
+    labels:labels,
+    datasets:[{
+      label:'Surplus Per Share ($)',
+      data:psArr,
+      backgroundColor:colors,
+      borderColor:colors.map(function(c){return c.replace('0.82','1');}),
+      borderWidth:1,
+      borderRadius:4
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'#1e2d2a',
+        titleColor:'#a0c4b0',
+        bodyColor:'#e8f0ec',
+        borderColor:'#2d7a5e',
+        borderWidth:1,
+        padding:12,
+        callbacks:{
+          title:function(it){return it[0].label;},
+          label:function(item){
+            var v=item.parsed.y;
+            return 'Per Share: '+(v<0?'-$':'$')+Math.abs(v).toFixed(2);
+          },
+          afterLabel:function(item){
+            var surplus=rows[item.dataIndex].surplus;
+            return 'Annual Surplus: '+(surplus<0?'-$':'$')+Math.abs(surplus).toLocaleString('en-US');
+          }
+        }
+      }
+    },
+    scales:{
+      x:{
+        ticks:{color:'#6a6560',font:{size:10,family:'Courier New'},maxRotation:45},
+        grid:{display:false}
+      },
+      y:{
+        ticks:{
+          color:'#6a6560',
+          font:{size:10,family:'Courier New'},
+          callback:function(v){return (v<0?'-$':'$')+Math.abs(v).toFixed(2);}
+        },
+        grid:{color:'#e8e4dc'}
+      }
+    }
+  }
+});
 </script>
 </body>
 </html>
