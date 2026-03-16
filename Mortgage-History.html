@@ -129,6 +129,7 @@
 <div id="tooltip"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script>
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
 
@@ -203,6 +204,48 @@ const chart = new Chart(ctx, {
     plugins: {
       legend: { display: false },
       tooltip: { enabled: false },
+      annotation: {
+        annotations: {
+          refi1998: {
+            type: 'line',
+            xMin: years.indexOf(1998),
+            xMax: years.indexOf(1998),
+            borderColor: '#2E7D32',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: '🏦 Refinancing',
+              position: 'end',
+              backgroundColor: '#2E7D32',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 10, weight: '600' },
+              padding: { x: 7, y: 4 },
+              borderRadius: 4,
+              yAdjust: -10
+            }
+          },
+          refi2013: {
+            type: 'line',
+            xMin: years.indexOf(2013),
+            xMax: years.indexOf(2013),
+            borderColor: '#2E7D32',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            label: {
+              display: true,
+              content: '🏦 Refinancing',
+              position: 'end',
+              backgroundColor: '#2E7D32',
+              color: '#fff',
+              font: { family: 'DM Sans', size: 10, weight: '600' },
+              padding: { x: 7, y: 4 },
+              borderRadius: 4,
+              yAdjust: -10
+            }
+          }
+        }
+      }
     },
     scales: {
       x: {
@@ -247,8 +290,11 @@ document.getElementById('lineChart').addEventListener('mousemove', (e) => {
   const intPct = combined > 0 ? (interest / combined * 100).toFixed(1) : '0.0';
   const prinPct = combined > 0 ? (principal / combined * 100).toFixed(1) : '0.0';
 
+  const refiYears = [1998, 2013];
+  const isRefi = refiYears.includes(yr);
+
   tooltip.innerHTML = `
-    <div class="tt-year">${yr}</div>
+    <div class="tt-year">${yr}${isRefi ? ' &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;">🏦 Refinancing</span>' : ''}</div>
     <div class="tt-row"><span class="tt-label" style="color:#f0a86b">Mortgage Interest</span><span class="tt-val" style="color:#f0a86b">$${interest.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-label" style="color:#82cfff">Mortgage Principal</span><span class="tt-val" style="color:#82cfff">$${principal.toLocaleString()}</span></div>
     <div class="tt-divider"></div>
