@@ -1,0 +1,184 @@
+<!!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actual Results vs. Board Projection — 2024</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f4f1eb; font-family: 'Courier New', Courier, monospace; color: #1a1a1a; padding: 28px 20px; }
+  .wrapper { max-width: 880px; margin: 0 auto; }
+  .top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+  .title-block h1 { font-family: Georgia, serif; font-size: 22px; color: #2d4a3e; margin-bottom: 4px; }
+  .title-block .sub { font-size: 11px; color: #7a7570; }
+  .badge { display: flex; align-items: center; gap: 8px; background: #1a1a2e; border: 1px solid #3a3a5c; border-radius: 8px; padding: 8px 14px; font-size: 11px; color: #a8b4d8; white-space: nowrap; }
+  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #c77dff, #7b5ea7); display: inline-block; flex-shrink: 0; box-shadow: 0 0 6px #c77dff88; }
+  .badge strong { color: #c77dff; }
+
+  /* Board letter callout */
+  .callout { background: #fff8e7; border-left: 4px solid #e6a817; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 16px; }
+  .callout h3 { font-family: Georgia, serif; font-size: 13px; color: #7a5000; margin-bottom: 8px; }
+  .callout p { font-size: 11px; color: #5a4000; line-height: 1.6; }
+  .proj-items { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .proj-item { background: rgba(230,168,23,0.15); border: 1px solid #e6a817; border-radius: 6px; padding: 5px 12px; font-size: 11px; color: #7a5000; }
+  .proj-item strong { color: #3a2800; }
+
+  /* Exclusion note */
+  .excl-note { background: #f0f4ff; border-left: 3px solid #3a6fa5; padding: 6px 12px; font-size: 11px; color: #2a3f6e; border-radius: 0 4px 4px 0; margin-bottom: 16px; display: inline-block; }
+
+  /* Cards */
+  .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .card { flex: 1; min-width: 140px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 13px 15px; border-top: 3px solid #2d7a5e; }
+  .card.red   { border-top-color: #b03020; }
+  .card.amber { border-top-color: #e6a817; }
+  .card.blue  { border-top-color: #3a6fa5; }
+  .card.green { border-top-color: #1a6b3c; }
+  .card-label { font-size: 10px; color: #7a7570; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .card-val   { font-family: Georgia, serif; font-size: 19px; color: #2d4a3e; font-weight: bold; }
+  .card.red   .card-val { color: #b03020; }
+  .card.amber .card-val { color: #b07a00; }
+  .card.blue  .card-val { color: #3a6fa5; }
+  .card.green .card-val { color: #1a6b3c; }
+  .card-sub { font-size: 10px; color: #9a9590; margin-top: 2px; }
+
+  /* Table */
+  .table-wrap { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #2d4a3e; }
+  thead th { padding: 12px 14px; font-size: 10px; font-weight: bold; color: #f0ebe0; text-transform: uppercase; letter-spacing: 1.2px; text-align: right; }
+  thead th:first-child { text-align: left; }
+  tbody tr { border-bottom: 1px solid #e8e4dc; }
+  tbody tr:nth-child(even) { background: #f9f7f3; }
+  tbody tr:hover { background: #eef5f1; }
+  tbody tr.highlight { background: #fff8e7 !important; }
+  tbody tr.highlight:hover { background: #fff3d0 !important; }
+  td { padding: 10px 14px; font-size: 12px; text-align: right; }
+  td:first-child { text-align: left; font-weight: bold; color: #2d4a3e; }
+  .up   { color: #b03020; background: #fdf2f0; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+  .down { color: #1a6b3c; background: #f0f7f3; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+  .pup  { color: #b03020; font-weight: bold; }
+  .pdn  { color: #1a6b3c; font-weight: bold; }
+  tfoot tr { background: #2d4a3e; }
+  tfoot td { padding: 12px 14px; font-size: 13px; font-weight: bold; color: #f0ebe0; text-align: right; border-top: 2px solid #4a7a6a; }
+  tfoot td:first-child { text-align: left; font-family: Georgia, serif; font-size: 14px; }
+  .tup { color: #ffb3a8; font-weight: bold; }
+  .tdn { color: #a8ffc4; font-weight: bold; }
+
+  /* Key finding */
+  .spotlight { background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 18px 20px; margin-bottom: 20px; border-left: 4px solid #b03020; }
+  .spotlight h3 { font-family: Georgia, serif; font-size: 14px; color: #b03020; margin-bottom: 10px; }
+  .spotlight p { font-size: 12px; color: #3a3530; line-height: 1.7; }
+  .spotlight .fig { font-weight: bold; color: #2d4a3e; }
+  .spotlight .fig.red { color: #b03020; }
+  .spotlight .fig.grn { color: #1a6b3c; }
+
+  .footer { margin-top: 16px; text-align: center; font-size: 10px; color: #9a9590; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .footer .dot { width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #c77dff, #7b5ea7); display: inline-block; box-shadow: 0 0 4px #c77dff88; }
+  .footer a { color: #a87ddf; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="top-bar">
+    <div class="title-block">
+      <h1>Actual Results vs. Board Projection: 2023 vs. 2024</h1>
+      <p class="sub">Year-over-year expense comparison &middot; Dollar &amp; percentage change per category</p>
+    </div>
+    <div class="badge"><span class="dot"></span>Generated by <strong>Claude AI</strong> &mdash; Anthropic</div>
+  </div>
+
+  <!-- Board letter callout -->
+  <div class="callout">
+    <h3>&#9888; Board Letter dated November 27, 2023 — Projected increases used to justify the 9% maintenance increase:</h3>
+    <p>The Board stated: <em>"The Board projects dramatic increases in the cost of operating the Riveredge building and property in 2024."</em></p>
+    <div class="proj-items">
+      <div class="proj-item"><strong>Fuel Oil:</strong> +$110,000 projected</div>
+      <div class="proj-item"><strong>Insurance:</strong> +$23,000 projected</div>
+      <div class="proj-item"><strong>Real Estate Taxes:</strong> +$8,500 projected</div>
+      <div class="proj-item"><strong>Other Expenses:</strong> +$77,300 projected</div>
+      <div class="proj-item"><strong>Total Projected Increase:</strong> +$218,800</div>
+    </div>
+  </div>
+
+  <!-- Exclusion note -->
+  <div class="excl-note">&#9432; 2024 Repairs &amp; Maintenance excludes $228,074 fire &amp; water damage (one-time, unforeseeable event — not an operating expense)</div>
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card"><div class="card-label">Total Expenses 2023</div><div class="card-val">$1,649,127</div><div class="card-sub">Base year</div></div>
+    <div class="card red"><div class="card-label">Total Expenses 2024</div><div class="card-val">$1,752,936</div><div class="card-sub">Actual (adj.) results</div></div>
+    <div class="card amber"><div class="card-label">Actual $ Increase</div><div class="card-val">+$103,809</div><div class="card-sub">Adj. vs. 2023</div></div>
+    <div class="card blue"><div class="card-label">Board's Projection</div><div class="card-val">+$218,800</div><div class="card-sub">Nov. 2023 letter</div></div>
+    <div class="card green"><div class="card-label">Overestimate</div><div class="card-val">$114,991</div><div class="card-sub">Board overstated by 111%</div></div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>2023</th>
+          <th>2024 (Adj.)</th>
+          <th>$ Change</th>
+          <th>% Change</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+      <tfoot id="tfoot"></tfoot>
+    </table>
+  </div>
+
+  <!-- Key finding -->
+  <div class="spotlight">
+    <h3>&#128269; Key Finding: Board Projection vs. Actual Results</h3>
+    <p>The Board's November 2023 letter projected <span class="fig red">$218,800 in total expense increases</span> to justify the 9% maintenance increase. With the one-time fire &amp; water damage event properly excluded, actual 2024 operating expenses increased by just <span class="fig red">$103,809</span> — less than half the Board's projection. The Board overstated expense growth by <span class="fig red">$114,991</span>, or <span class="fig red">111%</span>. The projected <span class="fig red">$110,000 fuel oil increase</span> — the single largest item cited — came in at just <span class="fig red">$37,866</span>, one-third of what was projected. The maintenance increase of 9% generating <span class="fig red">$134,342 in additional annual income</span> was simply not justified by the actual operating results.</p>
+  </div>
+
+  <div class="footer">
+    <span class="dot"></span>
+    Prepared by <a href="https://claude.ai" target="_blank">Claude AI</a> (Anthropic) &middot; claude.ai
+  </div>
+</div>
+
+<script>
+var cats   = ["Real Estate Taxes","Utilities","Payroll","Mortgage Interest","Repairs & Maint.*","Insurance","Security","Management Fee","Water & Sewer","Legal & Audit","Corp Tax & Misc."];
+var v23    = [369302,290726,249503,187392,224945,86587,72322,51150,52920,39560,24720];
+var v24    = [384242,328592,262939,185476,267743,99094,77374,52725,52221,10953,31577];
+var hilite = [false,true,false,false,true,false,false,false,false,false,false];
+
+function fmt(n)  { return '$'+Math.abs(n).toLocaleString('en-US'); }
+function fmtD(n) { return (n>=0?'+$':'-$')+Math.abs(n).toLocaleString('en-US'); }
+function fmtP(n) { return (n>=0?'+':'')+n.toFixed(1)+'%'; }
+
+var tbody=document.getElementById('tbody');
+var tot23=0, tot24=0;
+
+for(var i=0;i<cats.length;i++){
+  var a=v23[i], b=v24[i], d=b-a, p=(d/a)*100;
+  tot23+=a; tot24+=b;
+
+  var dHtml = d>0 ? '<span class="up">&#9650; '+fmtD(d)+'</span>'
+                  : d<0 ? '<span class="down">&#9660; '+fmtD(d)+'</span>'
+                        : fmtD(d);
+  var pHtml = p>0 ? '<span class="pup">'+fmtP(p)+'</span>'
+                  : p<0 ? '<span class="pdn">'+fmtP(p)+'</span>'
+                        : fmtP(p);
+
+  var tr=document.createElement('tr');
+  if(hilite[i]) tr.className='highlight';
+  tr.innerHTML='<td>'+cats[i]+'</td>'+
+    '<td>'+fmt(a)+'</td><td>'+fmt(b)+'</td>'+
+    '<td>'+dHtml+'</td><td>'+pHtml+'</td>';
+  tbody.appendChild(tr);
+}
+
+var td=tot24-tot23, tp=(td/tot23)*100;
+document.getElementById('tfoot').innerHTML=
+  '<tr><td>Total Expenses</td><td>'+fmt(tot23)+'</td><td>'+fmt(tot24)+'</td>'+
+  '<td><span class="tup">'+fmtD(td)+'</span></td>'+
+  '<td><span class="tup">'+fmtP(tp)+'</span></td></tr>';
+</script>
+</body>
+</html>
