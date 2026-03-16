@@ -277,7 +277,16 @@ const chart1=new Chart(ctx1,{type:'line',data:{labels:years,datasets:[
   {label:'Income',data:incRaw,borderColor:'#3fb950',backgroundColor:gGrad,borderWidth:2.5,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:'#3fb950',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,stepped:true},
   {label:'Expenses',data:expRaw,borderColor:'#f85149',backgroundColor:rGrad,borderWidth:2.5,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:'#f85149',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:true,stepped:true},
   {label:'Exp+Principal',data:expPrinRaw,borderColor:'#d29922',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#d29922',pointBorderColor:'#0d1117',pointBorderWidth:1.5,fill:false,stepped:true}
-]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{enabled:false},
+  annotation:{annotations:{
+    mi2004:{type:'line',xMin:years.indexOf(2004),xMax:years.indexOf(2004),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+9.8%',position:'end',backgroundColor:'#2E7D32',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:80}},
+    mi2005:{type:'line',xMin:years.indexOf(2005),xMax:years.indexOf(2005),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+13.5%',position:'end',backgroundColor:'#1b5e20',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:60}},
+    mi2006:{type:'line',xMin:years.indexOf(2006),xMax:years.indexOf(2006),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+17%',position:'end',backgroundColor:'#1b5e20',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
+    mi2008:{type:'line',xMin:years.indexOf(2008),xMax:years.indexOf(2008),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+3%',position:'end',backgroundColor:'#388e3c',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
+    mi2013:{type:'line',xMin:years.indexOf(2013),xMax:years.indexOf(2013),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+5%',position:'end',backgroundColor:'#388e3c',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
+    mi2024:{type:'line',xMin:years.indexOf(2024),xMax:years.indexOf(2024),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+9%',position:'end',backgroundColor:'#2E7D32',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}}
+  }}
+},scales:{
   x:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''},border:{display:false}},
   y:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+(v/1000000>=1?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},border:{display:false},min:700000}
 }}});
@@ -287,7 +296,9 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
-  showTT(e,`<div class="tt-yr">${yr}</div>
+  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004'},2005:{pct:'+13.5%',date:'Apr 1, 2005'},2006:{pct:'+17%',date:'Jan 1, 2006'},2008:{pct:'+3%',date:'Sep 1, 2008'},2013:{pct:'+5%',date:'Mar 1, 2013'},2024:{pct:'+9%',date:'Jan 1, 2024'}};
+  const mi=maintIncreases[yr];
+  showTT(e,`<div class="tt-yr">${yr}${mi?` &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;white-space:nowrap;">📈 Maint. ${mi.pct} — ${mi.date}</span>`:''}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-lbl" style="color:#f85149">Total Expenses</span><span class="tt-val" style="color:#f85149">$${exp.toLocaleString()}</span></div>
     <div class="tt-row"><span class="tt-lbl" style="color:#d29922">Exp + Principal</span><span class="tt-val" style="color:#d29922">$${ep.toLocaleString()}</span></div>
