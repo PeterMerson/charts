@@ -153,6 +153,22 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
+<div style="max-width:1400px;margin:10px auto 0;padding:0 32px;">
+  <div style="background:#1a1208;border:1px solid #3a3028;border-radius:6px;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.12em;color:#c9a84c;font-weight:600;">Global Toggles</span>
+    <div style="width:1px;height:20px;background:#3a3028;"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#9a8f7e;">Mortgage Principal</span>
+      <button class="mode-btn" id="btn-principal" onclick="togglePrincipal()" title="Include or exclude Mortgage Principal in Expense totals">Excluded</button>
+    </div>
+    <div style="width:1px;height:20px;background:#3a3028;"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#9a8f7e;">CPI-U Overlay</span>
+      <button class="mode-btn" id="btn-cpi" onclick="toggleCPI()" title="Show CPI-U inflation line on trend charts">Off</button>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#5a5040;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Right axis when active</div>
+  </div>
+</div>
 <div class="section-rule"><span class="rule-label">Income Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
  
 <div class="controls-bar">
@@ -316,6 +332,8 @@ const EXPENSES = {
   "Corp Tax & Misc.":   [14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,5878,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577]
 };
  
+const MORTGAGE_PRINCIPAL = [0, 0, 0, 0, 0, 0, 0, 0, 55958, 65133, 70241, 75566, 81296, 87458, 94089, 101223, 108896, 117152, 126026, 135596, 145869, 156927, 168738, 33488, 41572, 44034, 46362, 48819, 51404, 54125, 56991, 60008, 63185, 66530, 70052];
+const CPI_U_DATA = [130.7, 136.2, 140.3, 144.5, 148.2, 152.4, 156.9, 160.5, 163.0, 166.6, 172.2, 177.1, 179.9, 184.0, 188.9, 195.3, 201.6, 207.3, 215.3, 214.5, 218.1, 224.9, 229.6, 233.0, 236.7, 237.0, 240.0, 245.1, 251.1, 255.7, 258.8, 270.9, 292.7, 304.7, 314.2];
 const INC_CATS = Object.keys(INCOME);
 const EXP_CATS = Object.keys(EXPENSES);
 const INC_COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1','#FF9800'];
@@ -325,6 +343,8 @@ const state = {
   inc: { mode:'range', showChg:true, selectedCat:null, trendChart:null },
   exp: { mode:'range', showChg:true, selectedCat:null, trendChart:null }
 };
+var SHOW_CPI = false;
+var SHOW_PRINCIPAL = false;
  
 function initSelects(prefix) {
   ['from','to','single'].forEach(id => {
@@ -430,16 +450,21 @@ function render(prefix) {
     body.appendChild(tr);
   });
  
-  // TOTALS ROW
+  // TOTALS ROW — clickable
   const ttr = document.createElement('tr');
   ttr.classList.add('total-row');
+  ttr.style.cursor = 'pointer';
+  ttr.title = 'Click to graph total';
   const ttd0 = document.createElement('td');
   ttd0.className = 'cat-col';
-  ttd0.textContent = prefix==='inc' ? 'Total Income' : 'Total Expenses';
+  const totalLabel = prefix==='inc' ? 'Total Income' : 'Total Expenses';
+  ttd0.textContent = totalLabel + ' ▶';
   ttr.appendChild(ttd0);
   let prevTotal = null;
+  const totalsByYear = {};
   years.forEach((y) => {
     const val = totals[y];
+    totalsByYear[y] = val;
     const p = prevTotal!==null ? pct(prevTotal,val) : null;
     const isUp = p!==null && p>=0;
     const ttd = document.createElement('td');
@@ -454,6 +479,7 @@ function render(prefix) {
     ttr.appendChild(ttd);
     prevTotal = val;
   });
+  ttr.onclick = () => selectTotal(prefix, years, totalsByYear);
   body.appendChild(ttr);
  
   if(selectedCat) selectCat(prefix, selectedCat, years);
@@ -500,17 +526,112 @@ function selectCat(prefix, cat, years) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0, color+'33'); grad.addColorStop(1, color+'05');
  
+  // Build datasets
+  const datasets = [
+    { data:vals, borderColor:color, backgroundColor:grad, borderWidth:2, pointRadius:years.length>15?2:3.5, pointHoverRadius:5, pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5, fill:true, tension:0.25, label: cat, yAxisID:'y' }
+  ];
+  const scales = {
+    x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
+    y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
+  };
+  if(SHOW_CPI) {
+    const cpiVals = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
+    datasets.push({ data:cpiVals, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U', yAxisID:'ycpi' });
+    scales['ycpi'] = { position:'right', ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c', callback:v=>v.toFixed(0) }, grid:{drawOnChartArea:false}, title:{ display:true, text:'CPI-U Index', font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c' } };
+  }
+ 
   state[prefix].trendChart = new Chart(ctx, {
     type:'line',
-    data:{ labels:years, datasets:[{ data:vals, borderColor:color, backgroundColor:grad, borderWidth:2, pointRadius:years.length>15?2:3.5, pointHoverRadius:5, pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5, fill:true, tension:0.25 }] },
+    data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>' '+fmtFull(item.parsed.y) } } },
-      scales:{
-        x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
-        y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'} }
-      }
+      plugins:{ legend:{ display: SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
+      scales:scales
     }
   });
+}
+ 
+// ── SELECT TOTAL ROW ──
+function selectTotal(prefix, years, totalsByYear) {
+  // Deselect any cat row
+  state[prefix].selectedCat = null;
+  document.querySelectorAll('#'+prefix+'-matrix-body tr').forEach(tr => {
+    if(!tr.classList.contains('total-row')) tr.classList.remove('selected');
+  });
+ 
+  const label = prefix==='inc' ? 'Total Income' : 'Total Expenses';
+  const color = prefix==='inc' ? '#3fb950' : '#f85149';
+  const vals = years.map(y => totalsByYear[y]);
+  const peak = Math.max(...vals);
+  const peakYr = years[vals.indexOf(peak)];
+  const latest = vals[vals.length-1];
+  const first = vals[0];
+  const chgPct = first>0 ? ((latest-first)/first*100) : 0;
+ 
+  document.getElementById(prefix+'-panel-cat').textContent = label;
+  document.getElementById(prefix+'-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+  document.getElementById(prefix+'-ps-peak').textContent = peakYr;
+  document.getElementById(prefix+'-ps-peak-val').textContent = fmtFull(peak);
+  document.getElementById(prefix+'-ps-latest').textContent = fmtFull(latest);
+  const chgEl = document.getElementById(prefix+'-ps-chg');
+  chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
+  chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  document.getElementById(prefix+'-panel-stats-wrap').style.display = 'grid';
+  document.getElementById(prefix+'-panel-empty').style.display = 'none';
+  document.getElementById(prefix+'-chart-panel').style.display = 'block';
+ 
+  if(state[prefix].trendChart){ state[prefix].trendChart.destroy(); state[prefix].trendChart = null; }
+  const ctx = document.getElementById(prefix+'-trend-chart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0, color+'33'); grad.addColorStop(1, color+'05');
+ 
+  const datasets = [
+    { data:vals, borderColor:color, backgroundColor:grad, borderWidth:2.5, pointRadius:years.length>15?2:3.5, pointHoverRadius:5, pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5, fill:true, tension:0.25, label:label, yAxisID:'y' }
+  ];
+  const scales = {
+    x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
+    y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
+  };
+  if(SHOW_CPI) {
+    const cpiVals = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
+    datasets.push({ data:cpiVals, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U', yAxisID:'ycpi' });
+    scales['ycpi'] = { position:'right', ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c', callback:v=>v.toFixed(0) }, grid:{drawOnChartArea:false}, title:{ display:true, text:'CPI-U Index', font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c' } };
+  }
+ 
+  state[prefix].trendChart = new Chart(ctx, {
+    type:'line',
+    data:{ labels:years, datasets:datasets },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
+      scales:scales
+    }
+  });
+}
+ 
+// ── TOGGLE CPI ──
+function toggleCPI() {
+  SHOW_CPI = !SHOW_CPI;
+  const btn = document.getElementById('btn-cpi');
+  btn.textContent = SHOW_CPI ? 'On' : 'Off';
+  btn.classList.toggle('active', SHOW_CPI);
+  // Redraw active charts
+  ['inc','exp'].forEach(prefix => {
+    if(state[prefix].selectedCat) {
+      const years = getYears(prefix);
+      selectCat(prefix, state[prefix].selectedCat, years);
+    }
+  });
+}
+ 
+// ── TOGGLE MORTGAGE PRINCIPAL ──
+function togglePrincipal() {
+  SHOW_PRINCIPAL = !SHOW_PRINCIPAL;
+  const btn = document.getElementById('btn-principal');
+  btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
+  btn.classList.toggle('active', SHOW_PRINCIPAL);
+  // Update info note
+  const note = document.getElementById('principal-note');
+  if(note) note.style.display = SHOW_PRINCIPAL ? 'none' : 'block';
+  render('exp');
 }
  
 // ── BOOT ──
