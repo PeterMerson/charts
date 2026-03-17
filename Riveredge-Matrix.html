@@ -733,6 +733,7 @@ function selectCat(prefix, cat, years) {
       scales:scales
     }
   });
+}
  
 // ── SELECT TOTAL ROW ──
 function selectTotal(prefix, years, totalsByYear) {
@@ -793,6 +794,7 @@ function selectTotal(prefix, years, totalsByYear) {
       scales:scales
     }
   });
+}
  
 // ── CHART TYPE TOGGLE ──
 function setChartType(type) {
@@ -971,9 +973,6 @@ function togglePrincipal() {
   render('exp');
   renderNet();
   if(window._netYears) renderNetChart(window._netYears);
-}
- 
- 
 }
  
 // ── EXPAND PANEL (simple CSS fullscreen) ──
