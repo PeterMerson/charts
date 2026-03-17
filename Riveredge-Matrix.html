@@ -126,49 +126,9 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 /* ── FOOTER ── */
 .page-footer { max-width: 1400px; margin: 0 auto; padding: 16px 32px; border-top: 1px solid var(--rule); font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--neutral); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
  
-/* ── EXPAND BUTTON ── */
-.chart-panel { position: relative; }
-.expand-btn {
-  position: absolute; bottom: 8px; right: 8px;
-  width: 26px; height: 26px;
-  background: var(--paper2); border: 1px solid var(--rule2);
-  border-radius: 4px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--neutral); opacity: 0.55;
-  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
-  z-index: 10; line-height: 1; padding: 0;
-}
-.expand-btn:hover { opacity: 1; background: var(--ink); color: var(--gold-light); border-color: var(--gold); }
  
-/* ── FULLSCREEN MODAL ── */
-.fs-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(26,18,8,0.85); z-index: 99999;
-  align-items: center; justify-content: center; padding: 32px;
-}
-.fs-overlay.open { display: flex; }
-.fs-modal {
-  background: #fff; border-radius: 8px;
-  width: 90vw; height: 80vh;
-  display: flex; flex-direction: column;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-  overflow: hidden;
-}
-.fs-header {
-  background: var(--ink); padding: 12px 20px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 2px solid var(--gold-light); flex-shrink: 0;
-}
-.fs-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--paper); }
-.fs-close {
-  background: none; border: 1px solid #3a3028; color: var(--muted);
-  border-radius: 4px; padding: 4px 10px; cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
-  transition: all 0.15s;
-}
-.fs-close:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-.fs-body { flex: 1; padding: 20px; position: relative; overflow: hidden; }
-.fs-body canvas { width: 100% !important; height: 100% !important; }
+ 
+ 
 .claude-tag { display: flex; align-items: center; gap: 5px; }
 .claude-dot { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg,#c77dff,#7b5ea7); box-shadow: 0 0 4px #c77dff66; }
  
@@ -181,6 +141,54 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
 .net-pos { color: #6fcf82 !important; font-weight: 700; }
 .net-neg { color: #f47a70 !important; font-weight: 700; }
+ 
+/* ── EXPAND BUTTON ── */
+.expand-btn {
+  position: absolute; bottom: 6px; right: 6px;
+  width: 24px; height: 24px;
+  background: var(--paper2); border: 1px solid var(--rule2);
+  border-radius: 4px; cursor: pointer;
+  font-size: 12px; color: var(--neutral); opacity: 0.6;
+  transition: all 0.15s; z-index: 20;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.expand-btn:hover { opacity:1; background:var(--ink); color:var(--gold-light); border-color:var(--gold); }
+ 
+/* ── FULLSCREEN PANEL ── */
+.panel-card.fullscreen {
+  position: fixed !important;
+  top: 30px !important; left: 30px !important;
+  right: 30px !important; bottom: 30px !important;
+  width: auto !important; height: auto !important;
+  z-index: 9999 !important;
+  box-shadow: 0 0 0 9999px rgba(26,18,8,0.82) !important;
+  border-radius: 8px !important;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel-card.fullscreen .chart-panel {
+  flex: 1 !important; display: block !important;
+  padding: 16px 20px !important;
+  min-height: 0;
+}
+.panel-card.fullscreen canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+.panel-card.fullscreen .expand-btn { font-size:14px; width:30px; height:30px; bottom:10px; right:10px; }
+ 
+/* ── NET ROW ── */
+.matrix tbody tr.principal-row { background: rgba(201,168,76,0.08) !important; border-top: 1px dashed var(--gold); cursor: default; }
+.matrix tbody tr.principal-row:hover { background: rgba(201,168,76,0.14) !important; }
+.matrix tbody tr.principal-row td.cat-col { color: var(--gold); font-style: italic; }
+.matrix tbody tr.principal-row td { color: var(--ink2); }
+.net-pos { color: #6fcf82 !important; font-weight: 700; }
+.net-neg { color: #f47a70 !important; font-weight: 700; }
+.matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.net-row:hover { background: #1e361e !important; }
+.matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
+.matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
+ 
 </style>
 </head>
 <body>
@@ -262,7 +270,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 <div class="main-layout">
   <div class="matrix-wrap"><table class="matrix"><thead id="inc-matrix-head"></thead><tbody id="inc-matrix-body"></tbody></table></div>
   <div class="right-panel">
-    <div class="panel-card">
+    <div class="panel-card" id="inc-panel-card">
       <div class="panel-header">
         <div class="panel-cat" id="inc-panel-cat">Select a Row</div>
         <div class="panel-range" id="inc-panel-range">Click any income category in the matrix</div>
@@ -276,7 +284,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div id="inc-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any income category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="inc-chart-panel" style="display:none;position:relative;">
         <canvas id="inc-trend-chart" height="180"></canvas>
-        <button class="expand-btn" onclick="openFSModal('inc')" title="Expand chart to full screen">⤢</button>
+        <button class="expand-btn" id="inc-expand-btn" onclick="toggleFS('inc')" title="Expand / Collapse chart">⤢</button>
       </div>
     </div>
   </div>
@@ -339,7 +347,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 <div class="main-layout">
   <div class="matrix-wrap"><table class="matrix"><thead id="exp-matrix-head"></thead><tbody id="exp-matrix-body"></tbody></table></div>
   <div class="right-panel">
-    <div class="panel-card">
+    <div class="panel-card" id="exp-panel-card">
       <div class="panel-header">
         <div class="panel-cat" id="exp-panel-cat">Select a Row</div>
         <div class="panel-range" id="exp-panel-range">Click any expense category in the matrix</div>
@@ -353,7 +361,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div id="exp-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any expense category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="exp-chart-panel" style="display:none;position:relative;">
         <canvas id="exp-trend-chart" height="180"></canvas>
-        <button class="expand-btn" onclick="openFSModal('exp')" title="Expand chart to full screen">⤢</button>
+        <button class="expand-btn" id="exp-expand-btn" onclick="toggleFS('exp')" title="Expand / Collapse chart">⤢</button>
       </div>
     </div>
   </div>
@@ -400,7 +408,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <table class="matrix"><thead id="net-matrix-head"></thead><tbody id="net-matrix-body"></tbody></table>
   </div>
   <div class="right-panel">
-    <div class="panel-card">
+    <div class="panel-card" id="net-panel-card">
       <div class="panel-header" style="background:#1a2e1a;border-color:#3fb950;">
         <div class="panel-cat" id="net-panel-cat">Net Income</div>
         <div class="panel-range" id="net-panel-range">Click the row to graph</div>
@@ -414,7 +422,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div id="net-panel-empty" class="panel-empty"><span class="arrow" style="color:#3fb950;">←</span>Click the Net Income row<br>to graph surplus &amp; deficit<br>over the selected range</div>
       <div class="chart-panel" id="net-chart-panel" style="display:none;position:relative;">
         <canvas id="net-trend-chart" height="180"></canvas>
-        <button class="expand-btn" onclick="openFSModal('net')" title="Expand chart to full screen">⤢</button>
+        <button class="expand-btn" id="net-expand-btn" onclick="toggleFS('net')" title="Expand / Collapse chart">⤢</button>
       </div>
     </div>
   </div>
@@ -725,9 +733,6 @@ function selectCat(prefix, cat, years) {
       scales:scales
     }
   });
-  // Store config for fullscreen
-  window['_fsCfg_'+prefix] = { type:CHART_TYPE, labels:years, datasets:datasets, scales:scales, interaction:{mode:'index',intersect:false}, showLegend:SHOW_CPI };
-}
  
 // ── SELECT TOTAL ROW ──
 function selectTotal(prefix, years, totalsByYear) {
@@ -788,9 +793,6 @@ function selectTotal(prefix, years, totalsByYear) {
       scales:scales
     }
   });
-  // Store config for fullscreen
-  window['_fsCfg_'+prefix] = { type:CHART_TYPE, labels:years, datasets:datasets, scales:scales, interaction:{mode:'index',intersect:false}, showLegend:SHOW_CPI };
-}
  
 // ── CHART TYPE TOGGLE ──
 function setChartType(type) {
@@ -920,7 +922,6 @@ function renderNetChart(years, nets) {
     y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
   };
   // Store for fullscreen
-  window['_fsCfg_net'] = { type: isBar?'bar':'line', labels:years, datasets:[netDataset], scales:netScales, interaction:{mode:'index',intersect:false}, showLegend:false };
   window._netChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data:{ labels:years, datasets:[netDataset]},
@@ -972,64 +973,63 @@ function togglePrincipal() {
   if(window._netYears) renderNetChart(window._netYears);
 }
  
-// ── FULLSCREEN MODAL ──
-var _fsChart = null;
  
+}
+ 
+// ── EXPAND PANEL (simple CSS fullscreen) ──
 function openFSModal(prefix) {
-  // Get stored chart config
-  var cfg = window['_fsCfg_'+prefix];
-  if(!cfg) return;
+  var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
+  var panel = document.getElementById(panelId);
+  if(!panel) return;
+  // Check a chart is actually loaded
+  var chartPanel = document.getElementById(prefix+'-chart-panel');
+  if(!chartPanel || chartPanel.style.display === 'none') return;
  
-  // Set title
-  var titleText = prefix==='net'
-    ? document.getElementById('net-panel-cat').textContent
-    : document.getElementById(prefix+'-panel-cat').textContent;
-  document.getElementById('fs-modal-title').textContent = titleText;
+  panel.classList.add('fullscreen');
+  document.body.style.overflow = 'hidden';
  
-  // Open overlay
-  document.getElementById('fs-overlay').classList.add('open');
- 
-  // Destroy previous fullscreen chart
-  if(_fsChart) { _fsChart.destroy(); _fsChart = null; }
- 
+  // Resize chart to fill new space
   setTimeout(function() {
-    var canvas = document.getElementById('fs-canvas');
-    var ctx = canvas.getContext('2d');
- 
-    // Build scales with bigger fonts
-    var fsScales = {};
-    if(cfg.scales) {
-      Object.keys(cfg.scales).forEach(function(ax) {
-        var s = cfg.scales[ax];
-        fsScales[ax] = Object.assign({}, s, {
-          ticks: Object.assign({}, s.ticks, { font:{ family:'IBM Plex Mono', size:12 }, color:'#5a5040' }),
-          title: s.title ? Object.assign({}, s.title, { font:{ family:'IBM Plex Mono', size:12 } }) : undefined
-        });
-      });
-    }
- 
-    _fsChart = new Chart(ctx, {
-      type: cfg.type,
-      data: { labels: cfg.labels, datasets: cfg.datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: cfg.interaction || { mode:'index', intersect:false },
-        plugins: {
-          legend: { display: cfg.showLegend, labels:{ font:{family:'IBM Plex Mono',size:12}, color:'#5a5040', boxWidth:24 } },
-          tooltip: cfg.tooltip,
-          annotation: cfg.annotation || {}
-        },
-        scales: fsScales
-      }
-    });
-  }, 60);
+    var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+    if(chart) chart.resize();
+  }, 50);
 }
  
 function closeFSModal() {
-  document.getElementById('fs-overlay').classList.remove('open');
-  if(_fsChart) { _fsChart.destroy(); _fsChart = null; }
+  ['inc','exp','net'].forEach(function(prefix) {
+    var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
+    var panel = document.getElementById(panelId);
+    if(panel) panel.classList.remove('fullscreen');
+  });
+  document.body.style.overflow = '';
+  // Resize charts back
+  setTimeout(function() {
+    ['inc','exp','net'].forEach(function(prefix) {
+      var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+      if(chart) chart.resize();
+    });
+  }, 50);
 }
+ 
+function toggleFS(prefix) {
+  var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
+  var panel = document.getElementById(panelId);
+  if(!panel) return;
+  var chartPanel = document.getElementById(prefix+'-chart-panel');
+  if(!chartPanel || chartPanel.style.display === 'none') return;
+  if(panel.classList.contains('fullscreen')) {
+    closeFSModal();
+    document.getElementById(prefix+'-expand-btn').textContent = '⤢';
+  } else {
+    openFSModal(prefix);
+    document.getElementById(prefix+'-expand-btn').textContent = '✕';
+  }
+}
+ 
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') closeFSModal();
+});
  
 // ── BOOT ──
 initSelects('inc');
@@ -1051,4 +1051,3 @@ renderNet();
 </script>
 </body>
 </html>
-  
