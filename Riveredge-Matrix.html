@@ -450,6 +450,14 @@ function render(prefix) {
     body.appendChild(tr);
   });
  
+  // Add mortgage principal to expense totals AFTER category accumulation
+  if(prefix==='exp' && SHOW_PRINCIPAL) {
+    years.forEach(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      totals[y] += (MORTGAGE_PRINCIPAL[idx] || 0);
+    });
+  }
+ 
   // TOTALS ROW — clickable
   const ttr = document.createElement('tr');
   ttr.classList.add('total-row');
@@ -535,9 +543,12 @@ function selectCat(prefix, cat, years) {
     y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
   };
   if(SHOW_CPI) {
-    const cpiVals = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
-    datasets.push({ data:cpiVals, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U', yAxisID:'ycpi' });
-    scales['ycpi'] = { position:'right', ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c', callback:v=>v.toFixed(0) }, grid:{drawOnChartArea:false}, title:{ display:true, text:'CPI-U Index', font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c' } };
+    // Index both series to 100 at the first year of the selected range
+    const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
+    const cpiBase = cpiRaw[0];
+    const valBase = vals[0];
+    const cpiIndexed = cpiRaw.map(v => valBase * (v / cpiBase));
+    datasets.push({ data:cpiIndexed, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U (indexed to '+years[0]+')', yAxisID:'y' });
   }
  
   state[prefix].trendChart = new Chart(ctx, {
@@ -592,9 +603,12 @@ function selectTotal(prefix, years, totalsByYear) {
     y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
   };
   if(SHOW_CPI) {
-    const cpiVals = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
-    datasets.push({ data:cpiVals, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U', yAxisID:'ycpi' });
-    scales['ycpi'] = { position:'right', ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c', callback:v=>v.toFixed(0) }, grid:{drawOnChartArea:false}, title:{ display:true, text:'CPI-U Index', font:{family:'IBM Plex Mono',size:9}, color:'#c9a84c' } };
+    // Index both series to 100 at the first year of the selected range
+    const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
+    const cpiBase = cpiRaw[0];
+    const valBase = vals[0];
+    const cpiIndexed = cpiRaw.map(v => valBase * (v / cpiBase));
+    datasets.push({ data:cpiIndexed, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U (indexed to '+years[0]+')', yAxisID:'y' });
   }
  
   state[prefix].trendChart = new Chart(ctx, {
