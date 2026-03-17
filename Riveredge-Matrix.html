@@ -562,14 +562,26 @@ function render(prefix) {
     ttr.appendChild(ttd);
     prevTotal = val;
   });
-  ttr.onclick = () => selectTotal(prefix, years, totalsByYear);
+  // Store globally so toggle/chart-type change can redraw
+  window['_'+prefix+'TotalsByYear'] = totalsByYear;
+  window['_'+prefix+'TotalYears'] = years;
+  state[prefix].totalSelected = state[prefix].totalSelected || false;
+ 
+  ttr.onclick = () => {
+    state[prefix].totalSelected = true;
+    state[prefix].selectedCat = null;
+    selectTotal(prefix, years, totalsByYear);
+  };
   body.appendChild(ttr);
  
-  if(selectedCat) selectCat(prefix, selectedCat, years);
+  // Redraw total chart if it was previously selected
+  if(state[prefix].totalSelected) selectTotal(prefix, years, totalsByYear);
+  else if(selectedCat) selectCat(prefix, selectedCat, years);
 }
  
 function selectCat(prefix, cat, years) {
   state[prefix].selectedCat = cat;
+  state[prefix].totalSelected = false;
   const data = prefix==='inc' ? INCOME : EXPENSES;
   const cats = prefix==='inc' ? INC_CATS : EXP_CATS;
   const colors = prefix==='inc' ? INC_COLORS : EXP_COLORS;
@@ -640,6 +652,7 @@ function selectCat(prefix, cat, years) {
 function selectTotal(prefix, years, totalsByYear) {
   // Deselect any cat row
   state[prefix].selectedCat = null;
+  state[prefix].totalSelected = true;
   document.querySelectorAll('#'+prefix+'-matrix-body tr').forEach(tr => {
     if(!tr.classList.contains('total-row')) tr.classList.remove('selected');
   });
@@ -701,11 +714,14 @@ function setChartType(type) {
   CHART_TYPE = type;
   document.getElementById('btn-charttype-line').classList.toggle('active', type==='line');
   document.getElementById('btn-charttype-bar').classList.toggle('active', type==='bar');
-  // Redraw all active charts
+  // Redraw all active charts using stored state
   ['inc','exp'].forEach(prefix => {
-    const years = getYears(prefix);
-    if(state[prefix].selectedCat) selectCat(prefix, state[prefix].selectedCat, years);
-    else if(window['_'+prefix+'TotalsByYear']) selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
+    const years = window['_'+prefix+'TotalYears'] || getYears(prefix);
+    if(state[prefix].selectedCat) {
+      selectCat(prefix, state[prefix].selectedCat, years);
+    } else if(state[prefix].totalSelected && window['_'+prefix+'TotalsByYear']) {
+      selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
+    }
   });
   if(window._netYears) renderNetChart(window._netYears);
 }
@@ -862,13 +878,11 @@ function togglePrincipal() {
   const btn = document.getElementById('btn-principal');
   btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
   btn.classList.toggle('active', SHOW_PRINCIPAL);
+  // Reset totalSelected so render() will redraw it correctly
+  state.exp.totalSelected = false;
   render('exp');
   renderNet();
-  // Refresh active expense chart
-  if(state.exp.selectedCat) {
-    const years = getYears('exp');
-    selectCat('exp', state.exp.selectedCat, years);
-  }
+  if(window._netYears) renderNetChart(window._netYears);
 }
  
 // ── BOOT ──
