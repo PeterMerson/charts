@@ -998,30 +998,51 @@ function toggleFS(prefix) {
   var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
   var panel = document.getElementById(panelId);
   if(!panel) return;
-  // Don't expand if no chart loaded yet
   var chartPanel = document.getElementById(prefix+'-chart-panel');
   if(!chartPanel || chartPanel.style.display === 'none') return;
+  var btn = document.getElementById(prefix+'-expand-btn');
+  var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
  
-  if(panel.classList.contains('fullscreen')) {
-    // Collapse
-    panel.classList.remove('fullscreen');
+  if(panel._isFullscreen) {
+    // ── COLLAPSE ──
+    panel._isFullscreen = false;
+    // Restore all saved inline styles
+    panel.style.position = '';
+    panel.style.top = '';
+    panel.style.left = '';
+    panel.style.right = '';
+    panel.style.bottom = '';
+    panel.style.width = '';
+    panel.style.height = '';
+    panel.style.zIndex = '';
+    panel.style.boxShadow = '';
+    panel.style.borderRadius = '';
+    panel.style.display = '';
+    chartPanel.style.flex = '';
+    chartPanel.style.height = '200px';
     document.body.style.overflow = '';
-    document.getElementById(prefix+'-expand-btn').textContent = '⤢';
-    // Resize chart back to small size
-    setTimeout(function() {
-      var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
-      if(chart) chart.resize();
-    }, 50);
+    if(btn) btn.textContent = '⤢';
+    setTimeout(function() { if(chart) chart.resize(); }, 80);
   } else {
-    // Expand
-    panel.classList.add('fullscreen');
+    // ── EXPAND ──
+    panel._isFullscreen = true;
+    panel.style.position = 'fixed';
+    panel.style.top = '30px';
+    panel.style.left = '30px';
+    panel.style.right = '30px';
+    panel.style.bottom = '30px';
+    panel.style.width = 'auto';
+    panel.style.height = 'auto';
+    panel.style.zIndex = '9999';
+    panel.style.boxShadow = '0 0 0 9999px rgba(26,18,8,0.82)';
+    panel.style.borderRadius = '8px';
+    panel.style.display = 'flex';
+    panel.style.flexDirection = 'column';
+    chartPanel.style.flex = '1';
+    chartPanel.style.height = 'auto';
     document.body.style.overflow = 'hidden';
-    document.getElementById(prefix+'-expand-btn').textContent = '✕';
-    // Resize chart to fill new large space
-    setTimeout(function() {
-      var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
-      if(chart) chart.resize();
-    }, 50);
+    if(btn) btn.textContent = '✕';
+    setTimeout(function() { if(chart) chart.resize(); }, 80);
   }
 }
  
@@ -1031,7 +1052,7 @@ document.addEventListener('keydown', function(e) {
     ['inc','exp','net'].forEach(function(p) {
       var panelId = p === 'net' ? 'net-panel-card' : p+'-panel-card';
       var panel = document.getElementById(panelId);
-      if(panel && panel.classList.contains('fullscreen')) toggleFS(p);
+      if(panel && panel._isFullscreen) toggleFS(p);
     });
   }
 });
