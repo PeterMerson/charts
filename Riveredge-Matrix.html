@@ -1002,11 +1002,11 @@ function toggleFS(prefix) {
   if(!chartPanel || chartPanel.style.display === 'none') return;
   var btn = document.getElementById(prefix+'-expand-btn');
   var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+  var backdrop = document.getElementById('fs-backdrop');
  
   if(panel._isFullscreen) {
     // ── COLLAPSE ──
     panel._isFullscreen = false;
-    // Restore all saved inline styles
     panel.style.position = '';
     panel.style.top = '';
     panel.style.left = '';
@@ -1018,14 +1018,17 @@ function toggleFS(prefix) {
     panel.style.boxShadow = '';
     panel.style.borderRadius = '';
     panel.style.display = '';
+    panel.style.flexDirection = '';
     chartPanel.style.flex = '';
     chartPanel.style.height = '200px';
     document.body.style.overflow = '';
+    if(backdrop) backdrop.style.display = 'none';
     if(btn) btn.textContent = '⤢';
     setTimeout(function() { if(chart) chart.resize(); }, 80);
   } else {
     // ── EXPAND ──
     panel._isFullscreen = true;
+    if(backdrop) backdrop.style.display = 'block';
     panel.style.position = 'fixed';
     panel.style.top = '30px';
     panel.style.left = '30px';
@@ -1034,7 +1037,7 @@ function toggleFS(prefix) {
     panel.style.width = 'auto';
     panel.style.height = 'auto';
     panel.style.zIndex = '9999';
-    panel.style.boxShadow = '0 0 0 9999px rgba(26,18,8,0.82)';
+    panel.style.boxShadow = 'none';
     panel.style.borderRadius = '8px';
     panel.style.display = 'flex';
     panel.style.flexDirection = 'column';
