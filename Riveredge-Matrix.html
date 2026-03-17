@@ -976,23 +976,7 @@ function togglePrincipal() {
 }
  
 // ── EXPAND PANEL (simple CSS fullscreen) ──
-function openFSModal(prefix) {
-  var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
-  var panel = document.getElementById(panelId);
-  if(!panel) return;
-  // Check a chart is actually loaded
-  var chartPanel = document.getElementById(prefix+'-chart-panel');
-  if(!chartPanel || chartPanel.style.display === 'none') return;
- 
-  panel.classList.add('fullscreen');
-  document.body.style.overflow = 'hidden';
- 
-  // Resize chart to fill new space
-  setTimeout(function() {
-    var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
-    if(chart) chart.resize();
-  }, 50);
-}
+function openFSModal(prefix) { toggleFS(prefix); }
  
 function closeFSModal() {
   ['inc','exp','net'].forEach(function(prefix) {
@@ -1014,20 +998,42 @@ function toggleFS(prefix) {
   var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
   var panel = document.getElementById(panelId);
   if(!panel) return;
+  // Don't expand if no chart loaded yet
   var chartPanel = document.getElementById(prefix+'-chart-panel');
   if(!chartPanel || chartPanel.style.display === 'none') return;
+ 
   if(panel.classList.contains('fullscreen')) {
-    closeFSModal();
+    // Collapse
+    panel.classList.remove('fullscreen');
+    document.body.style.overflow = '';
     document.getElementById(prefix+'-expand-btn').textContent = '⤢';
+    // Resize chart back to small size
+    setTimeout(function() {
+      var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+      if(chart) chart.resize();
+    }, 50);
   } else {
-    openFSModal(prefix);
+    // Expand
+    panel.classList.add('fullscreen');
+    document.body.style.overflow = 'hidden';
     document.getElementById(prefix+'-expand-btn').textContent = '✕';
+    // Resize chart to fill new large space
+    setTimeout(function() {
+      var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+      if(chart) chart.resize();
+    }, 50);
   }
 }
  
 // Close on Escape key
 document.addEventListener('keydown', function(e) {
-  if(e.key === 'Escape') closeFSModal();
+  if(e.key === 'Escape') {
+    ['inc','exp','net'].forEach(function(p) {
+      var panelId = p === 'net' ? 'net-panel-card' : p+'-panel-card';
+      var panel = document.getElementById(panelId);
+      if(panel && panel.classList.contains('fullscreen')) toggleFS(p);
+    });
+  }
 });
  
 // ── BOOT ──
