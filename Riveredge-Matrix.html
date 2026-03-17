@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Income Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --ink: #1a1208;
+  --ink2: #2e2416;
+  --paper: #f7f3ec;
+  --paper2: #ede8df;
+  --paper3: #e4ddd2;
+  --rule: #c9bfaa;
+  --rule2: #b8ad9a;
+  --gold: #8b6914;
+  --gold-light: #c9a84c;
+  --up: #1a5c2a;
+  --up-bg: #e8f4ea;
+  --up-mid: #c2e0c8;
+  --dn: #8b1a1a;
+  --dn-bg: #f7e8e8;
+  --dn-mid: #e8b8b8;
+  --neutral: #5a5040;
+  --selected: #1a3d5c;
+  --selected-bg: #e8f0f7;
+  --shadow: 0 2px 16px rgba(26,18,8,0.12);
+}
+ 
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 13px;
+}
+ 
+/* ── MASTHEAD ── */
+.masthead {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0;
+  border-bottom: 3px solid var(--gold-light);
+}
+.masthead-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 18px 32px 14px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 12px;
+}
+.masthead h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 900;
+  letter-spacing: -0.01em; line-height: 1;
+  color: #f7f3ec;
+}
+.masthead h1 em { color: var(--gold-light); font-style: normal; }
+.masthead-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; color: #9a8f7e;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-top: 4px;
+}
+.masthead-kpis { display: flex; gap: 16px; flex-wrap: wrap; }
+.mkpi {
+  text-align: right;
+  padding: 6px 14px;
+  border-left: 1px solid #3a3028;
+}
+.mkpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: #9a8f7e; margin-bottom: 2px; }
+.mkpi-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+.mkpi-val.up { color: #6fcf82; }
+.mkpi-val.dn { color: #f47a70; }
+.mkpi-val.gd { color: var(--gold-light); }
+ 
+/* ── RULE ── */
+.section-rule {
+  max-width: 1400px; margin: 0 auto;
+  padding: 10px 32px 0;
+  display: flex; align-items: center; gap: 12px;
+}
+.rule-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--gold); white-space: nowrap; font-weight: 600;
+}
+.rule-line { flex: 1; height: 1px; background: var(--rule); }
+ 
+/* ── CONTROLS ── */
+.controls-bar {
+  max-width: 1400px; margin: 0 auto;
+  padding: 10px 32px 12px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--neutral); white-space: nowrap;
+}
+select {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--paper2);
+  border: 1px solid var(--rule2);
+  color: var(--ink);
+  padding: 5px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5040'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  padding-right: 22px;
+}
+select:focus { outline: 2px solid var(--gold-light); outline-offset: 1px; }
+.ctrl-divider { width: 1px; height: 22px; background: var(--rule); margin: 0 4px; }
+.mode-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 5px 12px; border-radius: 3px;
+  border: 1px solid var(--rule2);
+  background: var(--paper2); color: var(--neutral);
+  cursor: pointer; transition: all 0.15s;
+}
+.mode-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.mode-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+ 
+/* ── MAIN LAYOUT ── */
+.main-layout {
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 32px 40px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+ 
+/* ── MATRIX TABLE ── */
+.matrix-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  background: #fff;
+}
+table.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  min-width: 600px;
+}
+.matrix thead tr { background: var(--ink); }
+.matrix thead th {
+  padding: 8px 10px;
+  color: #c9bfaa;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-align: right;
+  white-space: nowrap;
+  border-right: 1px solid #3a3028;
+  font-size: 0.68rem;
+}
+.matrix thead th.cat-col {
+  text-align: left; min-width: 155px;
+  position: sticky; left: 0; z-index: 2;
+  background: var(--ink);
+  border-right: 2px solid var(--gold);
+}
+.matrix thead th.yr-col { min-width: 82px; }
+ 
+/* Body rows */
+.matrix tbody tr {
+  border-bottom: 1px solid var(--paper3);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.matrix tbody tr:hover { background: #f0ebe0 !important; }
+.matrix tbody tr.selected { background: var(--selected-bg) !important; outline: 2px solid var(--selected); outline-offset: -2px; }
+.matrix tbody tr.total-row {
+  background: var(--ink) !important;
+  cursor: default;
+  border-top: 2px solid var(--gold);
+}
+.matrix tbody tr.total-row:hover { background: var(--ink2) !important; }
+ 
+.matrix td {
+  padding: 7px 10px;
+  text-align: right;
+  border-right: 1px solid var(--paper3);
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1.2;
+}
+.matrix td.cat-col {
+  text-align: left;
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.76rem;
+  font-weight: 400;
+  position: sticky; left: 0; z-index: 1;
+  background: inherit;
+  border-right: 2px solid var(--rule2);
+  color: var(--ink);
+}
+.matrix tbody tr.selected td.cat-col { background: var(--selected-bg); }
+.matrix tbody tr.total-row td.cat-col {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--gold-light);
+  background: var(--ink);
+}
+.matrix tbody tr.total-row td {
+  color: #f7f3ec;
+  border-right-color: #3a3028;
+}
+ 
+/* Cell value + change pill */
+.cell-val { font-weight: 500; color: var(--ink2); }
+.cell-chg {
+  display: inline-block;
+  font-size: 0.6rem; font-weight: 600;
+  padding: 1px 4px; border-radius: 2px;
+  margin-left: 3px; vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+.chg-up   { background: var(--up-bg); color: var(--up); }
+.chg-dn   { background: var(--dn-bg); color: var(--dn); }
+.chg-neu  { background: var(--paper3); color: var(--neutral); }
+ 
+/* Magnitude heat */
+.heat-up-3  { background: #1a5c2a20; }
+.heat-up-2  { background: #1a5c2a12; }
+.heat-up-1  { background: #1a5c2a07; }
+.heat-dn-3  { background: #8b1a1a1a; }
+.heat-dn-2  { background: #8b1a1a10; }
+.heat-dn-1  { background: #8b1a1a06; }
+ 
+/* Total row cells */
+.total-pos { color: #6fcf82 !important; font-weight: 700; }
+.total-neg { color: #f47a70 !important; font-weight: 700; }
+ 
+/* ── RIGHT PANEL ── */
+.right-panel {
+  position: sticky;
+  top: 20px;
+}
+.panel-card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.panel-header {
+  background: var(--ink);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--gold);
+}
+.panel-cat {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700;
+  color: var(--paper);
+  margin-bottom: 2px;
+}
+.panel-range {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #9a8f7e;
+}
+.panel-stats {
+  padding: 12px 16px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border-bottom: 1px solid var(--paper3);
+  background: var(--paper2);
+}
+.pstat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--neutral);
+  margin-bottom: 2px;
+}
+.pstat-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem; font-weight: 600; color: var(--ink);
+}
+.pstat-val.up { color: var(--up); }
+.pstat-val.dn { color: var(--dn); }
+.chart-panel { padding: 14px 16px 10px; }
+.panel-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--neutral);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+.panel-empty .arrow {
+  font-size: 1.4rem; display: block;
+  margin-bottom: 8px; color: var(--rule2);
+}
+ 
+/* ── LEGEND ── */
+.legend-bar {
+  max-width: 1400px; margin: 0 auto;
+  padding: 6px 32px 0;
+  display: flex; align-items: center; gap: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem; color: var(--neutral);
+  flex-wrap: wrap;
+}
+.leg-item { display: flex; align-items: center; gap: 5px; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+ 
+/* ── FOOTER ── */
+.page-footer {
+  max-width: 1400px; margin: 0 auto;
+  padding: 16px 32px;
+  border-top: 1px solid var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem; color: var(--neutral);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.claude-tag { display: flex; align-items: center; gap: 5px; }
+.claude-dot { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg,#c77dff,#7b5ea7); box-shadow: 0 0 4px #c77dff66; }
+</style>
+</head>
+<body>
+ 
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <h1>Riveredge <em>Income Matrix</em></h1>
+      <div class="masthead-meta">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+    </div>
+    <div class="masthead-kpis">
+      <div class="mkpi"><div class="mkpi-label">2024 Total Income</div><div class="mkpi-val gd">$1,846,671</div></div>
+      <div class="mkpi"><div class="mkpi-label">vs 2023</div><div class="mkpi-val up">+5.8%</div></div>
+      <div class="mkpi"><div class="mkpi-label">35-yr Peak</div><div class="mkpi-val gd">$1,846,671</div></div>
+      <div class="mkpi"><div class="mkpi-label">Special Assess. Excl.</div><div class="mkpi-val gd">All Years</div></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- RULE -->
+<div class="section-rule"><span class="rule-label">Income Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
+ 
+<!-- CONTROLS -->
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mode</span>
+    <button class="mode-btn active" id="btn-range" onclick="setMode('range')">Year Range</button>
+    <button class="mode-btn" id="btn-single" onclick="setMode('single')">Single Year</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group" id="range-controls">
+    <span class="ctrl-label">From</span>
+    <select id="sel-from" onchange="render()"></select>
+    <span class="ctrl-label">To</span>
+    <select id="sel-to" onchange="render()"></select>
+  </div>
+  <div class="ctrl-group" id="single-controls" style="display:none;">
+    <span class="ctrl-label">Year</span>
+    <select id="sel-single" onchange="render()"></select>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">% Change</span>
+    <button class="mode-btn active" id="btn-show-chg" onclick="toggleChg()">Visible</button>
+  </div>
+</div>
+ 
+<!-- LEGEND -->
+<div class="legend-bar">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--paper3);border:1px solid var(--rule)"></div> No change / first year</div>
+  <span style="color:var(--rule2)">|</span>
+  <span>Darker shading = larger % change &nbsp;·&nbsp; Click any row to see trend chart →</span>
+</div>
+ 
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+ 
+  <!-- MATRIX -->
+  <div class="matrix-wrap" id="matrix-wrap">
+    <table class="matrix" id="matrix-table">
+      <thead id="matrix-head"></thead>
+      <tbody id="matrix-body"></tbody>
+    </table>
+  </div>
+ 
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-card">
+      <div class="panel-header">
+        <div class="panel-cat" id="panel-cat">Select a Row</div>
+        <div class="panel-range" id="panel-range">Click any income category in the matrix</div>
+      </div>
+      <div id="panel-stats-wrap" class="panel-stats" style="display:none;">
+        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="ps-peak">—</div></div>
+        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="ps-peak-val">—</div></div>
+        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="ps-latest">—</div></div>
+        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="ps-chg">—</div></div>
+      </div>
+      <div id="panel-empty" class="panel-empty">
+        <span class="arrow">←</span>
+        Click any income category<br>row in the matrix to see<br>its trend over the selected<br>year range
+      </div>
+      <div class="chart-panel" id="chart-panel" style="display:none;">
+        <canvas id="trend-chart" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<div class="page-footer">
+  <span>Riveredge Income Matrix &nbsp;·&nbsp; Special Assessments excluded from all totals &nbsp;·&nbsp; Source: Audited Annual Financial Statements 1990–2024</span>
+  <div class="claude-tag"><div class="claude-dot"></div><span>Generated by Claude AI (Anthropic) &nbsp;·&nbsp; claude.ai</span></div>
+</div>
+ 
+<script>
+// ── DATA ──
+const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+ 
+const INCOME = {
+  "Maintenance Charges": [1020324,1020324,1020324,1027976,1048884,1066534,1074031,1073289,1073379,1042612,1025255,1005859,983558,1005504,1053243,1184580,1436277,1429801,1587982,1620174,1620174,1620174,1620174,1531251,1513447,1513447,1507782,1513404,1513404,1513404,1513404,1513404,1503542,1513404,1644840],
+  "Parking":             [87315,84893,85403,83638,83792,82754,82684,80162,78700,77113,76065,80649,86754,87193,84212,83814,85139,87939,87407,88235,88043,88352,87530,85794,86622,85896,87949,87754,86302,86251,83510,80949,81578,81329,80383],
+  "Laundry":             [15025,15000,15000,15550,15600,15600,15600,15600,15600,14300,17283,17838,27727,26278,23477,29926,28597,39492,35355,33798,36357,34675,31954,29333,28676,26581,28937,30524,31379,30853,26325,26000,25635,26280,25850],
+  "Transfer Fees":       [8750,10189,1026,6276,11231,11798,8481,11693,15735,20941,30057,17042,16019,15271,30594,18224,13233,9309,7818,7233,0,3251,3707,11602,10126,7378,4956,6121,4364,3457,3234,13024,12598,7599,4378],
+  "Interest":            [32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776],
+  "Miscellaneous":       [11836,3284,4076,8433,9582,15376,9882,12994,11548,20226,6502,7569,9256,4955,7103,8617,14022,5131,5529,26690,7146,11997,9663,37358,13735,19712,12367,8729,8247,7976,3356,11189,8643,9734,6421],
+  "Storage":             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023]
+};
+ 
+const CATS = Object.keys(INCOME);
+const COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1','#FF9800'];
+ 
+let mode = 'range';
+let showChg = true;
+let selectedCat = null;
+let trendChart = null;
+ 
+// ── INIT SELECTS ──
+function initSelects() {
+  const sf = document.getElementById('sel-from');
+  const st = document.getElementById('sel-to');
+  const ss = document.getElementById('sel-single');
+  ALL_YEARS.forEach(y => {
+    [sf,st,ss].forEach(el => {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y; el.appendChild(o);
+    });
+  });
+  sf.value = 2006; st.value = 2024; ss.value = 2024;
+}
+ 
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-range').classList.toggle('active', m==='range');
+  document.getElementById('btn-single').classList.toggle('active', m==='single');
+  document.getElementById('range-controls').style.display = m==='range'?'flex':'none';
+  document.getElementById('single-controls').style.display = m==='single'?'flex':'none';
+  render();
+}
+ 
+function toggleChg() {
+  showChg = !showChg;
+  document.getElementById('btn-show-chg').classList.toggle('active', showChg);
+  render();
+}
+ 
+function getYears() {
+  if (mode === 'single') {
+    const y = parseInt(document.getElementById('sel-single').value);
+    // Show 5 years ending at selected
+    const idx = ALL_YEARS.indexOf(y);
+    const start = Math.max(0, idx-4);
+    return ALL_YEARS.slice(start, idx+1);
+  } else {
+    const from = parseInt(document.getElementById('sel-from').value);
+    const to   = parseInt(document.getElementById('sel-to').value);
+    const f = Math.min(from,to), t = Math.max(from,to);
+    return ALL_YEARS.filter(y => y>=f && y<=t);
+  }
+}
+ 
+function fmt(v) { return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':'$'+(v/1000).toFixed(0)+'K').replace('$$','$'); }
+function fmtFull(v) { return '$'+Math.abs(v).toLocaleString('en-US'); }
+function pct(a,b) { if(!a) return null; return ((b-a)/a*100); }
+function heatClass(p, isUp) {
+  const abs = Math.abs(p);
+  if(isUp) { return abs>20?'heat-up-3':abs>8?'heat-up-2':'heat-up-1'; }
+  else      { return abs>20?'heat-dn-3':abs>8?'heat-dn-2':'heat-dn-1'; }
+}
+ 
+// ── RENDER ──
+function render() {
+  const years = getYears();
+  const head = document.getElementById('matrix-head');
+  const body = document.getElementById('matrix-body');
+  head.innerHTML = ''; body.innerHTML = '';
+ 
+  // HEAD
+  const hr = document.createElement('tr');
+  const thc = document.createElement('th');
+  thc.className = 'cat-col'; thc.textContent = 'Income Category';
+  hr.appendChild(thc);
+  years.forEach(y => {
+    const th = document.createElement('th');
+    th.className = 'yr-col'; th.textContent = y;
+    hr.appendChild(th);
+  });
+  head.appendChild(hr);
+ 
+  // BODY ROWS
+  const totals = {};
+  years.forEach(y => totals[y] = 0);
+ 
+  CATS.forEach((cat, ci) => {
+    const tr = document.createElement('tr');
+    if(selectedCat === cat) tr.classList.add('selected');
+    tr.onclick = () => selectCat(cat, years);
+ 
+    const td0 = document.createElement('td');
+    td0.className = 'cat-col'; td0.textContent = cat;
+    tr.appendChild(td0);
+ 
+    years.forEach((y, yi) => {
+      const idx = ALL_YEARS.indexOf(y);
+      const val = INCOME[cat][idx];
+      totals[y] += val;
+      const prevIdx = yi > 0 ? ALL_YEARS.indexOf(years[yi-1]) : -1;
+      const prevVal = prevIdx >= 0 ? INCOME[cat][prevIdx] : null;
+      const p = prevVal !== null ? pct(prevVal, val) : null;
+      const isUp = p !== null && p >= 0;
+ 
+      const td = document.createElement('td');
+      if(p !== null) td.className = heatClass(p, isUp);
+ 
+      // Value
+      const vSpan = document.createElement('span');
+      vSpan.className = 'cell-val';
+      vSpan.textContent = fmtFull(val);
+      td.appendChild(vSpan);
+ 
+      // % change pill
+      if(p !== null && showChg) {
+        const pSpan = document.createElement('span');
+        pSpan.className = 'cell-chg ' + (isUp ? 'chg-up' : (p===0?'chg-neu':'chg-dn'));
+        pSpan.textContent = (isUp?'+':'') + p.toFixed(1) + '%';
+        td.appendChild(pSpan);
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+ 
+  // TOTALS ROW
+  const ttr = document.createElement('tr');
+  ttr.classList.add('total-row');
+  const ttd0 = document.createElement('td');
+  ttd0.className = 'cat-col'; ttd0.textContent = 'Total Income';
+  ttr.appendChild(ttd0);
+  let prevTotal = null;
+  years.forEach((y, yi) => {
+    const val = totals[y];
+    const p = prevTotal !== null ? pct(prevTotal, val) : null;
+    const isUp = p !== null && p >= 0;
+    const ttd = document.createElement('td');
+    const vSpan = document.createElement('span');
+    vSpan.className = p===null ? '' : (isUp?'total-pos':'total-neg');
+    vSpan.textContent = fmtFull(val);
+    ttd.appendChild(vSpan);
+    if(p !== null && showChg) {
+      const pSpan = document.createElement('span');
+      pSpan.className = 'cell-chg ' + (isUp ? 'chg-up' : 'chg-dn');
+      pSpan.textContent = (isUp?'+':'') + p.toFixed(1) + '%';
+      ttd.appendChild(pSpan);
+    }
+    ttr.appendChild(ttd);
+    prevTotal = val;
+  });
+  body.appendChild(ttr);
+ 
+  // Update trend if selected
+  if(selectedCat) selectCat(selectedCat, years);
+}
+ 
+// ── SELECT CAT ──
+function selectCat(cat, years) {
+  selectedCat = cat;
+ 
+  // Update row highlight
+  document.querySelectorAll('#matrix-body tr').forEach(tr => {
+    const isTotal = tr.classList.contains('total-row');
+    if(!isTotal) {
+      const catCell = tr.querySelector('td.cat-col');
+      tr.classList.toggle('selected', catCell && catCell.textContent === cat);
+    }
+  });
+ 
+  // Panel header
+  document.getElementById('panel-cat').textContent = cat;
+  document.getElementById('panel-range').textContent = years[0] + ' – ' + years[years.length-1] + '  ·  ' + years.length + ' years';
+ 
+  // Get data
+  const vals = years.map(y => INCOME[cat][ALL_YEARS.indexOf(y)]);
+  const peak = Math.max(...vals);
+  const peakYr = years[vals.indexOf(peak)];
+  const latest = vals[vals.length-1];
+  const first = vals[0];
+  const chgPct = first > 0 ? ((latest-first)/first*100) : 0;
+ 
+  // Stats
+  document.getElementById('ps-peak').textContent = peakYr;
+  document.getElementById('ps-peak-val').textContent = fmtFull(peak);
+  document.getElementById('ps-latest').textContent = fmtFull(latest);
+  const chgEl = document.getElementById('ps-chg');
+  chgEl.textContent = (chgPct>=0?'+':'') + chgPct.toFixed(1) + '%';
+  chgEl.className = 'pstat-val ' + (chgPct>=0?'up':'dn');
+ 
+  document.getElementById('panel-stats-wrap').style.display = 'grid';
+  document.getElementById('panel-empty').style.display = 'none';
+  document.getElementById('chart-panel').style.display = 'block';
+ 
+  // Trend chart
+  if(trendChart) { trendChart.destroy(); trendChart = null; }
+  const ctx = document.getElementById('trend-chart').getContext('2d');
+  const catIdx = CATS.indexOf(cat);
+  const color = COLORS[catIdx % COLORS.length];
+ 
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0, color+'33');
+  grad.addColorStop(1, color+'05');
+ 
+  trendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [{
+        data: vals,
+        borderColor: color,
+        backgroundColor: grad,
+        borderWidth: 2,
+        pointRadius: years.length > 15 ? 2 : 3.5,
+        pointHoverRadius: 5,
+        pointBackgroundColor: color,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        fill: true,
+        tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1208',
+          titleColor: '#c9a84c',
+          bodyColor: '#f7f3ec',
+          borderColor: '#3a3028',
+          borderWidth: 1,
+          padding: 10,
+          callbacks: {
+            title: items => items[0].label,
+            label: item => ' ' + fmtFull(item.parsed.y)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            font: { family: 'IBM Plex Mono', size: 9 },
+            color: '#8b7a6a',
+            maxRotation: 45,
+            callback: (v, i) => years.length > 12 ? (years[i]%5===0?years[i]:'') : years[i]
+          },
+          grid: { color: '#f0ebe0' }
+        },
+        y: {
+          ticks: {
+            font: { family: 'IBM Plex Mono', size: 9 },
+            color: '#8b7a6a',
+            callback: v => '$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')
+          },
+          grid: { color: '#f0ebe0' }
+        }
+      }
+    }
+  });
+}
+ 
+// ── BOOT ──
+initSelects();
+render();
+</script>
+</body>
+</html>
