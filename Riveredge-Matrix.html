@@ -131,6 +131,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 /* Note badge for expense section */
 .info-note { max-width: 1400px; margin: 0 auto; padding: 6px 32px 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #7a5000; }
 .info-note span { background: #fff8e7; border: 1px solid #e6a817; border-radius: 4px; padding: 3px 10px; }
+.matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.net-row:hover { background: #1e361e !important; }
+.matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
+.matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
+.net-pos { color: #6fcf82 !important; font-weight: 700; }
+.net-neg { color: #f47a70 !important; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -166,7 +172,13 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#9a8f7e;">CPI-U Overlay</span>
       <button class="mode-btn" id="btn-cpi" onclick="toggleCPI()" title="Show CPI-U inflation line on trend charts">Off</button>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#5a5040;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Right axis when active</div>
+    <div style="width:1px;height:20px;background:#3a3028;"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#9a8f7e;">Chart Type</span>
+      <button class="mode-btn active" id="btn-charttype-line" onclick="setChartType('line')" title="Line chart">Line</button>
+      <button class="mode-btn" id="btn-charttype-bar" onclick="setChartType('bar')" title="Bar chart">Bar</button>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#5a5040;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
   </div>
 </div>
 <div class="section-rule"><span class="rule-label">Income Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
@@ -297,6 +309,64 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
+<!-- ══ NET INCOME SECTION ══ -->
+<div class="section-divider" style="margin-top:24px;">
+  <div class="section-divider-inner" style="background:#1a2e1a;border-color:#3fb950;">
+    <div>
+      <div class="section-title" style="color:#f7f3ec;">Net Income <em style="color:#6fcf82;">Surplus / Deficit</em></div>
+      <div class="masthead-meta" style="margin-top:4px;">Total Income minus Total Expenses (incl. Mortgage Principal if toggled) &nbsp;·&nbsp; 1990–2024</div>
+    </div>
+    <div class="section-kpis" id="net-kpis">
+      <div class="skpi"><div class="skpi-label">2024 Net</div><div class="skpi-val dn" id="net-kpi-2024">−$64,287</div></div>
+      <div class="skpi"><div class="skpi-label">Best Year</div><div class="skpi-val up" id="net-kpi-best">$394,114 (2013)</div></div>
+      <div class="skpi"><div class="skpi-label">Worst Year</div><div class="skpi-val dn" id="net-kpi-worst">−$134,339 (2024)</div></div>
+    </div>
+  </div>
+</div>
+ 
+<div class="section-rule"><span class="rule-label" style="color:#3fb950;">Net Income Analysis</span><div class="rule-line"></div><span class="rule-label" style="color:#3fb950;">Click row to graph</span></div>
+ 
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mode</span>
+    <button class="mode-btn active" id="net-btn-range" onclick="setMode('net','range')">Year Range</button>
+    <button class="mode-btn" id="net-btn-single" onclick="setMode('net','single')">Single Year</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group" id="net-range-controls">
+    <span class="ctrl-label">From</span>
+    <select id="net-sel-from" onchange="renderNet()"></select>
+    <span class="ctrl-label">To</span>
+    <select id="net-sel-to" onchange="renderNet()"></select>
+  </div>
+  <div class="ctrl-group" id="net-single-controls" style="display:none;">
+    <span class="ctrl-label">Year</span>
+    <select id="net-sel-single" onchange="renderNet()"></select>
+  </div>
+</div>
+ 
+<div class="main-layout">
+  <div class="matrix-wrap">
+    <table class="matrix"><thead id="net-matrix-head"></thead><tbody id="net-matrix-body"></tbody></table>
+  </div>
+  <div class="right-panel">
+    <div class="panel-card">
+      <div class="panel-header" style="background:#1a2e1a;border-color:#3fb950;">
+        <div class="panel-cat" id="net-panel-cat">Net Income</div>
+        <div class="panel-range" id="net-panel-range">Click the row to graph</div>
+      </div>
+      <div id="net-panel-stats-wrap" class="panel-stats" style="display:none;background:#edf7ed;">
+        <div><div class="pstat-label">Best Year</div><div class="pstat-val up" id="net-ps-peak">—</div></div>
+        <div><div class="pstat-label">Best Value</div><div class="pstat-val up" id="net-ps-peak-val">—</div></div>
+        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="net-ps-latest">—</div></div>
+        <div><div class="pstat-label">Deficit Years</div><div class="pstat-val dn" id="net-ps-defyrs">—</div></div>
+      </div>
+      <div id="net-panel-empty" class="panel-empty"><span class="arrow" style="color:#3fb950;">←</span>Click the Net Income row<br>to graph surplus &amp; deficit<br>over the selected range</div>
+      <div class="chart-panel" id="net-chart-panel" style="display:none;"><canvas id="net-trend-chart" height="180"></canvas></div>
+    </div>
+  </div>
+</div>
+ 
 <div class="gold-rule-full"></div>
 <div class="page-footer">
   <span>Riveredge Income &amp; Expense Matrix &nbsp;·&nbsp; Special Assessments &amp; Mortgage Principal excluded &nbsp;·&nbsp; Source: Audited Annual Financial Statements 1990–2024</span>
@@ -345,6 +415,7 @@ const state = {
 };
 var SHOW_CPI = false;
 var SHOW_PRINCIPAL = false;
+var CHART_TYPE = 'line';
  
 function initSelects(prefix) {
   ['from','to','single'].forEach(id => {
@@ -458,6 +529,10 @@ function render(prefix) {
     });
   }
  
+  // Store totals for net calculation
+  if(prefix==='exp') window._expTotals = Object.assign({}, totals);
+  if(prefix==='inc') window._incTotals = Object.assign({}, totals);
+ 
   // TOTALS ROW — clickable
   const ttr = document.createElement('tr');
   ttr.classList.add('total-row');
@@ -465,8 +540,8 @@ function render(prefix) {
   ttr.title = 'Click to graph total';
   const ttd0 = document.createElement('td');
   ttd0.className = 'cat-col';
-  const totalLabel = prefix==='inc' ? 'Total Income' : 'Total Expenses';
-  ttd0.textContent = totalLabel + ' ▶';
+  const totalLabel = prefix==='inc' ? 'Total Income ▶' : 'Total Expenses ▶';
+  ttd0.textContent = totalLabel;
   ttr.appendChild(ttd0);
   let prevTotal = null;
   const totalsByYear = {};
@@ -552,7 +627,7 @@ function selectCat(prefix, cat, years) {
   }
  
   state[prefix].trendChart = new Chart(ctx, {
-    type:'line',
+    type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display: SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
@@ -612,13 +687,158 @@ function selectTotal(prefix, years, totalsByYear) {
   }
  
   state[prefix].trendChart = new Chart(ctx, {
-    type:'line',
+    type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
       scales:scales
     }
   });
+}
+ 
+// ── CHART TYPE TOGGLE ──
+function setChartType(type) {
+  CHART_TYPE = type;
+  document.getElementById('btn-charttype-line').classList.toggle('active', type==='line');
+  document.getElementById('btn-charttype-bar').classList.toggle('active', type==='bar');
+  // Redraw all active charts
+  ['inc','exp'].forEach(prefix => {
+    const years = getYears(prefix);
+    if(state[prefix].selectedCat) selectCat(prefix, state[prefix].selectedCat, years);
+    else if(window['_'+prefix+'TotalsByYear']) selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
+  });
+  if(window._netYears) renderNetChart(window._netYears);
+}
+ 
+// ── NET INCOME SECTION ──
+function getNetYears() {
+  const s = { mode: document.getElementById('net-btn-range').classList.contains('active') ? 'range' : 'single' };
+  if(s.mode==='single') {
+    const y = parseInt(document.getElementById('net-sel-single').value);
+    const idx = ALL_YEARS.indexOf(y);
+    return ALL_YEARS.slice(Math.max(0,idx-4), idx+1);
+  } else {
+    const from = parseInt(document.getElementById('net-sel-from').value);
+    const to   = parseInt(document.getElementById('net-sel-to').value);
+    const f = Math.min(from,to), t = Math.max(from,to);
+    return ALL_YEARS.filter(y => y>=f && y<=t);
+  }
+}
+ 
+function renderNet() {
+  const years = getNetYears();
+  window._netYears = years;
+  const head = document.getElementById('net-matrix-head');
+  const body = document.getElementById('net-matrix-body');
+  head.innerHTML=''; body.innerHTML='';
+ 
+  // HEAD
+  const hr = document.createElement('tr');
+  const thc = document.createElement('th'); thc.className='cat-col'; thc.textContent='Net Income'; hr.appendChild(thc);
+  years.forEach(y => { const th=document.createElement('th'); th.className='yr-col'; th.textContent=y; hr.appendChild(th); });
+  head.appendChild(hr);
+ 
+  // NET ROW
+  const nets = {};
+  years.forEach(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+    let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+    if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+    nets[y] = inc - exp;
+  });
+ 
+  const ttr = document.createElement('tr');
+  ttr.classList.add('net-row');
+  ttr.style.cursor='pointer';
+  ttr.title='Click to graph net income';
+  const ttd0 = document.createElement('td'); ttd0.className='cat-col';
+  ttd0.textContent = 'Net Income (Surplus/Deficit) ▶'; ttr.appendChild(ttd0);
+ 
+  years.forEach(y => {
+    const v = nets[y];
+    const ttd = document.createElement('td');
+    const vSpan = document.createElement('span');
+    vSpan.className = v>=0?'net-pos':'net-neg';
+    vSpan.textContent = (v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US');
+    ttd.appendChild(vSpan); ttr.appendChild(ttd);
+  });
+  ttr.onclick = () => renderNetChart(years, nets);
+  body.appendChild(ttr);
+}
+ 
+function renderNetChart(years, nets) {
+  if(!nets) {
+    nets = {};
+    years.forEach(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      let inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+      let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+      if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+      nets[y] = inc - exp;
+    });
+  }
+  const vals = years.map(y => nets[y]);
+  const defYrs = vals.filter(v=>v<0).length;
+  const peak = Math.max(...vals);
+  const peakYr = years[vals.indexOf(peak)];
+  const latest = vals[vals.length-1];
+ 
+  document.getElementById('net-panel-cat').textContent = 'Net Income — Surplus / Deficit';
+  document.getElementById('net-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+  document.getElementById('net-ps-peak').textContent = peakYr;
+  document.getElementById('net-ps-peak-val').textContent = '+$'+peak.toLocaleString('en-US');
+  document.getElementById('net-ps-latest').textContent = (latest>=0?'+':'-')+'$'+Math.abs(latest).toLocaleString('en-US');
+  document.getElementById('net-ps-defyrs').textContent = defYrs+' year'+(defYrs!==1?'s':'');
+  document.getElementById('net-panel-stats-wrap').style.display='grid';
+  document.getElementById('net-panel-empty').style.display='none';
+  document.getElementById('net-chart-panel').style.display='block';
+ 
+  if(window._netChart){ window._netChart.destroy(); window._netChart=null; }
+  const ctx = document.getElementById('net-trend-chart').getContext('2d');
+  const colors = vals.map(v => v>=0 ? 'rgba(63,185,80,0.82)' : 'rgba(248,81,73,0.82)');
+  const borders = vals.map(v => v>=0 ? 'rgba(63,185,80,1)' : 'rgba(248,81,73,1)');
+ 
+  const isBar = CHART_TYPE==='bar';
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,'rgba(63,185,80,0.2)'); grad.addColorStop(1,'rgba(63,185,80,0.02)');
+ 
+  window._netChart = new Chart(ctx, {
+    type: isBar ? 'bar' : 'line',
+    data:{ labels:years, datasets:[{
+      data:vals,
+      backgroundColor: isBar ? colors : grad,
+      borderColor: isBar ? borders : '#3fb950',
+      borderWidth: isBar ? 1 : 2,
+      borderRadius: isBar ? 3 : 0,
+      pointRadius: isBar ? 0 : (years.length>15?2:3.5),
+      pointHoverRadius: 5,
+      pointBackgroundColor:'#3fb950',
+      fill: !isBar,
+      tension: isBar ? 0 : 0.25,
+      label:'Net Income'
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
+          callbacks:{ title:i=>i[0].label, label:i=>(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US') }
+        },
+        annotation:{ annotations:{ zeroLine:{ type:'line', yMin:0, yMax:0, borderColor:'rgba(139,148,158,0.5)', borderWidth:1 } } }
+      },
+      scales:{
+        x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
+        y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
+      }
+    }
+  });
+}
+ 
+function setNetMode(m) {
+  document.getElementById('net-btn-range').classList.toggle('active', m==='range');
+  document.getElementById('net-btn-single').classList.toggle('active', m==='single');
+  document.getElementById('net-range-controls').style.display = m==='range'?'flex':'none';
+  document.getElementById('net-single-controls').style.display = m==='single'?'flex':'none';
+  renderNet();
 }
  
 // ── TOGGLE CPI ──
@@ -642,17 +862,32 @@ function togglePrincipal() {
   const btn = document.getElementById('btn-principal');
   btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
   btn.classList.toggle('active', SHOW_PRINCIPAL);
-  // Update info note
-  const note = document.getElementById('principal-note');
-  if(note) note.style.display = SHOW_PRINCIPAL ? 'none' : 'block';
   render('exp');
+  renderNet();
+  // Refresh active expense chart
+  if(state.exp.selectedCat) {
+    const years = getYears('exp');
+    selectCat('exp', state.exp.selectedCat, years);
+  }
 }
  
 // ── BOOT ──
 initSelects('inc');
 initSelects('exp');
+ 
+// Init net selects
+['from','to','single'].forEach(id => {
+  const el = document.getElementById('net-sel-'+id);
+  if(!el) return;
+  ALL_YEARS.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; el.appendChild(o); });
+});
+document.getElementById('net-sel-from').value = 2006;
+document.getElementById('net-sel-to').value = 2024;
+document.getElementById('net-sel-single').value = 2024;
+ 
 render('inc');
 render('exp');
+renderNet();
 </script>
 </body>
 </html>
