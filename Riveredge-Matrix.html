@@ -127,18 +127,18 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .page-footer { max-width: 1400px; margin: 0 auto; padding: 16px 32px; border-top: 1px solid var(--rule); font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--neutral); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
  
 /* ── EXPAND BUTTON ── */
-.chart-panel-wrap { position: relative; }
+.chart-panel { position: relative; }
 .expand-btn {
-  position: absolute; bottom: 6px; right: 6px;
-  width: 22px; height: 22px;
+  position: absolute; bottom: 8px; right: 8px;
+  width: 26px; height: 26px;
   background: var(--paper2); border: 1px solid var(--rule2);
   border-radius: 4px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--neutral); opacity: 0.5;
-  transition: opacity 0.15s, background 0.15s;
-  z-index: 10; line-height: 1;
+  font-size: 13px; color: var(--neutral); opacity: 0.55;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  z-index: 10; line-height: 1; padding: 0;
 }
-.expand-btn:hover { opacity: 1; background: var(--ink); color: var(--paper); border-color: var(--gold); }
+.expand-btn:hover { opacity: 1; background: var(--ink); color: var(--gold-light); border-color: var(--gold); }
  
 /* ── FULLSCREEN MODAL ── */
 .fs-overlay {
@@ -274,12 +274,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="inc-ps-chg">—</div></div>
       </div>
       <div id="inc-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any income category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
-      <div class="chart-panel-wrap" style="position:relative;">
-      <div class="chart-panel" id="inc-chart-panel" style="display:none;">
+      <div class="chart-panel" id="inc-chart-panel" style="display:none;position:relative;">
         <canvas id="inc-trend-chart" height="180"></canvas>
+        <button class="expand-btn" onclick="openFSModal('inc')" title="Expand chart to full screen">⤢</button>
       </div>
-      <button class="expand-btn" onclick="openFSModal('inc')" title="Expand chart">⤢</button>
-    </div>
     </div>
   </div>
 </div>
@@ -353,12 +351,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="exp-ps-chg">—</div></div>
       </div>
       <div id="exp-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any expense category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
-      <div class="chart-panel-wrap" style="position:relative;">
-      <div class="chart-panel" id="exp-chart-panel" style="display:none;">
+      <div class="chart-panel" id="exp-chart-panel" style="display:none;position:relative;">
         <canvas id="exp-trend-chart" height="180"></canvas>
+        <button class="expand-btn" onclick="openFSModal('exp')" title="Expand chart to full screen">⤢</button>
       </div>
-      <button class="expand-btn" onclick="openFSModal('exp')" title="Expand chart">⤢</button>
-    </div>
     </div>
   </div>
 </div>
@@ -416,12 +412,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Deficit Years</div><div class="pstat-val dn" id="net-ps-defyrs">—</div></div>
       </div>
       <div id="net-panel-empty" class="panel-empty"><span class="arrow" style="color:#3fb950;">←</span>Click the Net Income row<br>to graph surplus &amp; deficit<br>over the selected range</div>
-      <div class="chart-panel-wrap" style="position:relative;">
-      <div class="chart-panel" id="net-chart-panel" style="display:none;">
+      <div class="chart-panel" id="net-chart-panel" style="display:none;position:relative;">
         <canvas id="net-trend-chart" height="180"></canvas>
+        <button class="expand-btn" onclick="openFSModal('net')" title="Expand chart to full screen">⤢</button>
       </div>
-      <button class="expand-btn" onclick="openFSModal('net')" title="Expand chart">⤢</button>
-    </div>
     </div>
   </div>
 </div>
@@ -793,7 +787,6 @@ function selectTotal(prefix, years, totalsByYear) {
     }
   });
 }
-
  
 // ── CHART TYPE TOGGLE ──
 function setChartType(type) {
@@ -975,44 +968,59 @@ function togglePrincipal() {
 var _fsChart = null;
  
 function openFSModal(prefix) {
-  const panelEl = document.getElementById(prefix+'-chart-panel');
-  if(panelEl.style.display === 'none') return; // no chart yet
+  // Get the source chart
+  var srcChart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
+  if(!srcChart) return;
  
-  const titleEl = document.getElementById(prefix+'-panel-cat') || document.getElementById('net-panel-cat');
-  const titleText = prefix==='net'
+  // Set title
+  var titleText = prefix==='net'
     ? document.getElementById('net-panel-cat').textContent
     : document.getElementById(prefix+'-panel-cat').textContent;
   document.getElementById('fs-modal-title').textContent = titleText;
  
-  // Get data from existing chart
-  const srcChart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
-  if(!srcChart) return;
- 
+  // Open overlay
   document.getElementById('fs-overlay').classList.add('open');
  
+  // Destroy previous fullscreen chart
   if(_fsChart) { _fsChart.destroy(); _fsChart = null; }
  
-  const ctx = document.getElementById('fs-canvas').getContext('2d');
-  // Clone chart config from source
-  const srcData = srcChart.data;
-  const srcOpts = JSON.parse(JSON.stringify(srcChart.options));
-  // Increase font sizes for fullscreen
-  if(srcOpts.scales) {
-    ['x','y','ycpi'].forEach(ax => {
-      if(srcOpts.scales[ax] && srcOpts.scales[ax].ticks) {
-        srcOpts.scales[ax].ticks.font = { family:'IBM Plex Mono', size:11 };
-      }
-    });
-  }
-  srcOpts.maintainAspectRatio = false;
-  srcOpts.responsive = true;
-  if(srcOpts.plugins && srcOpts.plugins.legend) srcOpts.plugins.legend.labels = { font:{family:'IBM Plex Mono',size:11}, color:'#8b7a6a', boxWidth:24 };
+  // Short delay to let modal render before drawing
+  setTimeout(function() {
+    var ctx = document.getElementById('fs-canvas').getContext('2d');
  
-  _fsChart = new Chart(ctx, {
-    type: srcChart.config.type,
-    data: srcData,
-    options: srcOpts
-  });
+    // Deep clone datasets safely
+    var clonedDatasets = srcChart.data.datasets.map(function(ds) {
+      return Object.assign({}, ds);
+    });
+ 
+    // Build clean options with larger fonts
+    var fsOpts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: srcChart.options.interaction || { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: srcChart.options.plugins.legend.display, labels:{ font:{family:'IBM Plex Mono',size:12}, color:'#8b7a6a', boxWidth:24 } },
+        tooltip: srcChart.options.plugins.tooltip
+      },
+      scales: {}
+    };
+ 
+    // Copy scales with larger tick fonts
+    if(srcChart.options.scales) {
+      Object.keys(srcChart.options.scales).forEach(function(ax) {
+        var srcScale = srcChart.options.scales[ax];
+        fsOpts.scales[ax] = Object.assign({}, srcScale, {
+          ticks: Object.assign({}, srcScale.ticks, { font:{ family:'IBM Plex Mono', size:12 } })
+        });
+      });
+    }
+ 
+    _fsChart = new Chart(ctx, {
+      type: srcChart.config.type,
+      data: { labels: srcChart.data.labels.slice(), datasets: clonedDatasets },
+      options: fsOpts
+    });
+  }, 50);
 }
  
 function closeFSModal() {
