@@ -725,6 +725,8 @@ function selectCat(prefix, cat, years) {
       scales:scales
     }
   });
+  // Store config for fullscreen
+  window['_fsCfg_'+prefix] = { type:CHART_TYPE, labels:years, datasets:datasets, scales:scales, interaction:{mode:'index',intersect:false}, showLegend:SHOW_CPI };
 }
  
 // ── SELECT TOTAL ROW ──
@@ -786,6 +788,8 @@ function selectTotal(prefix, years, totalsByYear) {
       scales:scales
     }
   });
+  // Store config for fullscreen
+  window['_fsCfg_'+prefix] = { type:CHART_TYPE, labels:years, datasets:datasets, scales:scales, interaction:{mode:'index',intersect:false}, showLegend:SHOW_CPI };
 }
  
 // ── CHART TYPE TOGGLE ──
@@ -898,9 +902,7 @@ function renderNetChart(years, nets) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,'rgba(63,185,80,0.2)'); grad.addColorStop(1,'rgba(63,185,80,0.02)');
  
-  window._netChart = new Chart(ctx, {
-    type: isBar ? 'bar' : 'line',
-    data:{ labels:years, datasets:[{
+  var netDataset = {
       data:vals,
       backgroundColor: isBar ? colors : grad,
       borderColor: isBar ? borders : '#3fb950',
@@ -912,7 +914,16 @@ function renderNetChart(years, nets) {
       fill: !isBar,
       tension: isBar ? 0 : 0.25,
       label:'Net Income'
-    }]},
+    };
+  var netScales = {
+    x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
+    y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
+  };
+  // Store for fullscreen
+  window['_fsCfg_net'] = { type: isBar?'bar':'line', labels:years, datasets:[netDataset], scales:netScales, interaction:{mode:'index',intersect:false}, showLegend:false };
+  window._netChart = new Chart(ctx, {
+    type: isBar ? 'bar' : 'line',
+    data:{ labels:years, datasets:[netDataset]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false},
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
@@ -920,10 +931,7 @@ function renderNetChart(years, nets) {
         },
         annotation:{ annotations:{ zeroLine:{ type:'line', yMin:0, yMax:0, borderColor:'rgba(139,148,158,0.5)', borderWidth:1 } } }
       },
-      scales:{
-        x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
-        y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
-      }
+      scales: netScales
     }
   });
 }
@@ -968,9 +976,9 @@ function togglePrincipal() {
 var _fsChart = null;
  
 function openFSModal(prefix) {
-  // Get the source chart
-  var srcChart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
-  if(!srcChart) return;
+  // Get stored chart config
+  var cfg = window['_fsCfg_'+prefix];
+  if(!cfg) return;
  
   // Set title
   var titleText = prefix==='net'
@@ -984,43 +992,38 @@ function openFSModal(prefix) {
   // Destroy previous fullscreen chart
   if(_fsChart) { _fsChart.destroy(); _fsChart = null; }
  
-  // Short delay to let modal render before drawing
   setTimeout(function() {
-    var ctx = document.getElementById('fs-canvas').getContext('2d');
+    var canvas = document.getElementById('fs-canvas');
+    var ctx = canvas.getContext('2d');
  
-    // Deep clone datasets safely
-    var clonedDatasets = srcChart.data.datasets.map(function(ds) {
-      return Object.assign({}, ds);
-    });
- 
-    // Build clean options with larger fonts
-    var fsOpts = {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: srcChart.options.interaction || { mode:'index', intersect:false },
-      plugins: {
-        legend: { display: srcChart.options.plugins.legend.display, labels:{ font:{family:'IBM Plex Mono',size:12}, color:'#8b7a6a', boxWidth:24 } },
-        tooltip: srcChart.options.plugins.tooltip
-      },
-      scales: {}
-    };
- 
-    // Copy scales with larger tick fonts
-    if(srcChart.options.scales) {
-      Object.keys(srcChart.options.scales).forEach(function(ax) {
-        var srcScale = srcChart.options.scales[ax];
-        fsOpts.scales[ax] = Object.assign({}, srcScale, {
-          ticks: Object.assign({}, srcScale.ticks, { font:{ family:'IBM Plex Mono', size:12 } })
+    // Build scales with bigger fonts
+    var fsScales = {};
+    if(cfg.scales) {
+      Object.keys(cfg.scales).forEach(function(ax) {
+        var s = cfg.scales[ax];
+        fsScales[ax] = Object.assign({}, s, {
+          ticks: Object.assign({}, s.ticks, { font:{ family:'IBM Plex Mono', size:12 }, color:'#5a5040' }),
+          title: s.title ? Object.assign({}, s.title, { font:{ family:'IBM Plex Mono', size:12 } }) : undefined
         });
       });
     }
  
     _fsChart = new Chart(ctx, {
-      type: srcChart.config.type,
-      data: { labels: srcChart.data.labels.slice(), datasets: clonedDatasets },
-      options: fsOpts
+      type: cfg.type,
+      data: { labels: cfg.labels, datasets: cfg.datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: cfg.interaction || { mode:'index', intersect:false },
+        plugins: {
+          legend: { display: cfg.showLegend, labels:{ font:{family:'IBM Plex Mono',size:12}, color:'#5a5040', boxWidth:24 } },
+          tooltip: cfg.tooltip,
+          annotation: cfg.annotation || {}
+        },
+        scales: fsScales
+      }
     });
-  }, 50);
+  }, 60);
 }
  
 function closeFSModal() {
@@ -1048,3 +1051,4 @@ renderNet();
 </script>
 </body>
 </html>
+  
