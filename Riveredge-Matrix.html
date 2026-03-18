@@ -361,6 +361,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <span style="color:var(--rule2)">|</span>
   <span>Darker shading = larger % change &nbsp;·&nbsp; Click any row to see trend chart →</span>
 </div>
+
  
 <div class="main-layout">
   <div class="matrix-wrap"><table class="matrix"><thead id="exp-matrix-head"></thead><tbody id="exp-matrix-body"></tbody></table></div>
@@ -464,6 +465,61 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
  
 <script>
 // ── CUSTOM BAR LABEL PLUGIN ──
+// ── MAINTENANCE INCREASE MARKERS PLUGIN ──
+const maintIncreaseMarkers = {
+  id: 'maintIncreaseMarkers',
+  afterDatasetsDraw(chart, args, opts) {
+    if(!opts || !opts.enabled) return;
+    const { ctx, data, scales: { x, y } } = chart;
+    if(!x || !y) return;
+    ctx.save();
+    data.labels.forEach(function(label, i) {
+      const yr = parseInt(label);
+      if(!MAINT_INCREASES[yr]) return;
+      const meta = chart.getDatasetMeta(0);
+      if(!meta || !meta.data[i]) return;
+      const xPos = meta.data[i].x;
+      const topY = y.top;
+      const botY = y.bottom;
+ 
+      // Draw green dashed vertical line
+      ctx.beginPath();
+      ctx.setLineDash([5, 3]);
+      ctx.strokeStyle = 'rgba(63,185,80,0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(xPos, topY);
+      ctx.lineTo(xPos, botY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+ 
+      // Draw label badge at staggered height
+      const pct = MAINT_INCREASES[yr];
+      const offset = MAINT_OFFSETS[yr] || 4;
+      ctx.font = 'bold 11px IBM Plex Mono, monospace';
+      const tw = ctx.measureText(pct).width;
+      const pad = 5;
+      const bw = tw + pad*2;
+      const bh = 18;
+      const bx = xPos - bw/2;
+      const by = topY + offset;
+ 
+      // Badge background
+      ctx.fillStyle = 'rgba(63,185,80,0.85)';
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 3);
+      ctx.fill();
+ 
+      // Badge text
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pct, xPos, by + bh/2);
+    });
+    ctx.restore();
+  }
+};
+Chart.register(maintIncreaseMarkers);
+ 
 const barYearLabels = {
   id: 'barYearLabels',
   afterDatasetsDraw(chart, args, opts) {
@@ -479,6 +535,7 @@ const barYearLabels = {
       // Only label via first dataset
       const meta = chart.getDatasetMeta(0);
       if(!meta || !meta.data[i]) return;
+
       const bar = meta.data[i];
       ctx.fillText(label, bar.x, bar.y - 6);
     });
@@ -486,6 +543,16 @@ const barYearLabels = {
   }
 };
 Chart.register(barYearLabels);
+ 
+// Maintenance charge increase years and percentages
+const MAINT_INCREASES = {
+  2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '+5%', 2024: '+9%'
+};
+// Stagger heights so closely-spaced labels don't overlap
+// Lower number = higher on chart (closer to top), higher = lower
+const MAINT_OFFSETS = {
+  2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2024: 4
+};
  
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
@@ -1294,8 +1361,9 @@ function toggleFS(prefix) {
           if(ds._origPointRadius !== undefined) { ds.pointRadius = ds._origPointRadius; delete ds._origPointRadius; }
           if(ds._origPointHoverRadius !== undefined) { ds.pointHoverRadius = ds._origPointHoverRadius; delete ds._origPointHoverRadius; }
         });
-        // Remove bar year labels on collapse
+        // Remove bar year labels and maintenance markers on collapse
         chart.options.plugins.barYearLabels = { enabled: false };
+        chart.options.plugins.maintIncreaseMarkers = { enabled: false };
         chart.resize();
         chart.update('none');
       }
@@ -1341,6 +1409,14 @@ function toggleFS(prefix) {
         } else {
           chart.options.plugins.barYearLabels = { enabled: false };
         }
+        // Maintenance Charges: show increase markers in expanded mode
+        var isMaintExpand = (prefix==='inc' && state[prefix] && state[prefix].selectedCat === 'Maintenance Charges');
+        if(isMaintExpand) {
+          chart.options.plugins.maintIncreaseMarkers = { enabled: true };
+        } else {
+          chart.options.plugins.maintIncreaseMarkers = { enabled: false };
+        }
+ 
         // RE Tax special handling in expanded mode:
         // Boost red certiorari point sizes further and ensure legend shows
         var isRETaxExpand = (prefix==='exp' && state[prefix] && state[prefix].selectedCat === 'Real Estate Taxes');
