@@ -557,12 +557,22 @@ function render(prefix) {
   cats.forEach((cat) => {
     const tr = document.createElement('tr');
     if(selectedCat === cat) tr.classList.add('selected');
+ 
+    // When principal is toggled on, combine it with Mortgage Interest row
+    const isMPI = prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
+    const rowLabel = isMPI ? 'Mortgage Interest + Principal' : cat;
+ 
     tr.onclick = () => selectCat(prefix, cat, years);
     const td0 = document.createElement('td');
-    td0.className = 'cat-col'; td0.textContent = cat; tr.appendChild(td0);
+    td0.className = 'cat-col';
+    td0.textContent = rowLabel;
+    if(isMPI) { td0.style.color = 'var(--gold)'; td0.style.fontStyle = 'italic'; }
+    tr.appendChild(td0);
     years.forEach((y, yi) => {
       const idx = ALL_YEARS.indexOf(y);
-      const val = data[cat][idx];
+      // Add principal to Mortgage Interest value when toggled
+      const baseVal = data[cat][idx];
+      const val = isMPI ? baseVal + (MORTGAGE_PRINCIPAL[idx] || 0) : baseVal;
       totals[y] += val;
       const prevIdx = yi>0 ? ALL_YEARS.indexOf(years[yi-1]) : -1;
       const prevVal = prevIdx>=0 ? data[cat][prevIdx] : null;
@@ -683,7 +693,12 @@ function selectCat(prefix, cat, years) {
   document.getElementById(prefix+'-panel-cat').textContent = cat;
   document.getElementById(prefix+'-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
  
-  const vals = years.map(y => data[cat][ALL_YEARS.indexOf(y)]);
+  // Use combined P&I values if principal toggle is on for Mortgage Interest
+  const isMPIcat = prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
+  const vals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    return isMPIcat ? data[cat][idx] + (MORTGAGE_PRINCIPAL[idx]||0) : data[cat][idx];
+  });
   const peak = Math.max(...vals);
   const peakYr = years[vals.indexOf(peak)];
   const latest = vals[vals.length-1];
@@ -973,6 +988,11 @@ function togglePrincipal() {
   render('exp');
   renderNet();
   if(window._netYears) renderNetChart(window._netYears);
+  // If Mortgage Interest chart is currently displayed, redraw it with new values
+  if(state.exp.selectedCat === 'Mortgage Interest') {
+    const years = getYears('exp');
+    selectCat('exp', 'Mortgage Interest', years);
+  }
 }
  
 // ── EXPAND PANEL (simple CSS fullscreen) ──
@@ -1055,6 +1075,7 @@ document.addEventListener('keydown', function(e) {
       if(panel && panel._isFullscreen) toggleFS(p);
     });
   }
+
 });
  
 // ── BOOT ──
