@@ -395,8 +395,8 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 <div class="controls-bar">
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
-    <button class="mode-btn active" id="net-btn-range" onclick="setMode('net','range')">Year Range</button>
-    <button class="mode-btn" id="net-btn-single" onclick="setMode('net','single')">Single Year</button>
+    <button class="mode-btn active" id="net-btn-range" onclick="setNetMode('range')">Year Range</button>
+    <button class="mode-btn" id="net-btn-single" onclick="setNetMode('single')">Single Year</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="net-range-controls">
@@ -844,8 +844,7 @@ function setChartType(type) {
       selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
     }
   });
-  if(window._netYears) {
-    // Check which net chart is showing and redraw it
+  if(window._netYears && document.getElementById('net-chart-panel').style.display !== 'none') {
     var netTitle = document.getElementById('net-panel-cat').textContent;
     if(netTitle.indexOf('vs') > -1) renderCompareChart(window._netYears);
     else renderNetChart(window._netYears);
@@ -960,7 +959,8 @@ function renderNetChart(years, nets) {
   document.getElementById('net-ps-peak').textContent = peakYr;
   document.getElementById('net-ps-peak-val').textContent = '+$'+peak.toLocaleString('en-US');
   document.getElementById('net-ps-latest').textContent = (latest>=0?'+':'-')+'$'+Math.abs(latest).toLocaleString('en-US');
-  document.getElementById('net-ps-defyrs').textContent = defYrs+' year'+(defYrs!==1?'s':'');
+  var defEl2 = document.getElementById('net-ps-defyrs');
+  if(defEl2) defEl2.textContent = defYrs+' year'+(defYrs!==1?'s':'');
   document.getElementById('net-panel-stats-wrap').style.display='grid';
   document.getElementById('net-panel-empty').style.display='none';
   document.getElementById('net-chart-panel').style.display='block';
@@ -1013,6 +1013,12 @@ function setNetMode(m) {
   document.getElementById('net-range-controls').style.display = m==='range'?'flex':'none';
   document.getElementById('net-single-controls').style.display = m==='single'?'flex':'none';
   renderNet();
+  // Redraw active chart if one is showing
+  var netTitle = document.getElementById('net-panel-cat').textContent;
+  var years = getNetYears();
+  window._netYears = years;
+  if(netTitle.indexOf('vs') > -1) renderCompareChart(years);
+  else if(netTitle.indexOf('Net') > -1 && document.getElementById('net-chart-panel').style.display !== 'none') renderNetChart(years);
 }
  
 // ── TOGGLE CPI ──
@@ -1036,12 +1042,15 @@ function togglePrincipal() {
   const btn = document.getElementById('btn-principal');
   btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
   btn.classList.toggle('active', SHOW_PRINCIPAL);
-  // Reset totalSelected so render() will redraw it correctly
   state.exp.totalSelected = false;
   render('exp');
   renderNet();
-  if(window._netYears) renderNetChart(window._netYears);
-  // If Mortgage Interest chart is currently displayed, redraw it with new values
+  // Redraw whichever net chart is active
+  if(window._netYears) {
+    var netTitle = document.getElementById('net-panel-cat').textContent;
+    if(netTitle.indexOf('vs') > -1) renderCompareChart(window._netYears);
+    else if(document.getElementById('net-chart-panel').style.display !== 'none') renderNetChart(window._netYears);
+  }
   if(state.exp.selectedCat === 'Mortgage Interest') {
     const years = getYears('exp');
     selectCat('exp', 'Mortgage Interest', years);
@@ -1180,13 +1189,10 @@ function renderCompareChart(years) {
   document.getElementById('net-ps-peak').textContent = peak_yr;
   document.getElementById('net-ps-peak-val').textContent = '$'+peak_inc.toLocaleString('en-US');
   document.getElementById('net-ps-latest').textContent = '$'+latest.toLocaleString('en-US');
-  const chgEl = document.getElementById('net-ps-chg');
-  chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
-  chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
-  // Rename deficit years label to surplus/deficit indicator
-  const defEl = document.getElementById('net-ps-defyrs');
+  // net-ps-defyrs shows deficit years count
   const defYrs = vals_inc.filter((v,i) => v < vals_exp[i]).length;
-  defEl.textContent = defYrs + ' deficit yr'+(defYrs!==1?'s':'');
+  const defEl = document.getElementById('net-ps-defyrs');
+  if(defEl) defEl.textContent = defYrs + ' deficit yr'+(defYrs!==1?'s':'');
  
   document.getElementById('net-panel-stats-wrap').style.display = 'grid';
   document.getElementById('net-panel-empty').style.display = 'none';
@@ -1260,4 +1266,4 @@ render('exp');
 renderNet();
 </script>
 </body>
-</html>    
+</html>
