@@ -136,6 +136,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .info-note { max-width: 1400px; margin: 0 auto; padding: 6px 32px 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #7a5000; }
 .info-note span { background: #fff8e7; border: 1px solid #e6a817; border-radius: 4px; padding: 3px 10px; }
 .matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
+.matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
+.matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.compare-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a3a; }
 .matrix tbody tr.net-row:hover { background: #1e361e !important; }
 .matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
@@ -185,6 +189,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .net-pos { color: #6fcf82 !important; font-weight: 700; }
 .net-neg { color: #f47a70 !important; font-weight: 700; }
 .matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
+.matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
+.matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.compare-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a3a; }
 .matrix tbody tr.net-row:hover { background: #1e361e !important; }
 .matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
@@ -419,7 +427,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="net-ps-latest">—</div></div>
         <div><div class="pstat-label">Deficit Years</div><div class="pstat-val dn" id="net-ps-defyrs">—</div></div>
       </div>
-      <div id="net-panel-empty" class="panel-empty"><span class="arrow" style="color:#3fb950;">←</span>Click the Net Income row<br>to graph surplus &amp; deficit<br>over the selected range</div>
+      <div id="net-panel-empty" class="panel-empty"><span class="arrow" style="color:#3fb950;">←</span>Click either row below<br>to graph in this panel</div>
       <div class="chart-panel" id="net-chart-panel" style="display:none;position:relative;">
         <canvas id="net-trend-chart" height="180"></canvas>
         <button class="expand-btn" id="net-expand-btn" onclick="toggleFS('net')" title="Expand / Collapse chart">⤢</button>
@@ -836,7 +844,12 @@ function setChartType(type) {
       selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
     }
   });
-  if(window._netYears) renderNetChart(window._netYears);
+  if(window._netYears) {
+    // Check which net chart is showing and redraw it
+    var netTitle = document.getElementById('net-panel-cat').textContent;
+    if(netTitle.indexOf('vs') > -1) renderCompareChart(window._netYears);
+    else renderNetChart(window._netYears);
+  }
 }
  
 // ── NET INCOME SECTION ──
@@ -894,6 +907,35 @@ function renderNet() {
   });
   ttr.onclick = () => renderNetChart(years, nets);
   body.appendChild(ttr);
+ 
+  // ── TOTAL INCOME vs TOTAL EXPENSES COMPARISON ROW ──
+  const ctr = document.createElement('tr');
+  ctr.classList.add('compare-row');
+  ctr.style.cursor = 'pointer';
+  ctr.title = 'Click to graph Total Income vs Total Expenses';
+  const ctd0 = document.createElement('td'); ctd0.className = 'cat-col';
+  ctd0.textContent = 'Total Income vs Total Expenses ▶'; ctr.appendChild(ctd0);
+ 
+  // Just show Total Income values in each cell (for reference)
+  let prevInc = null;
+  years.forEach(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    const inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+    let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+    if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+    const p = prevInc !== null ? pct(prevInc, inc) : null;
+    const isUp = p !== null && p >= 0;
+    const ctd = document.createElement('td');
+    const vSpan = document.createElement('span');
+    vSpan.style.color = '#58a6ff';
+    vSpan.style.fontWeight = '600';
+    vSpan.textContent = '$' + inc.toLocaleString('en-US');
+    ctd.appendChild(vSpan);
+    ctr.appendChild(ctd);
+    prevInc = inc;
+  });
+  ctr.onclick = () => renderCompareChart(years);
+  body.appendChild(ctr);
 }
  
 function renderNetChart(years, nets) {
@@ -1114,6 +1156,91 @@ document.addEventListener('keydown', function(e) {
   }
 });
  
+// ── TOTAL INCOME vs TOTAL EXPENSES COMPARE CHART ──
+function renderCompareChart(years) {
+  const vals_inc = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    return Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+  });
+  const vals_exp = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+    if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+    return exp;
+  });
+ 
+  const peak_inc = Math.max(...vals_inc);
+  const peak_yr  = years[vals_inc.indexOf(peak_inc)];
+  const latest   = vals_inc[vals_inc.length-1];
+  const first    = vals_inc[0];
+  const chgPct   = first>0 ? ((latest-first)/first*100) : 0;
+ 
+  document.getElementById('net-panel-cat').textContent = 'Total Income vs Total Expenses';
+  document.getElementById('net-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+  document.getElementById('net-ps-peak').textContent = peak_yr;
+  document.getElementById('net-ps-peak-val').textContent = '$'+peak_inc.toLocaleString('en-US');
+  document.getElementById('net-ps-latest').textContent = '$'+latest.toLocaleString('en-US');
+  const chgEl = document.getElementById('net-ps-chg');
+  chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
+  chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  // Rename deficit years label to surplus/deficit indicator
+  const defEl = document.getElementById('net-ps-defyrs');
+  const defYrs = vals_inc.filter((v,i) => v < vals_exp[i]).length;
+  defEl.textContent = defYrs + ' deficit yr'+(defYrs!==1?'s':'');
+ 
+  document.getElementById('net-panel-stats-wrap').style.display = 'grid';
+  document.getElementById('net-panel-empty').style.display = 'none';
+  document.getElementById('net-chart-panel').style.display = 'block';
+ 
+  if(window._netChart){ window._netChart.destroy(); window._netChart=null; }
+  const ctx = document.getElementById('net-trend-chart').getContext('2d');
+ 
+  const isBar = CHART_TYPE === 'bar';
+  const gradInc = ctx.createLinearGradient(0,0,0,180);
+  gradInc.addColorStop(0,'rgba(88,166,255,0.18)'); gradInc.addColorStop(1,'rgba(88,166,255,0.02)');
+  const gradExp = ctx.createLinearGradient(0,0,0,180);
+  gradExp.addColorStop(0,'rgba(248,81,73,0.12)'); gradExp.addColorStop(1,'rgba(248,81,73,0.01)');
+ 
+  window._netChart = new Chart(ctx, {
+    type: isBar ? 'bar' : 'line',
+    data:{ labels:years, datasets:[
+      { label:'Total Income', data:vals_inc,
+        borderColor:'#3fb950', backgroundColor: isBar ? '#3fb950cc' : gradInc,
+        borderWidth: isBar?1:5, borderRadius: isBar?3:0,
+        pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
+        pointBackgroundColor:'#3fb950', pointBorderColor:'#fff', pointBorderWidth:2.5,
+        fill: !isBar, tension: isBar?0:0.25 },
+      { label:'Total Expenses', data:vals_exp,
+        borderColor:'#f85149', backgroundColor: isBar ? '#f85149cc' : gradExp,
+        borderWidth: isBar?1:5, borderRadius: isBar?3:0,
+        pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
+        pointBackgroundColor:'#f85149', pointBorderColor:'#fff', pointBorderWidth:2.5,
+        fill: !isBar, tension: isBar?0:0.25 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:true, labels:{ font:{family:'IBM Plex Mono',size:10}, color:'#8b7a6a', boxWidth:20 } },
+        tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
+          callbacks:{
+            title:i=>i[0].label,
+            label:i=>' '+i.dataset.label+': $'+i.parsed.y.toLocaleString('en-US'),
+            afterBody:function(items) {
+              if(items.length<2) return '';
+              var net = items[0].parsed.y - items[1].parsed.y;
+              return ['', (net>=0?' Surplus: +$':' Deficit: -$')+Math.abs(net).toLocaleString('en-US')];
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
+        y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K') } }
+      }
+    }
+  });
+}
+ 
 // ── BOOT ──
 initSelects('inc');
 initSelects('exp');
@@ -1133,4 +1260,4 @@ render('exp');
 renderNet();
 </script>
 </body>
-</html>
+</html>    
