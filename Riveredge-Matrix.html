@@ -1035,7 +1035,6 @@ function toggleFS(prefix) {
   var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
   var backdrop = document.getElementById('fs-backdrop');
  
-  // Get the canvas element
   var canvasId = prefix + '-trend-chart';
   var canvas = document.getElementById(canvasId);
  
@@ -1046,12 +1045,22 @@ function toggleFS(prefix) {
     panel.removeAttribute('style');
     chartPanel.style.flex = '';
     chartPanel.style.height = '200px';
-    // Restore canvas fixed height
-    if(canvas) canvas.setAttribute('height', '180');
+    if(canvas) { canvas.setAttribute('height','180'); canvas.style.height = ''; }
     document.body.style.overflow = '';
     if(backdrop) backdrop.style.display = 'none';
     if(btn) btn.textContent = '⤢';
-    setTimeout(function() { if(chart) chart.resize(); }, 80);
+    // Restore original chart with normal line widths
+    setTimeout(function() {
+      if(chart) {
+        chart.data.datasets.forEach(function(ds) {
+          if(ds._origBorderWidth !== undefined) { ds.borderWidth = ds._origBorderWidth; delete ds._origBorderWidth; }
+          if(ds._origPointRadius !== undefined) { ds.pointRadius = ds._origPointRadius; delete ds._origPointRadius; }
+          if(ds._origPointHoverRadius !== undefined) { ds.pointHoverRadius = ds._origPointHoverRadius; delete ds._origPointHoverRadius; }
+        });
+        chart.resize();
+        chart.update('none');
+      }
+    }, 80);
   } else {
     // ── EXPAND ──
     panel._isFullscreen = true;
@@ -1072,11 +1081,25 @@ function toggleFS(prefix) {
     panel.style.overflow = 'hidden';
     chartPanel.style.flex = '1';
     chartPanel.style.height = 'auto';
-    // Remove fixed canvas height so it fills the panel
     if(canvas) { canvas.removeAttribute('height'); canvas.style.height = '100%'; }
     document.body.style.overflow = 'hidden';
     if(btn) btn.textContent = '✕';
-    setTimeout(function() { if(chart) chart.resize(); }, 80);
+    // Boost line widths and point sizes for fullscreen
+    setTimeout(function() {
+      if(chart) {
+        chart.data.datasets.forEach(function(ds) {
+          if(ds.borderDash) return; // skip CPI dashed line
+          if(ds._origBorderWidth === undefined) ds._origBorderWidth = ds.borderWidth;
+          if(ds._origPointRadius === undefined) ds._origPointRadius = ds.pointRadius;
+          if(ds._origPointHoverRadius === undefined) ds._origPointHoverRadius = ds.pointHoverRadius;
+          ds.borderWidth = (ds.borderWidth || 2) * 2.2;
+          ds.pointRadius = (ds.pointRadius || 3) * 1.8;
+          ds.pointHoverRadius = (ds.pointHoverRadius || 8) * 1.5;
+        });
+        chart.resize();
+        chart.update('none');
+      }
+    }, 80);
   }
 }
  
