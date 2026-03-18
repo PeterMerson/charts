@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -265,6 +265,11 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">% Change</span>
     <button class="mode-btn active" id="inc-btn-show-chg" onclick="toggleChg('inc')">Visible</button>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="inc-btn-show-dollar" onclick="toggleDollar('inc')">Hidden</button>
+  </div>
 </div>
  
 <div class="legend-bar">
@@ -341,6 +346,11 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
     <button class="mode-btn active" id="exp-btn-show-chg" onclick="toggleChg('exp')">Visible</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="exp-btn-show-dollar" onclick="toggleDollar('exp')">Hidden</button>
   </div>
 </div>
  
@@ -503,8 +513,8 @@ const INC_COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1',
 const EXP_COLORS = ['#E63946','#2196F3','#43A047','#FF9800','#d29922','#8E24AA','#00ACC1','#6D4C41','#546E7A','#7CB342','#F4511E'];
  
 const state = {
-  inc: { mode:'range', showChg:true, selectedCat:null, trendChart:null },
-  exp: { mode:'range', showChg:true, selectedCat:null, trendChart:null }
+  inc: { mode:'range', showChg:true, showDollar:false, selectedCat:null, trendChart:null },
+  exp: { mode:'range', showChg:true, showDollar:false, selectedCat:null, trendChart:null }
 };
 var SHOW_CPI = false;
 var SHOW_PRINCIPAL = false;
@@ -535,6 +545,14 @@ function setMode(prefix, m) {
 function toggleChg(prefix) {
   state[prefix].showChg = !state[prefix].showChg;
   document.getElementById(prefix+'-btn-show-chg').classList.toggle('active', state[prefix].showChg);
+  render(prefix);
+}
+ 
+function toggleDollar(prefix) {
+  state[prefix].showDollar = !state[prefix].showDollar;
+  const btn = document.getElementById(prefix+'-btn-show-dollar');
+  btn.textContent = state[prefix].showDollar ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', state[prefix].showDollar);
   render(prefix);
 }
  
@@ -619,6 +637,13 @@ function render(prefix) {
         pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
         pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; td.appendChild(pSpan);
       }
+      if(prevVal!==null && state[prefix].showDollar) {
+        const diff = val - prevVal;
+        const dSpan = document.createElement('span');
+        dSpan.className = 'cell-chg '+(diff>=0?'chg-up':diff===0?'chg-neu':'chg-dn');
+        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        td.appendChild(dSpan);
+      }
       tr.appendChild(td);
     });
     body.appendChild(tr);
@@ -688,6 +713,13 @@ function render(prefix) {
       const pSpan = document.createElement('span');
       pSpan.className = 'cell-chg '+(isUp?'chg-up':'chg-dn');
       pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; ttd.appendChild(pSpan);
+    }
+    if(p!==null && state[prefix].showDollar) {
+      const diff = val - prevTotal;
+      const dSpan = document.createElement('span');
+      dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
+      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+      ttd.appendChild(dSpan);
     }
     ttr.appendChild(ttd);
     prevTotal = val;
