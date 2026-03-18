@@ -1,4 +1,4 @@
-<!!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -556,7 +556,9 @@ function setMode(prefix, m) {
  
 function toggleChg(prefix) {
   state[prefix].showChg = !state[prefix].showChg;
-  document.getElementById(prefix+'-btn-show-chg').classList.toggle('active', state[prefix].showChg);
+  const btn = document.getElementById(prefix+'-btn-show-chg');
+  btn.textContent = state[prefix].showChg ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', state[prefix].showChg);
   render(prefix);
 }
  
@@ -571,6 +573,7 @@ function toggleDollar(prefix) {
 function toggleNetChg() {
   NET_SHOW_CHG = !NET_SHOW_CHG;
   const btn = document.getElementById('net-btn-show-chg');
+  btn.textContent = NET_SHOW_CHG ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', NET_SHOW_CHG);
   renderNet();
 }
@@ -1161,7 +1164,6 @@ function renderNetChart(years, nets) {
       data:vals,
       backgroundColor: isBar ? colors : grad,
       borderColor: isBar ? borders : '#3fb950',
-
       borderWidth: isBar ? 1 : 5,
       borderRadius: isBar ? 3 : 0,
       pointRadius: isBar ? 0 : (years.length>15?4:6),
