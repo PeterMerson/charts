@@ -758,31 +758,91 @@ function selectCat(prefix, cat, years) {
  
   // Build datasets — solid fill for bar, gradient for line
   const isBar = CHART_TYPE === 'bar';
+  const isRETax = prefix==='exp' && cat==='Real Estate Taxes';
+  const TAX_CERT_YEARS = [1997, 2009, 2021];
+ 
+  // For RE Taxes: use indexed values and highlight certiorari dip years
+  const dispVals = isRETax && !isBar
+    ? vals.map(v => vals[0] > 0 ? (v / vals[0]) * 100 : 100)
+    : vals;
+  const cpiIndexedForRE = isRETax && !isBar && SHOW_CPI
+    ? years.map(y => { const ci = CPI_U_DATA[ALL_YEARS.indexOf(y)]; const cb = CPI_U_DATA[ALL_YEARS.indexOf(years[0])]; return (ci/cb)*100; })
+    : null;
+ 
+  // Point colors — red for certiorari dip years on RE Tax chart
+  const pointColors = isRETax && !isBar
+    ? years.map(y => TAX_CERT_YEARS.indexOf(y) > -1 ? '#f85149' : color)
+    : null;
+  const pointRadii = isRETax && !isBar
+    ? years.map(y => TAX_CERT_YEARS.indexOf(y) > -1 ? 8 : (years.length>15?4:6))
+    : null;
+ 
   const datasets = [
-    { data:vals, borderColor:color, backgroundColor: isBar ? color+'cc' : grad,
+    { data: isRETax && !isBar ? dispVals : vals,
+      borderColor:color,
+      backgroundColor: isBar ? color+'cc' : grad,
       borderWidth: isBar ? 1 : 5, borderRadius: isBar ? 3 : 0,
-      pointRadius: isBar ? 0 : (years.length>15?4:6), pointHoverRadius:10,
-      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2.5,
-      fill: !isBar, tension: isBar ? 0 : 0.25, label: cat, yAxisID:'y' }
+      pointRadius: pointRadii || (isBar ? 0 : (years.length>15?4:6)),
+      pointHoverRadius:10,
+      pointBackgroundColor: pointColors || color,
+      pointBorderColor: isRETax && !isBar
+        ? years.map(y => TAX_CERT_YEARS.indexOf(y) > -1 ? '#fff' : '#fff')
+        : '#fff',
+      pointBorderWidth: isRETax && !isBar
+        ? years.map(y => TAX_CERT_YEARS.indexOf(y) > -1 ? 2.5 : 2)
+        : 2.5,
+      fill: !isBar, tension: isBar ? 0 : 0.25,
+      label: isRETax && !isBar ? 'RE Taxes (indexed to '+years[0]+')' : cat,
+      yAxisID:'y' }
   ];
   const scales = {
     x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
     y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
   };
-  if(SHOW_CPI) {
-    // Index both series to 100 at the first year of the selected range
+  if(SHOW_CPI || (isRETax && !isBar)) {
     const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
     const cpiBase = cpiRaw[0];
-    const valBase = vals[0];
-    const cpiIndexed = cpiRaw.map(v => valBase * (v / cpiBase));
-    datasets.push({ data:cpiIndexed, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U (indexed to '+years[0]+')', yAxisID:'y' });
+    // For RE Taxes: pure index (100 = start year). For others: scaled to dollar values
+    const cpiIndexed = isRETax && !isBar
+      ? cpiRaw.map(v => (v/cpiBase)*100)
+      : cpiRaw.map(v => vals[0] * (v/cpiBase));
+    const cpiColor = isRETax && !isBar ? '#58a6ff' : '#c9a84c';
+    const cpiLabel = isRETax && !isBar ? 'US CPI-U (indexed to '+years[0]+')' : 'CPI-U (indexed to '+years[0]+')';
+    datasets.push({ data:cpiIndexed, borderColor:cpiColor, backgroundColor:'transparent',
+      borderWidth:2.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25,
+      label:cpiLabel, yAxisID:'y' });
   }
+ 
+  // RE Tax: y-axis shows index values, highlight certiorari note in tooltip
+  if(isRETax && !isBar) {
+    scales.y.ticks = { font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a',
+      callback: v => v.toFixed(0) };
+    scales.y.title = { display:true, text:'Index ('+years[0]+' = 100)',
+      font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a' };
+  }
+ 
+  const showLegend = SHOW_CPI || (isRETax && !isBar);
  
   state[prefix].trendChart = new Chart(ctx, {
     type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display: SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
+      plugins:{ legend:{ display: showLegend, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } },
+        tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
+          callbacks:{ title:items=>items[0].label,
+            label:item => isRETax && !isBar
+              ? ' '+item.dataset.label+': '+item.parsed.y.toFixed(1)
+              : item.dataset.label.indexOf('CPI')>-1
+                ? ' CPI-U: '+item.parsed.y.toFixed(1)
+                : ' '+fmtFull(item.parsed.y),
+            afterBody: isRETax && !isBar ? function(items) {
+              var yr = parseInt(items[0].label);
+              if([1997,2009,2021].indexOf(yr) > -1) return ['','⚖ Tax Appeal/Certiorari year'];
+              return '';
+            } : undefined
+          }
+        }
+      },
       scales:scales
     }
   });
