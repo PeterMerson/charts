@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -419,6 +419,16 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">Year</span>
     <select id="net-sel-single" onchange="renderNet()"></select>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">% Change</span>
+    <button class="mode-btn active" id="net-btn-show-chg" onclick="toggleNetChg()">Visible</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="net-btn-show-dollar" onclick="toggleNetDollar()">Hidden</button>
+  </div>
 </div>
  
 <div class="main-layout">
@@ -519,6 +529,8 @@ const state = {
 var SHOW_CPI = false;
 var SHOW_PRINCIPAL = false;
 var CHART_TYPE = 'line';
+var NET_SHOW_CHG = true;
+var NET_SHOW_DOLLAR = false;
  
 function initSelects(prefix) {
   ['from','to','single'].forEach(id => {
@@ -554,6 +566,21 @@ function toggleDollar(prefix) {
   btn.textContent = state[prefix].showDollar ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', state[prefix].showDollar);
   render(prefix);
+}
+ 
+function toggleNetChg() {
+  NET_SHOW_CHG = !NET_SHOW_CHG;
+  const btn = document.getElementById('net-btn-show-chg');
+  btn.classList.toggle('active', NET_SHOW_CHG);
+  renderNet();
+}
+ 
+function toggleNetDollar() {
+  NET_SHOW_DOLLAR = !NET_SHOW_DOLLAR;
+  const btn = document.getElementById('net-btn-show-dollar');
+  btn.textContent = NET_SHOW_DOLLAR ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', NET_SHOW_DOLLAR);
+  renderNet();
 }
  
 function getYears(prefix) {
@@ -1020,13 +1047,32 @@ function renderNet() {
   const ttd0 = document.createElement('td'); ttd0.className='cat-col';
   ttd0.textContent = 'Net Income (Surplus/Deficit) ▶'; ttr.appendChild(ttd0);
  
+  let prevNet = null;
   years.forEach(y => {
     const v = nets[y];
     const ttd = document.createElement('td');
     const vSpan = document.createElement('span');
     vSpan.className = v>=0?'net-pos':'net-neg';
     vSpan.textContent = (v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US');
-    ttd.appendChild(vSpan); ttr.appendChild(ttd);
+    ttd.appendChild(vSpan);
+    if(prevNet !== null && NET_SHOW_CHG) {
+      const p = prevNet !== 0 ? ((v - prevNet) / Math.abs(prevNet) * 100) : null;
+      if(p !== null) {
+        const pSpan = document.createElement('span');
+        pSpan.className = 'cell-chg ' + (p>=0?'chg-up':'chg-dn');
+        pSpan.textContent = (p>=0?'+':'')+p.toFixed(1)+'%';
+        ttd.appendChild(pSpan);
+      }
+    }
+    if(prevNet !== null && NET_SHOW_DOLLAR) {
+      const diff = v - prevNet;
+      const dSpan = document.createElement('span');
+      dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
+      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+      ttd.appendChild(dSpan);
+    }
+    ttr.appendChild(ttd);
+    prevNet = v;
   });
   ttr.onclick = () => renderNetChart(years, nets);
   body.appendChild(ttr);
@@ -1054,6 +1100,19 @@ function renderNet() {
     vSpan.style.fontWeight = '600';
     vSpan.textContent = '$' + inc.toLocaleString('en-US');
     ctd.appendChild(vSpan);
+    if(p !== null && NET_SHOW_CHG) {
+      const pSpan = document.createElement('span');
+      pSpan.className = 'cell-chg ' + (isUp?'chg-up':'chg-dn');
+      pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%';
+      ctd.appendChild(pSpan);
+    }
+    if(prevInc !== null && NET_SHOW_DOLLAR) {
+      const diff = inc - prevInc;
+      const dSpan = document.createElement('span');
+      dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
+      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+      ctd.appendChild(dSpan);
+    }
     ctr.appendChild(ctd);
     prevInc = inc;
   });
@@ -1102,6 +1161,7 @@ function renderNetChart(years, nets) {
       data:vals,
       backgroundColor: isBar ? colors : grad,
       borderColor: isBar ? borders : '#3fb950',
+
       borderWidth: isBar ? 1 : 5,
       borderRadius: isBar ? 3 : 0,
       pointRadius: isBar ? 0 : (years.length>15?4:6),
