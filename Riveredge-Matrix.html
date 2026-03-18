@@ -1035,26 +1035,27 @@ function toggleFS(prefix) {
   var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
   var backdrop = document.getElementById('fs-backdrop');
  
+  // Get the canvas element
+  var canvasId = prefix + '-trend-chart';
+  var canvas = document.getElementById(canvasId);
+ 
   if(panel._isFullscreen) {
-    // ── COLLAPSE — move panel back to original parent ──
+    // ── COLLAPSE ──
     panel._isFullscreen = false;
-    // Move back to original parent
-    if(panel._origParent) {
-      panel._origParent.appendChild(panel);
-    }
-    // Clear all inline styles
+    if(panel._origParent) panel._origParent.appendChild(panel);
     panel.removeAttribute('style');
     chartPanel.style.flex = '';
     chartPanel.style.height = '200px';
+    // Restore canvas fixed height
+    if(canvas) canvas.setAttribute('height', '180');
     document.body.style.overflow = '';
     if(backdrop) backdrop.style.display = 'none';
     if(btn) btn.textContent = '⤢';
     setTimeout(function() { if(chart) chart.resize(); }, 80);
   } else {
-    // ── EXPAND — move panel to body to escape stacking context ──
+    // ── EXPAND ──
     panel._isFullscreen = true;
     panel._origParent = panel.parentNode;
-    // Move panel to body so position:fixed works correctly
     document.body.appendChild(panel);
     if(backdrop) backdrop.style.display = 'block';
     panel.style.position = 'fixed';
@@ -1071,6 +1072,8 @@ function toggleFS(prefix) {
     panel.style.overflow = 'hidden';
     chartPanel.style.flex = '1';
     chartPanel.style.height = 'auto';
+    // Remove fixed canvas height so it fills the panel
+    if(canvas) { canvas.removeAttribute('height'); canvas.style.height = '100%'; }
     document.body.style.overflow = 'hidden';
     if(btn) btn.textContent = '✕';
     setTimeout(function() { if(chart) chart.resize(); }, 80);
