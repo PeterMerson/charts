@@ -605,7 +605,8 @@ function render(prefix) {
     years.forEach((y, yi) => {
       const idx = ALL_YEARS.indexOf(y);
       const pval = MORTGAGE_PRINCIPAL[idx] || 0;
-      totals[y] += pval;
+      // NOTE: Do NOT add to totals here — principal is already included
+      // in the Mortgage Interest row values when SHOW_PRINCIPAL is true
       const p = prevPrin !== null && prevPrin > 0 ? pct(prevPrin, pval) : null;
       const isUp = p !== null && p >= 0;
       const ptd = document.createElement('td');
