@@ -1239,6 +1239,23 @@ function toggleFS(prefix) {
         } else {
           chart.options.plugins.barYearLabels = { enabled: false };
         }
+        // RE Tax special handling in expanded mode:
+        // Boost red certiorari point sizes further and ensure legend shows
+        var isRETaxExpand = (prefix==='exp' && state[prefix] && state[prefix].selectedCat === 'Real Estate Taxes');
+        if(isRETaxExpand && chart.config.type !== 'bar') {
+          var reCertYears = [1997, 2009, 2021];
+          chart.data.datasets[0].pointRadius = chart.data.labels.map(function(y) {
+            return reCertYears.indexOf(parseInt(y)) > -1 ? 12 : 5;
+          });
+          chart.data.datasets[0].pointBackgroundColor = chart.data.labels.map(function(y) {
+            return reCertYears.indexOf(parseInt(y)) > -1 ? '#f85149' : '#E63946';
+          });
+          chart.options.plugins.legend.display = true;
+          // Make CPI line thicker too
+          if(chart.data.datasets[1]) {
+            chart.data.datasets[1].borderWidth = 3;
+          }
+        }
         chart.resize();
         chart.update('none');
       }
