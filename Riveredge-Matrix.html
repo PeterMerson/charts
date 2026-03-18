@@ -727,9 +727,9 @@ function selectCat(prefix, cat, years) {
   const isBar = CHART_TYPE === 'bar';
   const datasets = [
     { data:vals, borderColor:color, backgroundColor: isBar ? color+'cc' : grad,
-      borderWidth: isBar ? 1 : 2, borderRadius: isBar ? 3 : 0,
-      pointRadius: isBar ? 0 : (years.length>15?2:3.5), pointHoverRadius:5,
-      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5,
+      borderWidth: isBar ? 1 : 3.5, borderRadius: isBar ? 3 : 0,
+      pointRadius: isBar ? 0 : (years.length>15?3:5), pointHoverRadius:8,
+      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2,
       fill: !isBar, tension: isBar ? 0 : 0.25, label: cat, yAxisID:'y' }
   ];
   const scales = {
@@ -793,9 +793,9 @@ function selectTotal(prefix, years, totalsByYear) {
   const isBarT = CHART_TYPE === 'bar';
   const datasets = [
     { data:vals, borderColor:color, backgroundColor: isBarT ? color+'cc' : grad,
-      borderWidth: isBarT ? 1 : 2.5, borderRadius: isBarT ? 3 : 0,
-      pointRadius: isBarT ? 0 : (years.length>15?2:3.5), pointHoverRadius:5,
-      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5,
+      borderWidth: isBarT ? 1 : 3.5, borderRadius: isBarT ? 3 : 0,
+      pointRadius: isBarT ? 0 : (years.length>15?3:5), pointHoverRadius:8,
+      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2,
       fill: !isBarT, tension: isBarT ? 0 : 0.25, label:label, yAxisID:'y' }
   ];
   const scales = {
@@ -935,10 +935,10 @@ function renderNetChart(years, nets) {
       data:vals,
       backgroundColor: isBar ? colors : grad,
       borderColor: isBar ? borders : '#3fb950',
-      borderWidth: isBar ? 1 : 2,
+      borderWidth: isBar ? 1 : 3.5,
       borderRadius: isBar ? 3 : 0,
-      pointRadius: isBar ? 0 : (years.length>15?2:3.5),
-      pointHoverRadius: 5,
+      pointRadius: isBar ? 0 : (years.length>15?3:5),
+      pointHoverRadius: 8,
       pointBackgroundColor:'#3fb950',
       fill: !isBar,
       tension: isBar ? 0 : 0.25,
