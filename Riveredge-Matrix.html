@@ -723,9 +723,14 @@ function selectCat(prefix, cat, years) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0, color+'33'); grad.addColorStop(1, color+'05');
  
-  // Build datasets
+  // Build datasets — solid fill for bar, gradient for line
+  const isBar = CHART_TYPE === 'bar';
   const datasets = [
-    { data:vals, borderColor:color, backgroundColor:grad, borderWidth:2, pointRadius:years.length>15?2:3.5, pointHoverRadius:5, pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5, fill:true, tension:0.25, label: cat, yAxisID:'y' }
+    { data:vals, borderColor:color, backgroundColor: isBar ? color+'cc' : grad,
+      borderWidth: isBar ? 1 : 2, borderRadius: isBar ? 3 : 0,
+      pointRadius: isBar ? 0 : (years.length>15?2:3.5), pointHoverRadius:5,
+      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5,
+      fill: !isBar, tension: isBar ? 0 : 0.25, label: cat, yAxisID:'y' }
   ];
   const scales = {
     x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
@@ -785,8 +790,13 @@ function selectTotal(prefix, years, totalsByYear) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0, color+'33'); grad.addColorStop(1, color+'05');
  
+  const isBarT = CHART_TYPE === 'bar';
   const datasets = [
-    { data:vals, borderColor:color, backgroundColor:grad, borderWidth:2.5, pointRadius:years.length>15?2:3.5, pointHoverRadius:5, pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5, fill:true, tension:0.25, label:label, yAxisID:'y' }
+    { data:vals, borderColor:color, backgroundColor: isBarT ? color+'cc' : grad,
+      borderWidth: isBarT ? 1 : 2.5, borderRadius: isBarT ? 3 : 0,
+      pointRadius: isBarT ? 0 : (years.length>15?2:3.5), pointHoverRadius:5,
+      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:1.5,
+      fill: !isBarT, tension: isBarT ? 0 : 0.25, label:label, yAxisID:'y' }
   ];
   const scales = {
     x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
@@ -1075,7 +1085,6 @@ document.addEventListener('keydown', function(e) {
       if(panel && panel._isFullscreen) toggleFS(p);
     });
   }
-
 });
  
 // ── BOOT ──
