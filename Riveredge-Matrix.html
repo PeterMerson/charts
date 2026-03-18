@@ -1,4 +1,4 @@
-<!!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -321,7 +321,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
-<div class="info-note"><span>⚠ 2024 Repairs &amp; Maintenance includes $228,074 fire &amp; water damage (one-time event) &nbsp;·&nbsp; Mortgage Principal excluded from all totals — information only</span></div>
+<div class="info-note"><span>⚠ 2024 Repairs &amp; Maintenance includes $228,074 fire &amp; water damage (one-time event) &nbsp;·&nbsp; Mortgage Principal excluded from all totals — use <strong>Global Toggle</strong> above to include</span></div>
  
 <div class="section-rule"><span class="rule-label">Expense Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
  
@@ -862,11 +862,19 @@ function selectCat(prefix, cat, years) {
       plugins:{ legend:{ display: showLegend, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } },
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
           callbacks:{ title:items=>items[0].label,
-            label:item => isRETax && !isBar
-              ? ' '+item.dataset.label+': '+item.parsed.y.toFixed(1)
-              : item.dataset.label.indexOf('CPI')>-1
-                ? ' CPI-U: '+item.parsed.y.toFixed(1)
-                : ' '+fmtFull(item.parsed.y),
+            label:item => {
+              if(isRETax && !isBar) {
+                if(item.dataset.label.indexOf('CPI') > -1) {
+                  return ' CPI-U Index: ' + item.parsed.y.toFixed(1);
+                }
+                // RE Taxes: show index value AND actual dollar amount
+                var actualVal = vals[item.dataIndex];
+                return ' RE Taxes: ' + item.parsed.y.toFixed(1) + '  ($' + actualVal.toLocaleString('en-US') + ')';
+              }
+              return item.dataset.label.indexOf('CPI') > -1
+                ? ' CPI-U: ' + item.parsed.y.toFixed(1)
+                : ' ' + fmtFull(item.parsed.y);
+            },
             afterBody: isRETax && !isBar ? function(items) {
               var yr = parseInt(items[0].label);
               if([1997,2009,2021].indexOf(yr) > -1) return ['','⚖ Tax Appeal/Certiorari year'];
