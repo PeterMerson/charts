@@ -443,6 +443,30 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 </div>
  
 <script>
+// ── CUSTOM BAR LABEL PLUGIN ──
+const barYearLabels = {
+  id: 'barYearLabels',
+  afterDatasetsDraw(chart, args, opts) {
+    if(!opts || !opts.enabled) return;
+    if(chart.config.type !== 'bar') return;
+    const { ctx, data, scales: { x, y } } = chart;
+    ctx.save();
+    ctx.font = 'bold 10px IBM Plex Mono, monospace';
+    ctx.fillStyle = '#2e2416';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    data.labels.forEach(function(label, i) {
+      // Only label via first dataset
+      const meta = chart.getDatasetMeta(0);
+      if(!meta || !meta.data[i]) return;
+      const bar = meta.data[i];
+      ctx.fillText(label, bar.x, bar.y - 6);
+    });
+    ctx.restore();
+  }
+};
+Chart.register(barYearLabels);
+ 
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
 // ── INCOME DATA ──
@@ -1108,6 +1132,8 @@ function toggleFS(prefix) {
           if(ds._origPointRadius !== undefined) { ds.pointRadius = ds._origPointRadius; delete ds._origPointRadius; }
           if(ds._origPointHoverRadius !== undefined) { ds.pointHoverRadius = ds._origPointHoverRadius; delete ds._origPointHoverRadius; }
         });
+        // Remove bar year labels on collapse
+        chart.options.plugins.barYearLabels = { enabled: false };
         chart.resize();
         chart.update('none');
       }
@@ -1147,6 +1173,12 @@ function toggleFS(prefix) {
           ds.pointRadius = (ds.pointRadius || 3) * 1.8;
           ds.pointHoverRadius = (ds.pointHoverRadius || 8) * 1.5;
         });
+        // Add year labels on top of bars in fullscreen bar mode
+        if(chart.config.type === 'bar') {
+          chart.options.plugins.barYearLabels = { enabled: true };
+        } else {
+          chart.options.plugins.barYearLabels = { enabled: false };
+        }
         chart.resize();
         chart.update('none');
       }
