@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Repairs & Utilities Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --ink: #1a1208; --ink2: #2e2416;
+  --paper: #f7f3ec; --paper2: #ede8df; --paper3: #e4ddd2;
+  --rule: #c9bfaa; --rule2: #b8ad9a;
+  --gold: #8b6914; --gold-light: #c9a84c;
+  --up: #1a5c2a; --up-bg: #e8f4ea; --up-mid: #c2e0c8;
+  --dn: #8b1a1a; --dn-bg: #f7e8e8; --dn-mid: #e8b8b8;
+  --neutral: #5a5040;
+  --selected: #1a3d5c; --selected-bg: #e8f0f7;
+  --shadow: 0 2px 16px rgba(26,18,8,0.12);
+}
+ 
+body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); color: var(--ink); min-height: 100vh; font-size: 13px; }
+ 
+/* ── MASTHEAD ── */
+.masthead { background: var(--ink); color: var(--paper); padding: 0; border-bottom: 3px solid var(--gold-light); }
+.masthead-inner { max-width: 1400px; margin: 0 auto; padding: 18px 32px 14px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+.masthead h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; letter-spacing: -0.01em; line-height: 1; color: #f7f3ec; }
+.masthead h1 em { color: var(--gold-light); font-style: normal; }
+.masthead-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: #f7f3ec; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+.masthead-kpis { display: flex; gap: 16px; flex-wrap: wrap; }
+.mkpi { text-align: right; padding: 6px 14px; border-left: 1px solid #3a3028; }
+.mkpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: #f7f3ec; margin-bottom: 2px; }
+.mkpi-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+.mkpi-val.up { color: #6fcf82; } .mkpi-val.dn { color: #f47a70; } .mkpi-val.gd { color: var(--gold-light); }
+ 
+.gold-rule-full { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); margin: 0; }
+ 
+/* ── SECTION DIVIDER ── */
+.section-divider {
+  max-width: 1400px; margin: 32px auto 0;
+  padding: 0 32px;
+  display: flex; align-items: center; gap: 0;
+}
+.section-divider-inner {
+  flex: 1; background: var(--ink);
+  border-radius: 6px 6px 0 0;
+  padding: 14px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 3px solid var(--gold-light);
+  flex-wrap: wrap; gap: 12px;
+}
+.section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: #f7f3ec; }
+.section-title em { color: var(--gold-light); font-style: normal; }
+.section-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+.skpi { text-align: right; padding: 4px 12px; border-left: 1px solid #3a3028; }
+.skpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.60rem; text-transform: uppercase; letter-spacing: 0.1em; color: #f7f3ec; margin-bottom: 2px; }
+.skpi-val { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+.skpi-val.up { color: #6fcf82; } .skpi-val.dn { color: #f47a70; } .skpi-val.gd { color: var(--gold-light); }
+ 
+/* ── RULE ── */
+.section-rule { max-width: 1400px; margin: 0 auto; padding: 10px 32px 0; display: flex; align-items: center; gap: 12px; }
+.rule-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); white-space: nowrap; font-weight: 600; }
+.rule-line { flex: 1; height: 1px; background: var(--rule); }
+ 
+/* ── CONTROLS ── */
+.controls-bar { max-width: 1400px; margin: 0 auto; padding: 10px 32px 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neutral); white-space: nowrap; }
+select { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; background: var(--paper2); border: 1px solid var(--rule2); color: var(--ink); padding: 5px 8px; border-radius: 3px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5040'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; padding-right: 22px; }
+select:focus { outline: 2px solid var(--gold-light); outline-offset: 1px; }
+.ctrl-divider { width: 1px; height: 22px; background: var(--rule); margin: 0 4px; }
+.mode-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--rule2); background: var(--paper2); color: var(--neutral); cursor: pointer; transition: all 0.15s; }
+.mode-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.mode-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+ 
+/* ── MAIN LAYOUT ── */
+.main-layout { max-width: 1400px; margin: 0 auto; padding: 0 32px 20px; display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+ 
+/* ── MATRIX TABLE ── */
+.matrix-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); background: #fff; }
+table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; min-width: 600px; }
+.matrix thead tr { background: var(--ink); }
+.matrix thead th { padding: 8px 10px; color: #c9bfaa; font-weight: 500; letter-spacing: 0.06em; text-align: right; white-space: nowrap; border-right: 1px solid #3a3028; font-size: 0.68rem; }
+.matrix thead th.cat-col { text-align: left; min-width: 155px; position: sticky; left: 0; z-index: 2; background: var(--ink); border-right: 2px solid var(--gold); }
+.matrix thead th.yr-col { min-width: 82px; }
+.matrix tbody tr { border-bottom: 1px solid var(--paper3); cursor: pointer; transition: background 0.1s; }
+.matrix tbody tr:hover { background: #f0ebe0 !important; }
+.matrix tbody tr.selected { background: var(--selected-bg) !important; outline: 2px solid var(--selected); outline-offset: -2px; }
+.matrix tbody tr.total-row { background: var(--ink) !important; cursor: default; border-top: 2px solid var(--gold); }
+.matrix tbody tr.total-row:hover { background: var(--ink2) !important; }
+.matrix td { padding: 7px 10px; text-align: right; border-right: 1px solid var(--paper3); white-space: nowrap; vertical-align: middle; line-height: 1.2; }
+.matrix td.cat-col { text-align: left; font-family: 'Source Serif 4', serif; font-size: 0.76rem; font-weight: 400; position: sticky; left: 0; z-index: 1; background: inherit; border-right: 2px solid var(--rule2); color: var(--ink); }
+.matrix tbody tr.selected td.cat-col { background: var(--selected-bg); }
+.matrix tbody tr.total-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: var(--gold-light); background: var(--ink); }
+.matrix tbody tr.total-row td { color: #f7f3ec; border-right-color: #3a3028; }
+.cell-val { font-weight: 500; color: var(--ink2); }
+.cell-chg { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 4px; border-radius: 2px; margin-left: 3px; vertical-align: middle; letter-spacing: 0.02em; }
+.chg-up { background: var(--up-bg); color: var(--up); }
+.chg-dn { background: var(--dn-bg); color: var(--dn); }
+.chg-neu { background: var(--paper3); color: var(--neutral); }
+.heat-up-3 { background: #1a5c2a20; } .heat-up-2 { background: #1a5c2a12; } .heat-up-1 { background: #1a5c2a07; }
+.heat-dn-3 { background: #8b1a1a1a; } .heat-dn-2 { background: #8b1a1a10; } .heat-dn-1 { background: #8b1a1a06; }
+.total-pos { color: #6fcf82 !important; font-weight: 700; } .total-neg { color: #f47a70 !important; font-weight: 700; }
+ 
+/* ── RIGHT PANEL ── */
+.right-panel { position: sticky; top: 20px; }
+.panel-card { background: #fff; border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
+.panel-header { background: var(--ink); padding: 12px 16px; border-bottom: 2px solid var(--gold); }
+.panel-cat { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--paper); margin-bottom: 2px; }
+.panel-range { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9a8f7e; }
+.panel-stats { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-bottom: 1px solid var(--paper3); background: var(--paper2); }
+.pstat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--neutral); margin-bottom: 2px; }
+.pstat-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+.pstat-val.up { color: var(--up); } .pstat-val.dn { color: var(--dn); }
+.chart-panel { padding: 14px 16px 10px; }
+.panel-empty { padding: 48px 20px; text-align: center; color: var(--neutral); font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; line-height: 1.7; }
+.panel-empty .arrow { font-size: 1.4rem; display: block; margin-bottom: 8px; color: var(--rule2); }
+ 
+/* ── LEGEND ── */
+.legend-bar { max-width: 1400px; margin: 0 auto; padding: 6px 32px 0; display: flex; align-items: center; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--neutral); flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 5px; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+ 
+/* ── FOOTER ── */
+.page-footer { max-width: 1400px; margin: 0 auto; padding: 16px 32px; border-top: 1px solid var(--rule); font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--neutral); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+ 
+ 
+ 
+ 
+.claude-tag { display: flex; align-items: center; gap: 5px; }
+.claude-dot { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg,#c77dff,#7b5ea7); box-shadow: 0 0 4px #c77dff66; }
+ 
+/* Note badge for expense section */
+.info-note { max-width: 1400px; margin: 0 auto; padding: 6px 32px 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #7a5000; }
+.info-note span { background: #fff8e7; border: 1px solid #e6a817; border-radius: 4px; padding: 3px 10px; }
+.matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
+.matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
+.matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.compare-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a3a; }
+.matrix tbody tr.net-row:hover { background: #1e361e !important; }
+.matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
+.matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
+.net-pos { color: #6fcf82 !important; font-weight: 700; }
+.net-neg { color: #f47a70 !important; font-weight: 700; }
+ 
+/* ── EXPAND BUTTON ── */
+.expand-btn {
+  position: absolute; bottom: 6px; right: 6px;
+  width: 24px; height: 24px;
+  background: var(--paper2); border: 1px solid var(--rule2);
+  border-radius: 4px; cursor: pointer;
+  font-size: 12px; color: var(--neutral); opacity: 0.6;
+  transition: all 0.15s; z-index: 20;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.expand-btn:hover { opacity:1; background:var(--ink); color:var(--gold-light); border-color:var(--gold); }
+ 
+/* ── FULLSCREEN PANEL ── */
+.panel-card.fullscreen {
+  position: fixed !important;
+  top: 30px !important; left: 30px !important;
+  right: 30px !important; bottom: 30px !important;
+  width: auto !important; height: auto !important;
+  z-index: 9999 !important;
+  box-shadow: 0 0 0 9999px rgba(26,18,8,0.82) !important;
+  border-radius: 8px !important;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel-card.fullscreen .chart-panel {
+  flex: 1 !important; display: block !important;
+  padding: 16px 20px !important;
+  min-height: 0;
+}
+.panel-card.fullscreen canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+.panel-card.fullscreen .expand-btn { font-size:14px; width:30px; height:30px; bottom:10px; right:10px; }
+ 
+/* ── NET ROW ── */
+.matrix tbody tr.principal-row { background: rgba(201,168,76,0.08) !important; border-top: 1px dashed var(--gold); cursor: default; }
+.matrix tbody tr.principal-row:hover { background: rgba(201,168,76,0.14) !important; }
+.matrix tbody tr.principal-row td.cat-col { color: var(--gold); font-style: italic; }
+.matrix tbody tr.principal-row td { color: var(--ink2); }
+.net-pos { color: #6fcf82 !important; font-weight: 700; }
+.net-neg { color: #f47a70 !important; font-weight: 700; }
+.matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
+.matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
+.matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.compare-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a3a; }
+.matrix tbody tr.net-row:hover { background: #1e361e !important; }
+.matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
+.matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
+ 
+</style>
+<style>
+/* Extra styles for this file */
+.matrix tbody tr.total-row { cursor: pointer; }
+</style>
+</head>
+<body>
+ 
+<!-- ══════════════════════════════════════════ -->
+<!--  REPAIRS & MAINTENANCE SECTION            -->
+<!-- ══════════════════════════════════════════ -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <h1>Riveredge <em>Repairs &amp; Maintenance Matrix</em></h1>
+      <div class="masthead-meta">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+    </div>
+    <div class="masthead-kpis">
+      <div class="mkpi"><div class="mkpi-label">2024 Total R&amp;M</div><div class="mkpi-val gd">$500,543</div></div>
+      <div class="mkpi"><div class="mkpi-label">vs 2023</div><div class="mkpi-val dn">+115.0%</div></div>
+      <div class="mkpi"><div class="mkpi-label">Incl. Fire &amp; Water</div><div class="mkpi-val dn">$228,074</div></div>
+      <div class="mkpi"><div class="mkpi-label">Adj. (ex. Fire/Water)</div><div class="mkpi-val gd">$272,469</div></div>
+    </div>
+  </div>
+</div>
+ 
+<div class="info-note"><span>⚠ 2024 Fire &amp; Water Damages includes $228,074 one-time event &nbsp;·&nbsp; 2022 figure includes $25,986 adjustment</span></div>
+ 
+<div class="section-rule"><span class="rule-label">Repairs &amp; Maintenance Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
+ 
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mode</span>
+    <button class="mode-btn active" id="rep-btn-range" onclick="setMode2('rep','range')">Year Range</button>
+    <button class="mode-btn" id="rep-btn-single" onclick="setMode2('rep','single')">Single Year</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group" id="rep-range-controls">
+    <span class="ctrl-label">From</span>
+    <select id="rep-sel-from" onchange="render2('rep')"></select>
+    <span class="ctrl-label">To</span>
+    <select id="rep-sel-to" onchange="render2('rep')"></select>
+  </div>
+  <div class="ctrl-group" id="rep-single-controls" style="display:none;">
+    <span class="ctrl-label">Year</span>
+    <select id="rep-sel-single" onchange="render2('rep')"></select>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">% Change</span>
+    <button class="mode-btn active" id="rep-btn-show-chg" onclick="toggleChg2('rep')">Visible</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="rep-btn-show-dollar" onclick="toggleDollar2('rep')">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="rep-btn-line" onclick="setChartType2('rep','line')">Line</button>
+    <button class="mode-btn" id="rep-btn-bar" onclick="setChartType2('rep','bar')">Bar</button>
+  </div>
+</div>
+ 
+<div class="legend-bar">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--paper3);border:1px solid var(--rule)"></div> No change / first year</div>
+  <span style="color:var(--rule2)">|</span>
+  <span>Darker shading = larger % change &nbsp;·&nbsp; Click any row to see trend chart →</span>
+</div>
+ 
+<div class="main-layout">
+  <div class="matrix-wrap"><table class="matrix"><thead id="rep-matrix-head"></thead><tbody id="rep-matrix-body"></tbody></table></div>
+  <div class="right-panel">
+    <div class="panel-card" id="rep-panel-card">
+      <div class="panel-header">
+        <div class="panel-cat" id="rep-panel-cat">Select a Row</div>
+        <div class="panel-range" id="rep-panel-range">Click any category in the matrix</div>
+      </div>
+      <div id="rep-panel-stats-wrap" class="panel-stats" style="display:none;">
+        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="rep-ps-peak">—</div></div>
+        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="rep-ps-peak-val">—</div></div>
+        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="rep-ps-latest">—</div></div>
+        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="rep-ps-chg">—</div></div>
+      </div>
+      <div id="rep-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any R&amp;M category<br>to see its trend chart</div>
+      <div class="chart-panel" id="rep-chart-panel" style="display:none;position:relative;">
+        <canvas id="rep-trend-chart" height="180"></canvas>
+        <button class="expand-btn" id="rep-expand-btn" onclick="toggleFS2('rep')" title="Expand chart">⤢</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ══════════════════════════════════════════ -->
+<!--  UTILITIES SECTION                        -->
+<!-- ══════════════════════════════════════════ -->
+<div class="section-divider">
+  <div class="section-divider-inner">
+    <div>
+      <div class="section-title">Riveredge <em>Utilities Matrix</em></div>
+      <div class="masthead-meta" style="margin-top:4px;">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+    </div>
+    <div class="section-kpis">
+      <div class="skpi"><div class="skpi-label">2024 Total Utilities</div><div class="skpi-val dn">$328,592</div></div>
+      <div class="skpi"><div class="skpi-label">vs 2023</div><div class="skpi-val dn">+13.0%</div></div>
+      <div class="skpi"><div class="skpi-label">Fuel Oil</div><div class="skpi-val gd">$221,019</div></div>
+      <div class="skpi"><div class="skpi-label">Electric &amp; Gas</div><div class="skpi-val gd">$107,573</div></div>
+    </div>
+  </div>
+</div>
+ 
+<div class="section-rule"><span class="rule-label">Utilities Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
+ 
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mode</span>
+    <button class="mode-btn active" id="utl-btn-range" onclick="setMode2('utl','range')">Year Range</button>
+    <button class="mode-btn" id="utl-btn-single" onclick="setMode2('utl','single')">Single Year</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group" id="utl-range-controls">
+    <span class="ctrl-label">From</span>
+    <select id="utl-sel-from" onchange="render2('utl')"></select>
+    <span class="ctrl-label">To</span>
+    <select id="utl-sel-to" onchange="render2('utl')"></select>
+  </div>
+  <div class="ctrl-group" id="utl-single-controls" style="display:none;">
+    <span class="ctrl-label">Year</span>
+    <select id="utl-sel-single" onchange="render2('utl')"></select>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">% Change</span>
+    <button class="mode-btn active" id="utl-btn-show-chg" onclick="toggleChg2('utl')">Visible</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="utl-btn-show-dollar" onclick="toggleDollar2('utl')">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="utl-btn-line" onclick="setChartType2('utl','line')">Line</button>
+    <button class="mode-btn" id="utl-btn-bar" onclick="setChartType2('utl','bar')">Bar</button>
+  </div>
+</div>
+ 
+<div class="legend-bar">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--paper3);border:1px solid var(--rule)"></div> No change / first year</div>
+  <span style="color:var(--rule2)">|</span>
+  <span>Click any row to see trend chart →</span>
+</div>
+ 
+<div class="main-layout">
+  <div class="matrix-wrap"><table class="matrix"><thead id="utl-matrix-head"></thead><tbody id="utl-matrix-body"></tbody></table></div>
+  <div class="right-panel">
+    <div class="panel-card" id="utl-panel-card">
+      <div class="panel-header">
+        <div class="panel-cat" id="utl-panel-cat">Select a Row</div>
+        <div class="panel-range" id="utl-panel-range">Click any utility category</div>
+      </div>
+      <div id="utl-panel-stats-wrap" class="panel-stats" style="display:none;">
+        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="utl-ps-peak">—</div></div>
+        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="utl-ps-peak-val">—</div></div>
+        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="utl-ps-latest">—</div></div>
+        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="utl-ps-chg">—</div></div>
+      </div>
+      <div id="utl-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any utility category<br>to see its trend chart</div>
+      <div class="chart-panel" id="utl-chart-panel" style="display:none;position:relative;">
+        <canvas id="utl-trend-chart" height="180"></canvas>
+        <button class="expand-btn" id="utl-expand-btn" onclick="toggleFS2('utl')" title="Expand chart">⤢</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<div class="gold-rule-full"></div>
+<div class="page-footer">
+  <span>Riveredge Repairs &amp; Maintenance / Utilities Matrix &nbsp;·&nbsp; Source: Audited Annual Financial Statements 1990–2024</span>
+  <div class="claude-tag"><div class="claude-dot"></div><span>Generated by Claude AI (Anthropic) &nbsp;·&nbsp; claude.ai</span></div>
+</div>
+ 
+<!-- FULLSCREEN BACKDROP -->
+<div id="fs-backdrop2" style="display:none;position:fixed;inset:0;background:rgba(26,18,8,0.88);z-index:9998;"></div>
+ 
+<script>
+const ALL_YEARS2 = [1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+ 
+const REPAIRS = {
+  "Pool & Supplies": [10267,15168,13934,3765,7516,7016,11802,6780,7221,4328,10687,1502,8153,9401,8132,8715,6435,19245,28529,33726,32762,33193,30650,29360,33417,30699,30099,34983,33768,35923,1222,55872,39654,49524,56840],
+  "Landscaping": [21749,21524,20374,4782,28421,14981,18344,18539,19328,16489,20827,19237,6768,14256,43063,34464,28933,29930,30437,17151,37204,16302,3336,9384,38007,56065,54632,36647,36722,21600,33316,27159,36504,38814,68142],
+  "Janitorial Supplies": [18764,17370,23947,15916,17693,9307,7851,6886,7791,9632,6359,21022,31750,19247,29572,35899,20187,17303,26918,29638,35084,29159,28795,39128,33700,22455,18247,19746,27202,33528,29807,25665,15934,19113,21563],
+  "Misc. Repairs & Contracting": [20668,29632,51289,41906,55345,48369,36345,34260,22114,38762,63021,174420,45496,53949,58980,32283,44004,38666,30326,55354,21481,16406,4069,3263,18690,22395,37367,42369,25776,21941,33391,27064,14568,32307,16315],
+  "Plumbing & Heating/Boiler": [11312,2057,3515,13826,928,3659,5130,6751,6277,14411,27364,16036,9381,18330,16256,8997,10487,3608,17528,18984,13976,21803,0,4520,31577,24308,10654,11312,4749,4600,4753,13134,11849,18375,56666],
+  "Water Damage & Mold": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48300,85787,-13010,0,0,0,0,0,13009,2850,0],
+  "Elevator": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9827,9871,8869,17856,16305,20155,13446,17102,9664,9664,9664,9628,9145,10125,20317,17487,13404],
+  "Painting & Plastering": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,36000,54045,0,0,0,0,0,0,0,0,22294,37815,17850,5600],
+  "Doors, Locks & Windows": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3820,3019,12090,3255,14329,13048,6488,0,0,0,0,0,0,12423,10990,15303,10906],
+  "Laundry Room": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5798,4609,5977,3477,2302,0,1485,0,0,6279,7787,5529,0,7025,6208,7447,20031],
+  "Exterminating": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2949,2883,1235,5236,0,2926,3170,2929,2417,2940,2655,6397,3087,3087,3093,3592,3002],
+  "Electric Repairs": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2013,5029,4348,5542,0,0,0,0,0,5889,0,0,0,0,0,0],
+  "Apartment Repairs": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8450,0,0,0,0,0,0,0,0,0,0,0],
+  "Storm Damage & Cleanup": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,856,0,0,0,0,0,0,0,0,0,22367,0,2200,0],
+  "Fencing": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2200,0,1000,0,0,0,0,0,0,0,0,15754,6500,0],
+  "Exterior": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1500,0],
+  "Fire & Water Damages": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,228074],
+  "Roadway Repairs": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20000,4000,0,0,0],
+  "Miscellaneous A": [0,0,0,13582,0,0,0,0,0,0,0,0,5604,26202,0,0,0,0,0,1714,854,298,1279,910,339,1640,550,0,0,0,0,0,0,0,0],
+  "Miscellaneous B": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2139,0,0,1157,0,0,0,0,0,0,0,0,0,0],
+};
+const UTILITIES = {
+  "Fuel Oil": [58581,42490,48032,42259,46581,43457,60137,50178,35895,38440,97679,73822,72694,109272,106897,157170,147144,189501,234216,132461,183679,196876,237832,218702,282575,149523,118789,145558,163392,183863,117071,178490,292115,243083,267710],
+  "Electric & Gas": [45981,45643,42713,50116,44424,45494,46362,42075,45344,51137,50524,56474,49645,58998,64154,74830,64351,71362,68239,58662,67891,51174,53638,53044,54842,50136,56403,54268,52569,48015,46191,53823,52882,47643,60882],
+};
+ 
+const REP_CATS = ['Pool & Supplies', 'Landscaping', 'Janitorial Supplies', 'Misc. Repairs & Contracting', 'Plumbing & Heating/Boiler', 'Water Damage & Mold', 'Elevator', 'Painting & Plastering', 'Doors, Locks & Windows', 'Laundry Room', 'Exterminating', 'Electric Repairs', 'Apartment Repairs', 'Storm Damage & Cleanup', 'Fencing', 'Exterior', 'Fire & Water Damages', 'Roadway Repairs', 'Miscellaneous A', 'Miscellaneous B'];
+const UTL_CATS = ['Fuel Oil', 'Electric & Gas'];
+const REP_COLORS = ['#1D6FA4', '#2196F3', '#8E24AA', '#F4511E', '#43A047', '#00ACC1', '#FF9800', '#E63946', '#6D4C41', '#546E7A', '#7CB342', '#d29922', '#bc8cff', '#f778ba', '#39d353', '#79c0ff', '#ffa657', '#58a6ff', '#f87171', '#a78bfa'];
+const UTL_COLORS = ['#FF6B35','#2196F3'];
+ 
+const state2 = {
+  rep: { mode:'range', showChg:true, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false },
+  utl: { mode:'range', showChg:true, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false }
+};
+ 
+// ── INIT SELECTS ──
+function initSelects2(prefix) {
+  ['from','to','single'].forEach(id => {
+    const el = document.getElementById(prefix+'-sel-'+id);
+    ALL_YEARS2.forEach(y => {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y; el.appendChild(o);
+    });
+  });
+  document.getElementById(prefix+'-sel-from').value = 2006;
+  document.getElementById(prefix+'-sel-to').value = 2024;
+  document.getElementById(prefix+'-sel-single').value = 2024;
+}
+ 
+function setMode2(prefix, m) {
+  state2[prefix].mode = m;
+  document.getElementById(prefix+'-btn-range').classList.toggle('active', m==='range');
+  document.getElementById(prefix+'-btn-single').classList.toggle('active', m==='single');
+  document.getElementById(prefix+'-range-controls').style.display = m==='range'?'flex':'none';
+  document.getElementById(prefix+'-single-controls').style.display = m==='single'?'flex':'none';
+  render2(prefix);
+}
+ 
+function toggleChg2(prefix) {
+  state2[prefix].showChg = !state2[prefix].showChg;
+  const btn = document.getElementById(prefix+'-btn-show-chg');
+  btn.textContent = state2[prefix].showChg ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', state2[prefix].showChg);
+  render2(prefix);
+}
+ 
+function toggleDollar2(prefix) {
+  state2[prefix].showDollar = !state2[prefix].showDollar;
+  const btn = document.getElementById(prefix+'-btn-show-dollar');
+  btn.textContent = state2[prefix].showDollar ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', state2[prefix].showDollar);
+  render2(prefix);
+}
+ 
+function setChartType2(prefix, type) {
+  state2[prefix].chartType = type;
+  document.getElementById(prefix+'-btn-line').classList.toggle('active', type==='line');
+  document.getElementById(prefix+'-btn-bar').classList.toggle('active', type==='bar');
+  const s = state2[prefix];
+  const years = getYears2(prefix);
+  if(s.selectedCat) selectCat2(prefix, s.selectedCat, years);
+  else if(s.totalSelected) selectTotal2(prefix, years);
+}
+ 
+function getYears2(prefix) {
+  const s = state2[prefix];
+  if(s.mode === 'single') {
+    const y = parseInt(document.getElementById(prefix+'-sel-single').value);
+    const idx = ALL_YEARS2.indexOf(y);
+    return ALL_YEARS2.slice(Math.max(0,idx-4), idx+1);
+  } else {
+    const from = parseInt(document.getElementById(prefix+'-sel-from').value);
+    const to   = parseInt(document.getElementById(prefix+'-sel-to').value);
+    const f = Math.min(from,to), t = Math.max(from,to);
+    return ALL_YEARS2.filter(y => y>=f && y<=t);
+  }
+}
+ 
+function fmtFull2(v) { return '$'+Math.abs(v).toLocaleString('en-US'); }
+function pct2(a,b) { if(!a) return null; return ((b-a)/a*100); }
+function heatClass2(p, isUp) {
+  const abs = Math.abs(p);
+  if(isUp) return abs>20?'heat-up-3':abs>8?'heat-up-2':'heat-up-1';
+  else     return abs>20?'heat-dn-3':abs>8?'heat-dn-2':'heat-dn-1';
+}
+ 
+function render2(prefix) {
+  const years = getYears2(prefix);
+  const data  = prefix==='rep' ? REPAIRS : UTILITIES;
+  const cats  = prefix==='rep' ? REP_CATS : UTL_CATS;
+  const s     = state2[prefix];
+ 
+  const head = document.getElementById(prefix+'-matrix-head');
+  const body = document.getElementById(prefix+'-matrix-body');
+  head.innerHTML=''; body.innerHTML='';
+ 
+  const hr = document.createElement('tr');
+  const thc = document.createElement('th');
+  thc.className='cat-col';
+  thc.textContent = prefix==='rep' ? 'R&M Category' : 'Utility Category';
+  hr.appendChild(thc);
+  years.forEach(y => {
+    const th = document.createElement('th');
+    th.className='yr-col'; th.textContent=y; hr.appendChild(th);
+  });
+  head.appendChild(hr);
+ 
+  const totals = {};
+  years.forEach(y => totals[y]=0);
+ 
+  cats.forEach(cat => {
+    if(!data[cat]) return;
+    const tr = document.createElement('tr');
+    if(s.selectedCat===cat) tr.classList.add('selected');
+    tr.onclick = () => selectCat2(prefix, cat, years);
+    const td0 = document.createElement('td');
+    td0.className='cat-col'; td0.textContent=cat; tr.appendChild(td0);
+    years.forEach((y,yi) => {
+      const idx = ALL_YEARS2.indexOf(y);
+      const val = data[cat][idx] || 0;
+      totals[y] += val;
+      const prevIdx = yi>0 ? ALL_YEARS2.indexOf(years[yi-1]) : -1;
+      const prevVal = prevIdx>=0 ? (data[cat][prevIdx]||0) : null;
+      const p = prevVal!==null && prevVal!==0 ? pct2(prevVal,val) : null;
+      const isUp = p!==null && p>=0;
+      const td = document.createElement('td');
+      if(p!==null) td.className = heatClass2(p, isUp);
+      const vSpan = document.createElement('span');
+      vSpan.className='cell-val';
+      vSpan.textContent = val>0 ? fmtFull2(val) : '—';
+      td.appendChild(vSpan);
+      if(p!==null && s.showChg) {
+        const pSpan = document.createElement('span');
+        pSpan.className='cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
+        pSpan.textContent=(isUp?'+':'')+p.toFixed(1)+'%'; td.appendChild(pSpan);
+      }
+      if(prevVal!==null && s.showDollar) {
+        const diff = val - prevVal;
+        const dSpan = document.createElement('span');
+        dSpan.className='cell-chg '+(diff>=0?'chg-up':'chg-dn');
+        dSpan.textContent=(diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        td.appendChild(dSpan);
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+ 
+  // TOTAL ROW
+  const ttr = document.createElement('tr');
+  ttr.classList.add('total-row');
+  ttr.style.cursor='pointer';
+  ttr.title='Click to graph total';
+  const ttd0 = document.createElement('td');
+  ttd0.className='cat-col';
+  ttd0.textContent = (prefix==='rep'?'Total R&M':'Total Utilities')+' ▶';
+  ttr.appendChild(ttd0);
+  let prevTotal=null;
+  const totalsByYear={};
+  years.forEach(y => {
+    const val=totals[y];
+    totalsByYear[y]=val;
+    const p=prevTotal!==null?pct2(prevTotal,val):null;
+    const isUp=p!==null&&p>=0;
+    const ttd=document.createElement('td');
+    const vSpan=document.createElement('span');
+    vSpan.className=p===null?'':(isUp?'total-pos':'total-neg');
+    vSpan.textContent=fmtFull2(val); ttd.appendChild(vSpan);
+    if(p!==null&&s.showChg){
+      const pSpan=document.createElement('span');
+      pSpan.className='cell-chg '+(isUp?'chg-up':'chg-dn');
+      pSpan.textContent=(isUp?'+':'')+p.toFixed(1)+'%'; ttd.appendChild(pSpan);
+    }
+    if(p!==null&&s.showDollar){
+      const diff=val-prevTotal;
+      const dSpan=document.createElement('span');
+      dSpan.className='cell-chg '+(diff>=0?'chg-up':'chg-dn');
+      dSpan.textContent=(diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+      ttd.appendChild(dSpan);
+    }
+    ttr.appendChild(ttd);
+    prevTotal=val;
+  });
+  window['_'+prefix+'TotalsByYear2']=totalsByYear;
+  window['_'+prefix+'TotalYears2']=years;
+  ttr.onclick=()=>{state2[prefix].totalSelected=true;state2[prefix].selectedCat=null;selectTotal2(prefix,years,totalsByYear);};
+  body.appendChild(ttr);
+ 
+  if(s.totalSelected) selectTotal2(prefix,years,totalsByYear);
+  else if(s.selectedCat) selectCat2(prefix,s.selectedCat,years);
+}
+ 
+function selectCat2(prefix, cat, years) {
+  state2[prefix].selectedCat=cat;
+  state2[prefix].totalSelected=false;
+  const data=prefix==='rep'?REPAIRS:UTILITIES;
+  const cats=prefix==='rep'?REP_CATS:UTL_CATS;
+  const colors=prefix==='rep'?REP_COLORS:UTL_COLORS;
+ 
+  document.querySelectorAll('#'+prefix+'-matrix-body tr').forEach(tr=>{
+    if(!tr.classList.contains('total-row')) {
+      const cc=tr.querySelector('td.cat-col');
+      tr.classList.toggle('selected', cc&&cc.textContent===cat);
+    }
+  });
+ 
+  document.getElementById(prefix+'-panel-cat').textContent=cat;
+  document.getElementById(prefix+'-panel-range').textContent=years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+ 
+  const vals=years.map(y=>data[cat][ALL_YEARS2.indexOf(y)]||0);
+  const nonZero=vals.filter(v=>v>0);
+  const peak=nonZero.length?Math.max(...nonZero):0;
+  const peakYr=peak>0?years[vals.indexOf(peak)]:'-';
+  const latest=vals[vals.length-1];
+  const firstNZ=vals.find(v=>v>0)||0;
+  const chgPct=firstNZ>0?((latest-firstNZ)/firstNZ*100):0;
+ 
+  document.getElementById(prefix+'-ps-peak').textContent=peakYr;
+  document.getElementById(prefix+'-ps-peak-val').textContent=fmtFull2(peak);
+  document.getElementById(prefix+'-ps-latest').textContent=fmtFull2(latest);
+  const chgEl=document.getElementById(prefix+'-ps-chg');
+  chgEl.textContent=(chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
+  chgEl.className='pstat-val '+(chgPct>=0?'up':'dn');
+ 
+  document.getElementById(prefix+'-panel-stats-wrap').style.display='grid';
+  document.getElementById(prefix+'-panel-empty').style.display='none';
+  document.getElementById(prefix+'-chart-panel').style.display='block';
+ 
+  if(state2[prefix].trendChart){state2[prefix].trendChart.destroy();state2[prefix].trendChart=null;}
+  const ctx=document.getElementById(prefix+'-trend-chart').getContext('2d');
+  const catIdx=cats.indexOf(cat);
+  const color=colors[catIdx%colors.length];
+  const isBar=state2[prefix].chartType==='bar';
+  const grad=ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
+ 
+  state2[prefix].trendChart=new Chart(ctx,{
+    type:isBar?'bar':'line',
+    data:{labels:years,datasets:[{
+      data:vals,borderColor:color,
+      backgroundColor:isBar?color+'cc':grad,
+      borderWidth:isBar?1:5,borderRadius:isBar?3:0,
+      pointRadius:isBar?0:(years.length>15?4:6),pointHoverRadius:10,
+      pointBackgroundColor:color,pointBorderColor:'#fff',pointBorderWidth:2.5,
+      fill:!isBar,tension:isBar?0:0.25,label:cat
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+        callbacks:{title:items=>items[0].label,label:item=>' '+fmtFull2(item.parsed.y)}
+      }},
+      scales:{
+        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
+        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
+      }
+    }
+  });
+}
+ 
+function selectTotal2(prefix, years, totalsByYear) {
+  state2[prefix].selectedCat=null;
+  state2[prefix].totalSelected=true;
+  if(!totalsByYear) totalsByYear=window['_'+prefix+'TotalsByYear2'];
+  if(!years) years=window['_'+prefix+'TotalYears2'];
+  const label=prefix==='rep'?'Total R&M':'Total Utilities';
+  const color=prefix==='rep'?'#d29922':'#2196F3';
+  const vals=years.map(y=>totalsByYear[y]||0);
+  const peak=Math.max(...vals);
+  const peakYr=years[vals.indexOf(peak)];
+  const latest=vals[vals.length-1];
+  const first=vals[0];
+  const chgPct=first>0?((latest-first)/first*100):0;
+ 
+  document.getElementById(prefix+'-panel-cat').textContent=label;
+  document.getElementById(prefix+'-panel-range').textContent=years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+  document.getElementById(prefix+'-ps-peak').textContent=peakYr;
+  document.getElementById(prefix+'-ps-peak-val').textContent=fmtFull2(peak);
+  document.getElementById(prefix+'-ps-latest').textContent=fmtFull2(latest);
+  const chgEl=document.getElementById(prefix+'-ps-chg');
+  chgEl.textContent=(chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
+  chgEl.className='pstat-val '+(chgPct>=0?'up':'dn');
+  document.getElementById(prefix+'-panel-stats-wrap').style.display='grid';
+  document.getElementById(prefix+'-panel-empty').style.display='none';
+  document.getElementById(prefix+'-chart-panel').style.display='block';
+ 
+  if(state2[prefix].trendChart){state2[prefix].trendChart.destroy();state2[prefix].trendChart=null;}
+  const ctx=document.getElementById(prefix+'-trend-chart').getContext('2d');
+  const isBar=state2[prefix].chartType==='bar';
+  const grad=ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
+ 
+  state2[prefix].trendChart=new Chart(ctx,{
+    type:isBar?'bar':'line',
+    data:{labels:years,datasets:[{
+      data:vals,borderColor:color,
+      backgroundColor:isBar?color+'cc':grad,
+      borderWidth:isBar?1:5,borderRadius:isBar?3:0,
+      pointRadius:isBar?0:(years.length>15?4:6),pointHoverRadius:10,
+      pointBackgroundColor:color,pointBorderColor:'#fff',pointBorderWidth:2.5,
+      fill:!isBar,tension:isBar?0:0.25,label:label
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+        callbacks:{title:items=>items[0].label,label:item=>' '+fmtFull2(item.parsed.y)}
+      }},
+      scales:{
+        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
+        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
+      }
+    }
+  });
+}
+ 
+// ── EXPAND / COLLAPSE ──
+function toggleFS2(prefix) {
+  const panelId=prefix+'-panel-card';
+  const panel=document.getElementById(panelId);
+  if(!panel) return;
+  const chartPanel=document.getElementById(prefix+'-chart-panel');
+  if(!chartPanel||chartPanel.style.display==='none') return;
+  const btn=document.getElementById(prefix+'-expand-btn');
+  const chart=state2[prefix].trendChart;
+  const backdrop=document.getElementById('fs-backdrop2');
+  const canvas=document.getElementById(prefix+'-trend-chart');
+ 
+  if(panel._isFullscreen) {
+    panel._isFullscreen=false;
+    if(panel._origParent) panel._origParent.appendChild(panel);
+    panel.removeAttribute('style');
+    chartPanel.style.flex='';chartPanel.style.height='200px';
+    if(canvas){canvas.setAttribute('height','180');canvas.style.height='';}
+    document.body.style.overflow='';
+    if(backdrop) backdrop.style.display='none';
+    if(btn) btn.textContent='⤢';
+    setTimeout(()=>{
+      if(chart){
+        chart.data.datasets.forEach(ds=>{
+          if(ds._origBW!==undefined){ds.borderWidth=ds._origBW;delete ds._origBW;}
+          if(ds._origPR!==undefined){ds.pointRadius=ds._origPR;delete ds._origPR;}
+        });
+        chart.options.plugins.barYearLabels={enabled:false};
+        chart.resize();chart.update('none');
+      }
+    },80);
+  } else {
+    panel._isFullscreen=true;
+    panel._origParent=panel.parentNode;
+    document.body.appendChild(panel);
+    if(backdrop) backdrop.style.display='block';
+    panel.style.position='fixed';panel.style.top='30px';panel.style.left='30px';
+    panel.style.right='30px';panel.style.bottom='30px';
+    panel.style.width='auto';panel.style.height='auto';panel.style.zIndex='9999';
+    panel.style.borderRadius='8px';panel.style.display='flex';
+    panel.style.flexDirection='column';panel.style.overflow='hidden';
+    chartPanel.style.flex='1';chartPanel.style.height='auto';
+    if(canvas){canvas.removeAttribute('height');canvas.style.height='100%';}
+    document.body.style.overflow='hidden';
+    if(btn) btn.textContent='✕';
+    setTimeout(()=>{
+      if(chart){
+        chart.data.datasets.forEach(ds=>{
+          if(ds._origBW===undefined) ds._origBW=ds.borderWidth;
+          if(ds._origPR===undefined) ds._origPR=ds.pointRadius;
+          ds.borderWidth=(ds.borderWidth||2)*2.2;
+          ds.pointRadius=(ds.pointRadius||3)*1.8;
+        });
+        if(chart.config.type==='bar') chart.options.plugins.barYearLabels={enabled:true};
+        chart.resize();chart.update('none');
+      }
+    },80);
+  }
+}
+ 
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') {
+    ['rep','utl'].forEach(p=>{
+      const panel=document.getElementById(p+'-panel-card');
+      if(panel&&panel._isFullscreen) toggleFS2(p);
+    });
+  }
+});
+ 
+// ── CUSTOM BAR LABEL PLUGIN (reuse) ──
+const barYearLabels2 = {
+  id:'barYearLabels',
+  afterDatasetsDraw(chart,args,opts){
+    if(!opts||!opts.enabled) return;
+    if(chart.config.type!=='bar') return;
+    const {ctx,data,scales:{x,y}} = chart;
+    if(!x||!y) return;
+    ctx.save();
+    ctx.font='bold 10px IBM Plex Mono,monospace';
+    ctx.fillStyle='#2e2416';ctx.textAlign='center';ctx.textBaseline='bottom';
+    data.labels.forEach((label,i)=>{
+      const meta=chart.getDatasetMeta(0);
+      if(!meta||!meta.data[i]) return;
+      const bar=meta.data[i];
+      ctx.fillText(label,bar.x,bar.y-6);
+    });
+    ctx.restore();
+  }
+};
+Chart.register(barYearLabels2);
+ 
+// ── BOOT ──
+initSelects2('rep');
+initSelects2('utl');
+render2('rep');
+render2('utl');
+</script>
+</body>
+</html>
