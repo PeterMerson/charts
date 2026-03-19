@@ -722,7 +722,10 @@ function render(prefix) {
       const val = isMPI ? baseVal + (MORTGAGE_PRINCIPAL[idx] || 0) : baseVal;
       totals[y] += val;
       const prevIdx = yi>0 ? ALL_YEARS.indexOf(years[yi-1]) : -1;
-      const prevVal = prevIdx>=0 ? data[cat][prevIdx] : null;
+      // For MPI row, previous value must also include principal for correct % and $ change
+      const prevVal = prevIdx>=0
+        ? (isMPI ? data[cat][prevIdx] + (MORTGAGE_PRINCIPAL[prevIdx] || 0) : data[cat][prevIdx])
+        : null;
       const p = prevVal!==null ? pct(prevVal,val) : null;
       const isUp = p!==null && p>=0;
       const td = document.createElement('td');
