@@ -252,7 +252,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
-    <button class="mode-btn active" id="rep-btn-show-chg" onclick="toggleChg2('rep')">Visible</button>
+    <button class="mode-btn" id="rep-btn-show-chg" onclick="toggleChg2('rep')">Hidden</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -338,7 +338,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
-    <button class="mode-btn active" id="utl-btn-show-chg" onclick="toggleChg2('utl')">Visible</button>
+    <button class="mode-btn" id="utl-btn-show-chg" onclick="toggleChg2('utl')">Hidden</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -417,7 +417,6 @@ const REPAIRS = {
   "Roadway Repairs": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20000,4000,0,0,0],
   "Miscellaneous A": [0,0,0,13582,0,0,0,0,0,0,0,0,5604,26202,0,0,0,0,0,1714,854,298,1279,910,339,1640,550,0,0,0,0,0,0,0,0],
   "Miscellaneous B": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2139,0,0,1157,0,0,0,0,0,0,0,0,0,0],
-
 };
 const UTILITIES = {
   "Fuel Oil": [58581,42490,48032,42259,46581,43457,60137,50178,35895,38440,97679,73822,72694,109272,106897,157170,147144,189501,234216,132461,183679,196876,237832,218702,282575,149523,118789,145558,163392,183863,117071,178490,292115,243083,267710],
@@ -430,8 +429,8 @@ const REP_COLORS = ['#1D6FA4', '#2196F3', '#8E24AA', '#F4511E', '#43A047', '#00A
 const UTL_COLORS = ['#FF6B35','#2196F3'];
  
 const state2 = {
-  rep: { mode:'range', showChg:true, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false },
-  utl: { mode:'range', showChg:true, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false }
+  rep: { mode:'range', showChg:false, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false },
+  utl: { mode:'range', showChg:false, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false }
 };
  
 // ── INIT SELECTS ──
