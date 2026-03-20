@@ -630,6 +630,7 @@ function toggleChg(prefix) {
   btn.textContent = state[prefix].showChg ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', state[prefix].showChg);
   render(prefix);
+  scrollAllRight();
 }
  
 function toggleDollar(prefix) {
@@ -638,6 +639,7 @@ function toggleDollar(prefix) {
   btn.textContent = state[prefix].showDollar ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', state[prefix].showDollar);
   render(prefix);
+  scrollAllRight();
 }
  
 function toggleNetChg() {
@@ -646,6 +648,7 @@ function toggleNetChg() {
   btn.textContent = NET_SHOW_CHG ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', NET_SHOW_CHG);
   renderNet();
+  scrollAllRight();
 }
  
 function toggleNetDollar() {
@@ -654,6 +657,7 @@ function toggleNetDollar() {
   btn.textContent = NET_SHOW_DOLLAR ? 'Visible' : 'Hidden';
   btn.classList.toggle('active', NET_SHOW_DOLLAR);
   renderNet();
+  scrollAllRight();
 }
  
 function getYears(prefix) {
@@ -1559,15 +1563,18 @@ render('exp');
 renderNet();
  
 // Scroll all matrix tables to the right so current year (2024) is visible
-setTimeout(function() {
-  ['inc','exp'].forEach(function(prefix) {
-    const wrap = document.querySelector('#'+prefix+'-matrix-head').closest('.matrix-wrap');
-    if(wrap) wrap.scrollLeft = wrap.scrollWidth;
-  });
-  // Also scroll the Net Income matrix
-  const netWrap = document.querySelector('#net-matrix-head').closest('.matrix-wrap');
-  if(netWrap) netWrap.scrollLeft = netWrap.scrollWidth;
-}, 100);
+function scrollAllRight() {
+  setTimeout(function() {
+    ['inc','exp','net'].forEach(function(prefix) {
+      const head = document.getElementById(prefix+'-matrix-head');
+      if(head) {
+        const wrap = head.closest('.matrix-wrap');
+        if(wrap) wrap.scrollLeft = wrap.scrollWidth;
+      }
+    });
+  }, 80);
+}
+scrollAllRight();
 </script>
 </body>
 </html>
