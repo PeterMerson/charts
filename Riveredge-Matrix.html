@@ -610,7 +610,7 @@ function initSelects(prefix) {
       o.value = y; o.textContent = y; el.appendChild(o);
     });
   });
-  document.getElementById(prefix+'-sel-from').value = 2006;
+  document.getElementById(prefix+'-sel-from').value = 2015;
   document.getElementById(prefix+'-sel-to').value = 2024;
   document.getElementById(prefix+'-sel-single').value = 2024;
 }
@@ -1550,7 +1550,7 @@ initSelects('exp');
   if(!el) return;
   ALL_YEARS.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; el.appendChild(o); });
 });
-document.getElementById('net-sel-from').value = 2006;
+document.getElementById('net-sel-from').value = 2015;
 document.getElementById('net-sel-to').value = 2024;
 document.getElementById('net-sel-single').value = 2024;
  
