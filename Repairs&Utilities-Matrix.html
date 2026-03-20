@@ -228,7 +228,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
-<div class="info-note"><span>⚠ 2024 Fire &amp; Water Damages includes $228,074 one-time event &nbsp;·&nbsp; 2022 figure includes $25,986 adjustment</span></div>
+<div class="info-note"><span>⚠ 2024 Fire &amp; Water Damages includes $228,074 one-time event &nbsp;·&nbsp; 2022 detail total is $225,695 vs. $199,709 in the audited statements — the $25,986 difference reflects a net credit or insurance reimbursement applied against gross repairs in the audited financials</span></div>
  
 <div class="section-rule"><span class="rule-label">Repairs &amp; Maintenance Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
  
@@ -545,22 +545,30 @@ function render2(prefix) {
       const isUp = p!==null && p>=0;
       const td = document.createElement('td');
       if(p!==null) td.className = heatClass2(p, isUp);
+      const cellDiv = document.createElement('div');
+      cellDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
       const vSpan = document.createElement('span');
       vSpan.className='cell-val';
       vSpan.textContent = val>0 ? fmtFull2(val) : '—';
-      td.appendChild(vSpan);
-      if(p!==null && s.showChg) {
-        const pSpan = document.createElement('span');
-        pSpan.className='cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
-        pSpan.textContent=(isUp?'+':'')+p.toFixed(1)+'%'; td.appendChild(pSpan);
+      cellDiv.appendChild(vSpan);
+      if((p!==null && s.showChg) || (prevVal!==null && s.showDollar)) {
+        const bWrap = document.createElement('div');
+        bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+        if(p!==null && s.showChg) {
+          const pSpan = document.createElement('span');
+          pSpan.className='cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
+          pSpan.textContent=(isUp?'+':'')+p.toFixed(1)+'%'; bWrap.appendChild(pSpan);
+        }
+        if(prevVal!==null && s.showDollar) {
+          const diff = val - prevVal;
+          const dSpan = document.createElement('span');
+          dSpan.className='cell-chg '+(diff>=0?'chg-up':'chg-dn');
+          dSpan.textContent=(diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+          bWrap.appendChild(dSpan);
+        }
+        cellDiv.appendChild(bWrap);
       }
-      if(prevVal!==null && s.showDollar) {
-        const diff = val - prevVal;
-        const dSpan = document.createElement('span');
-        dSpan.className='cell-chg '+(diff>=0?'chg-up':'chg-dn');
-        dSpan.textContent=(diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
-        td.appendChild(dSpan);
-      }
+      td.appendChild(cellDiv);
       tr.appendChild(td);
     });
     body.appendChild(tr);
@@ -669,6 +677,7 @@ function selectCat2(prefix, cat, years) {
         callbacks:{title:items=>items[0].label,label:item=>' '+fmtFull2(item.parsed.y)}
       }},
       scales:{
+
         x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
         y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
       }
