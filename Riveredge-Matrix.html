@@ -1564,6 +1564,9 @@ setTimeout(function() {
     const wrap = document.querySelector('#'+prefix+'-matrix-head').closest('.matrix-wrap');
     if(wrap) wrap.scrollLeft = wrap.scrollWidth;
   });
+  // Also scroll the Net Income matrix
+  const netWrap = document.querySelector('#net-matrix-head').closest('.matrix-wrap');
+  if(netWrap) netWrap.scrollLeft = netWrap.scrollWidth;
 }, 100);
 </script>
 </body>
