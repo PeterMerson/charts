@@ -1557,6 +1557,14 @@ document.getElementById('net-sel-single').value = 2024;
 render('inc');
 render('exp');
 renderNet();
+ 
+// Scroll all matrix tables to the right so current year (2024) is visible
+setTimeout(function() {
+  ['inc','exp'].forEach(function(prefix) {
+    const wrap = document.querySelector('#'+prefix+'-matrix-head').closest('.matrix-wrap');
+    if(wrap) wrap.scrollLeft = wrap.scrollWidth;
+  });
+}, 100);
 </script>
 </body>
 </html>
