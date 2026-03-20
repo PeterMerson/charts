@@ -1066,7 +1066,7 @@ function selectCat(prefix, cat, years) {
     x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
     y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
   };
-  if(SHOW_CPI || (isRETax && !isBar)) {
+  if(SHOW_CPI) {
     const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
     const cpiBase = cpiRaw[0];
     // For RE Taxes: pure index (100 = start year). For others: scaled to dollar values
@@ -1088,7 +1088,7 @@ function selectCat(prefix, cat, years) {
       font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a' };
   }
  
-  const showLegend = SHOW_CPI || (isRETax && !isBar);
+  const showLegend = SHOW_CPI;
  
   state[prefix].trendChart = new Chart(ctx, {
     type: CHART_TYPE,
