@@ -141,6 +141,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .info-note { max-width: 1400px; margin: 0 auto; padding: 6px 32px 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #7a5000; }
 .info-note span { background: #fff8e7; border: 1px solid #e6a817; border-radius: 4px; padding: 3px 10px; }
 .matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.cap-row { background: #1a1a2e !important; cursor: pointer; border-top: 2px solid #58a6ff; }
+.matrix tbody tr.cap-row:hover { background: #1e1e36 !important; }
+.matrix tbody tr.cap-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.cap-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a2e !important; }
 .matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
 .matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
 .matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
@@ -194,6 +198,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .net-pos { color: #6fcf82 !important; font-weight: 700; }
 .net-neg { color: #f47a70 !important; font-weight: 700; }
 .matrix tbody tr.net-row { background: #1a2e1a !important; cursor: pointer; border-top: 2px solid #3fb950; }
+.matrix tbody tr.cap-row { background: #1a1a2e !important; cursor: pointer; border-top: 2px solid #58a6ff; }
+.matrix tbody tr.cap-row:hover { background: #1e1e36 !important; }
+.matrix tbody tr.cap-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
+.matrix tbody tr.cap-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a2e !important; }
 .matrix tbody tr.compare-row { background: #1a1a3a !important; cursor: pointer; border-top: 1px solid #3a5a8a; }
 .matrix tbody tr.compare-row:hover { background: #1e1e42 !important; }
 .matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
@@ -461,6 +469,84 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
+<!-- ══ CAPITAL EXPENDITURES & TOTAL LIQUIDITY SECTION ══ -->
+<div class="section-divider" style="margin-top:24px;">
+  <div class="section-divider-inner" style="background:#1a1a2e;border-color:#58a6ff;">
+    <div>
+      <div class="section-title" style="color:#f7f3ec;">Capital Expenditures <em style="color:#58a6ff;">&amp; Total Liquidity</em></div>
+      <div class="masthead-meta" style="margin-top:4px;">Capital Expenditures &nbsp;·&nbsp; Cash &amp; Equivalents + Reserve Fund = Total Liquidity &nbsp;·&nbsp; 1990–2024</div>
+    </div>
+    <div class="section-kpis">
+      <div class="skpi"><div class="skpi-label">2024 CapEx</div><div class="skpi-val gd">$41,304</div></div>
+      <div class="skpi"><div class="skpi-label">2024 Cash &amp; Equiv</div><div class="skpi-val gd">$1,976,793</div></div>
+      <div class="skpi"><div class="skpi-label">2024 Reserve Fund</div><div class="skpi-val gd">$0</div></div>
+      <div class="skpi"><div class="skpi-label">2024 Total Liquidity</div><div class="skpi-val gd">$1,976,793</div></div>
+    </div>
+  </div>
+</div>
+ 
+<div class="section-rule"><span class="rule-label" style="color:#58a6ff;">Capital &amp; Liquidity Analysis</span><div class="rule-line"></div><span class="rule-label" style="color:#58a6ff;">Click row to graph</span></div>
+ 
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mode</span>
+    <button class="mode-btn active" id="cap-btn-range" onclick="setCapMode('range')">Year Range</button>
+    <button class="mode-btn" id="cap-btn-single" onclick="setCapMode('single')">Single Year</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group" id="cap-range-controls">
+    <span class="ctrl-label">From</span>
+    <select id="cap-sel-from" onchange="renderCap()"></select>
+    <span class="ctrl-label">To</span>
+    <select id="cap-sel-to" onchange="renderCap()"></select>
+  </div>
+  <div class="ctrl-group" id="cap-single-controls" style="display:none;">
+    <span class="ctrl-label">Year</span>
+    <select id="cap-sel-single" onchange="renderCap()"></select>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">% Change</span>
+    <button class="mode-btn" id="cap-btn-show-chg" onclick="toggleCapChg()">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">$ Change</span>
+    <button class="mode-btn" id="cap-btn-show-dollar" onclick="toggleCapDollar()">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="cap-btn-line" onclick="setCapChartType('line')">Line</button>
+    <button class="mode-btn" id="cap-btn-bar" onclick="setCapChartType('bar')">Bar</button>
+  </div>
+</div>
+ 
+<div class="main-layout">
+  <div class="matrix-wrap">
+    <table class="matrix"><thead id="cap-matrix-head"></thead><tbody id="cap-matrix-body"></tbody></table>
+  </div>
+  <div class="right-panel">
+    <div class="panel-card" id="cap-panel-card">
+      <div class="panel-header" style="background:#1a1a2e;border-color:#58a6ff;">
+        <div class="panel-cat" id="cap-panel-cat">Capital &amp; Liquidity</div>
+        <div class="panel-range" id="cap-panel-range">Click a row to graph</div>
+      </div>
+      <div id="cap-panel-stats-wrap" class="panel-stats" style="display:none;background:#edf2ff;">
+        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="cap-ps-peak">—</div></div>
+        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="cap-ps-peak-val">—</div></div>
+        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="cap-ps-latest">—</div></div>
+        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="cap-ps-chg">—</div></div>
+      </div>
+      <div id="cap-panel-empty" class="panel-empty"><span class="arrow" style="color:#58a6ff;">←</span>Click either row<br>to graph over the<br>selected range</div>
+      <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;">
+        <canvas id="cap-trend-chart" height="180"></canvas>
+        <button class="expand-btn" id="cap-expand-btn" onclick="toggleFSCap()" title="Expand chart">⤢</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
 <div class="gold-rule-full"></div>
 <div class="page-footer">
   <span>Riveredge Income &amp; Expense Matrix &nbsp;·&nbsp; Special Assessments &amp; Mortgage Principal excluded &nbsp;·&nbsp; Source: Audited Annual Financial Statements 1990–2024</span>
@@ -488,6 +574,7 @@ const maintIncreaseMarkers = {
  
       // Draw green dashed vertical line
       ctx.beginPath();
+
       ctx.setLineDash([5, 3]);
       ctx.strokeStyle = 'rgba(63,185,80,0.7)';
       ctx.lineWidth = 1.5;
@@ -556,6 +643,11 @@ const MAINT_INCREASES = {
 const MAINT_OFFSETS = {
   2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2024: 4
 };
+ 
+const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
+const CASH_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,393313,608614,252599,61503,30296,274066,110834,102845,214400,115582,98755,111999,83242,145852,223965,1425016,1976793];
+const RESERVE_DATA = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306484,470398,1006727,1083523,1120846,1303582,1338409,1462059,1354270,1667267,1877718,2118012,2335551,2364123,2231883,891297,0];
+const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
  
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
@@ -1574,6 +1666,247 @@ function renderCompareChart(years) {
   });
 }
  
+// ── CAPITAL EXPENDITURES & LIQUIDITY SECTION ──
+var CAP_SHOW_CHG = false;
+var CAP_SHOW_DOLLAR = false;
+var CAP_CHART_TYPE = 'line';
+var capState = { mode:'range', selectedCat:null, trendChart:null };
+ 
+const CAP_CATS = ['Capital Expenditures', 'Total Liquidity (Cash & Equiv + Reserve)'];
+const CAP_COLORS = ['#ffa657', '#58a6ff'];
+const CAP_DATA = {
+  'Capital Expenditures': CAPEX_DATA,
+  'Total Liquidity (Cash & Equiv + Reserve)': LIQUIDITY_DATA
+};
+ 
+function setCapMode(m) {
+  capState.mode = m;
+  document.getElementById('cap-btn-range').classList.toggle('active', m==='range');
+  document.getElementById('cap-btn-single').classList.toggle('active', m==='single');
+  document.getElementById('cap-range-controls').style.display = m==='range'?'flex':'none';
+  document.getElementById('cap-single-controls').style.display = m==='single'?'flex':'none';
+  renderCap();
+}
+ 
+function toggleCapChg() {
+  CAP_SHOW_CHG = !CAP_SHOW_CHG;
+  const btn = document.getElementById('cap-btn-show-chg');
+  btn.textContent = CAP_SHOW_CHG ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', CAP_SHOW_CHG);
+  renderCap();
+  scrollCapRight();
+}
+ 
+function toggleCapDollar() {
+  CAP_SHOW_DOLLAR = !CAP_SHOW_DOLLAR;
+  const btn = document.getElementById('cap-btn-show-dollar');
+  btn.textContent = CAP_SHOW_DOLLAR ? 'Visible' : 'Hidden';
+  btn.classList.toggle('active', CAP_SHOW_DOLLAR);
+  renderCap();
+  scrollCapRight();
+}
+ 
+function setCapChartType(type) {
+  CAP_CHART_TYPE = type;
+  document.getElementById('cap-btn-line').classList.toggle('active', type==='line');
+  document.getElementById('cap-btn-bar').classList.toggle('active', type==='bar');
+  if(capState.selectedCat) selectCapCat(capState.selectedCat, getCapYears());
+}
+ 
+function getCapYears() {
+  if(capState.mode === 'single') {
+    const y = parseInt(document.getElementById('cap-sel-single').value);
+    const idx = ALL_YEARS.indexOf(y);
+    return ALL_YEARS.slice(Math.max(0,idx-4), idx+1);
+  } else {
+    const from = parseInt(document.getElementById('cap-sel-from').value);
+    const to   = parseInt(document.getElementById('cap-sel-to').value);
+    const f = Math.min(from,to), t = Math.max(from,to);
+    return ALL_YEARS.filter(y => y>=f && y<=t);
+  }
+}
+ 
+function scrollCapRight() {
+  setTimeout(function() {
+    const head = document.getElementById('cap-matrix-head');
+    if(head) { const wrap = head.closest('.matrix-wrap'); if(wrap) wrap.scrollLeft = wrap.scrollWidth; }
+  }, 80);
+}
+ 
+function renderCap() {
+  const years = getCapYears();
+  const head = document.getElementById('cap-matrix-head');
+  const body = document.getElementById('cap-matrix-body');
+  head.innerHTML=''; body.innerHTML='';
+ 
+  // HEAD
+  const hr = document.createElement('tr');
+  const thc = document.createElement('th'); thc.className='cat-col'; thc.textContent='Category'; hr.appendChild(thc);
+  years.forEach(y => { const th=document.createElement('th'); th.className='yr-col'; th.textContent=y; hr.appendChild(th); });
+  head.appendChild(hr);
+ 
+  // DATA ROWS
+  CAP_CATS.forEach((cat, ci) => {
+    const vals = years.map(y => CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0);
+    const tr = document.createElement('tr');
+    tr.classList.add('cap-row');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => selectCapCat(cat, years);
+    if(capState.selectedCat === cat) tr.style.outline = '2px solid #58a6ff';
+    const td0 = document.createElement('td');
+    td0.className = 'cat-col'; td0.textContent = cat + ' ▶'; tr.appendChild(td0);
+ 
+    let prevVal = null;
+    vals.forEach((val, yi) => {
+      const p = prevVal !== null && prevVal !== 0 ? pct(prevVal, val) : null;
+      const isUp = p !== null && p >= 0;
+      const td = document.createElement('td');
+      const cellDiv = document.createElement('div');
+      cellDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
+      const vSpan = document.createElement('span');
+      vSpan.className = 'cell-val'; vSpan.style.color = CAP_COLORS[ci];
+      vSpan.textContent = fmtFull(val); cellDiv.appendChild(vSpan);
+      if((p!==null && CAP_SHOW_CHG) || (prevVal!==null && CAP_SHOW_DOLLAR)) {
+        const bWrap = document.createElement('div');
+        bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+        if(p!==null && CAP_SHOW_CHG) {
+          const pSpan = document.createElement('span');
+          pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
+          pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; bWrap.appendChild(pSpan);
+        }
+        if(prevVal!==null && CAP_SHOW_DOLLAR) {
+          const diff = val - prevVal;
+          const dSpan = document.createElement('span');
+          dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
+          dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+          bWrap.appendChild(dSpan);
+        }
+        cellDiv.appendChild(bWrap);
+      }
+      td.appendChild(cellDiv); tr.appendChild(td);
+      prevVal = val;
+    });
+    body.appendChild(tr);
+  });
+ 
+  if(capState.selectedCat) selectCapCat(capState.selectedCat, years);
+}
+ 
+function selectCapCat(cat, years) {
+  capState.selectedCat = cat;
+  document.querySelectorAll('#cap-matrix-body tr').forEach(tr => {
+    tr.style.outline = tr.querySelector('td.cat-col') && tr.querySelector('td.cat-col').textContent.replace(' ▶','') === cat
+      ? '2px solid #58a6ff' : '';
+  });
+ 
+  const vals = years.map(y => CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0);
+  const peak = Math.max(...vals);
+  const peakYr = years[vals.indexOf(peak)];
+  const latest = vals[vals.length-1];
+  const first = vals[0];
+  const chgPct = first > 0 ? ((latest-first)/first*100) : 0;
+ 
+  document.getElementById('cap-panel-cat').textContent = cat;
+  document.getElementById('cap-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
+  document.getElementById('cap-ps-peak').textContent = peakYr;
+  document.getElementById('cap-ps-peak-val').textContent = fmtFull(peak);
+  document.getElementById('cap-ps-latest').textContent = fmtFull(latest);
+  const chgEl = document.getElementById('cap-ps-chg');
+  chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
+  chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  document.getElementById('cap-panel-stats-wrap').style.display = 'grid';
+  document.getElementById('cap-panel-empty').style.display = 'none';
+  document.getElementById('cap-chart-panel').style.display = 'block';
+ 
+  if(capState.trendChart) { capState.trendChart.destroy(); capState.trendChart = null; }
+  const ctx = document.getElementById('cap-trend-chart').getContext('2d');
+  const ci = CAP_CATS.indexOf(cat);
+  const color = CAP_COLORS[ci];
+  const isBar = CAP_CHART_TYPE === 'bar';
+  const grad = ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,color+'33'); grad.addColorStop(1,color+'05');
+ 
+  capState.trendChart = new Chart(ctx, {
+    type: isBar ? 'bar' : 'line',
+    data: { labels:years, datasets:[{
+      data:vals, borderColor:color,
+      backgroundColor: isBar ? color+'cc' : grad,
+      borderWidth: isBar?1:5, borderRadius: isBar?3:0,
+      pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
+      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2.5,
+      fill:!isBar, tension:isBar?0:0.25, label:cat
+    }]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+        callbacks:{title:items=>items[0].label, label:item=>' '+fmtFull(item.parsed.y)}
+      }},
+
+      scales:{
+        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
+        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
+      }
+    }
+  });
+}
+ 
+function toggleFSCap() {
+  const panel = document.getElementById('cap-panel-card');
+  if(!panel) return;
+  const chartPanel = document.getElementById('cap-chart-panel');
+  if(!chartPanel || chartPanel.style.display==='none') return;
+  const btn = document.getElementById('cap-expand-btn');
+  const chart = capState.trendChart;
+  const backdrop = document.getElementById('fs-backdrop');
+  const canvas = document.getElementById('cap-trend-chart');
+ 
+  if(panel._isFullscreen) {
+    panel._isFullscreen = false;
+    if(panel._origParent) panel._origParent.appendChild(panel);
+    panel.removeAttribute('style');
+    chartPanel.style.flex=''; chartPanel.style.height='200px';
+    if(canvas){canvas.setAttribute('height','180');canvas.style.height='';}
+    document.body.style.overflow='';
+    if(backdrop) backdrop.style.display='none';
+    if(btn) btn.textContent='⤢';
+    setTimeout(function(){
+      if(chart){
+        chart.data.datasets.forEach(function(ds){
+          if(ds._origBW!==undefined){ds.borderWidth=ds._origBW;delete ds._origBW;}
+          if(ds._origPR!==undefined){ds.pointRadius=ds._origPR;delete ds._origPR;}
+        });
+        chart.options.plugins.barYearLabels={enabled:false};
+        chart.resize();chart.update('none');
+      }
+    },80);
+  } else {
+    panel._isFullscreen=true;
+    panel._origParent=panel.parentNode;
+    document.body.appendChild(panel);
+    if(backdrop) backdrop.style.display='block';
+    panel.style.position='fixed';panel.style.top='30px';panel.style.left='30px';
+    panel.style.right='30px';panel.style.bottom='30px';
+    panel.style.width='auto';panel.style.height='auto';panel.style.zIndex='9999';
+    panel.style.borderRadius='8px';panel.style.display='flex';
+    panel.style.flexDirection='column';panel.style.overflow='hidden';
+    chartPanel.style.flex='1';chartPanel.style.height='auto';
+    if(canvas){canvas.removeAttribute('height');canvas.style.height='100%';}
+    document.body.style.overflow='hidden';
+    if(btn) btn.textContent='✕';
+    setTimeout(function(){
+      if(chart){
+        chart.data.datasets.forEach(function(ds){
+          if(ds._origBW===undefined) ds._origBW=ds.borderWidth;
+          if(ds._origPR===undefined) ds._origPR=ds.pointRadius;
+          ds.borderWidth=(ds.borderWidth||2)*2.2;
+          ds.pointRadius=(ds.pointRadius||3)*1.8;
+        });
+        if(chart.config.type==='bar') chart.options.plugins.barYearLabels={enabled:true};
+        chart.resize();chart.update('none');
+      }
+    },80);
+  }
+}
+ 
 // ── BOOT ──
 initSelects('inc');
 initSelects('exp');
@@ -1591,6 +1924,17 @@ document.getElementById('net-sel-single').value = 2024;
 render('inc');
 render('exp');
 renderNet();
+ 
+// Init capital selects
+['from','to','single'].forEach(id => {
+  const el = document.getElementById('cap-sel-'+id);
+  if(!el) return;
+  ALL_YEARS.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; el.appendChild(o); });
+});
+document.getElementById('cap-sel-from').value = 2016;
+document.getElementById('cap-sel-to').value = 2024;
+document.getElementById('cap-sel-single').value = 2024;
+renderCap();
  
 // Scroll all matrix tables to the right so current year (2024) is visible
 function scrollAllRight() {
