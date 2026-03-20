@@ -93,6 +93,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.total-row { background: var(--ink) !important; cursor: default; border-top: 2px solid var(--gold); }
 .matrix tbody tr.total-row:hover { background: var(--ink2) !important; }
 .matrix td { padding: 7px 10px; text-align: right; border-right: 1px solid var(--paper3); white-space: nowrap; vertical-align: middle; line-height: 1.2; }
+.matrix td.data-cell { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .matrix td.cat-col { text-align: left; font-family: 'Source Serif 4', serif; font-size: 0.76rem; font-weight: 400; position: sticky; left: 0; z-index: 1; background: #fff; border-right: 2px solid var(--rule2); color: var(--ink); }
 /* sticky cat-col fix */
 .heat-up-1 td.cat-col, .heat-up-2 td.cat-col, .heat-up-3 td.cat-col { background: #fff !important; }
@@ -101,7 +102,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.total-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: var(--gold-light); background: var(--ink) !important; }
 .matrix tbody tr.total-row td { color: #f7f3ec; border-right-color: #3a3028; }
 .cell-val { font-weight: 500; color: var(--ink2); }
-.cell-chg { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 4px; border-radius: 2px; margin-left: 3px; vertical-align: middle; letter-spacing: 0.02em; }
+.cell-chg { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 4px; border-radius: 2px; letter-spacing: 0.02em; }
 .chg-up { background: var(--up-bg); color: var(--up); }
 .chg-dn { background: var(--dn-bg); color: var(--dn); }
 .chg-neu { background: var(--paper3); color: var(--neutral); }
@@ -736,20 +737,25 @@ function render(prefix) {
       const p = prevVal!==null ? pct(prevVal,val) : null;
       const isUp = p!==null && p>=0;
       const td = document.createElement('td');
-      if(p!==null) td.className = heatClass(p, isUp);
+      td.className = ('data-cell' + (p!==null?' '+heatClass(p,isUp):'')).trim();
       const vSpan = document.createElement('span');
       vSpan.className = 'cell-val'; vSpan.textContent = fmtFull(val); td.appendChild(vSpan);
-      if(p!==null && showChg) {
-        const pSpan = document.createElement('span');
-        pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
-        pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; td.appendChild(pSpan);
-      }
-      if(prevVal!==null && state[prefix].showDollar) {
-        const diff = val - prevVal;
-        const dSpan = document.createElement('span');
-        dSpan.className = 'cell-chg '+(diff>=0?'chg-up':diff===0?'chg-neu':'chg-dn');
-        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
-        td.appendChild(dSpan);
+      if((p!==null && showChg) || (prevVal!==null && state[prefix].showDollar)) {
+        const bWrap = document.createElement('div');
+        bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+        if(p!==null && showChg) {
+          const pSpan = document.createElement('span');
+          pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
+          pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; bWrap.appendChild(pSpan);
+        }
+        if(prevVal!==null && state[prefix].showDollar) {
+          const diff = val - prevVal;
+          const dSpan = document.createElement('span');
+          dSpan.className = 'cell-chg '+(diff>=0?'chg-up':diff===0?'chg-neu':'chg-dn');
+          dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+          bWrap.appendChild(dSpan);
+        }
+        td.appendChild(bWrap);
       }
       tr.appendChild(td);
     });
@@ -813,20 +819,26 @@ function render(prefix) {
     const p = prevTotal!==null ? pct(prevTotal,val) : null;
     const isUp = p!==null && p>=0;
     const ttd = document.createElement('td');
+    ttd.className = 'data-cell';
     const vSpan = document.createElement('span');
     vSpan.className = p===null?'':(isUp?'total-pos':'total-neg');
     vSpan.textContent = fmtFull(val); ttd.appendChild(vSpan);
-    if(p!==null && showChg) {
-      const pSpan = document.createElement('span');
-      pSpan.className = 'cell-chg '+(isUp?'chg-up':'chg-dn');
-      pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; ttd.appendChild(pSpan);
-    }
-    if(p!==null && state[prefix].showDollar) {
-      const diff = val - prevTotal;
-      const dSpan = document.createElement('span');
-      dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
-      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
-      ttd.appendChild(dSpan);
+    if((p!==null && showChg) || (p!==null && state[prefix].showDollar)) {
+      const badgeWrap = document.createElement('div');
+      badgeWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+      if(p!==null && showChg) {
+        const pSpan = document.createElement('span');
+        pSpan.className = 'cell-chg '+(isUp?'chg-up':'chg-dn');
+        pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; badgeWrap.appendChild(pSpan);
+      }
+      if(p!==null && state[prefix].showDollar) {
+        const diff = val - prevTotal;
+        const dSpan = document.createElement('span');
+        dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
+        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        badgeWrap.appendChild(dSpan);
+      }
+      ttd.appendChild(badgeWrap);
     }
     ttr.appendChild(ttd);
     prevTotal = val;
@@ -1131,25 +1143,31 @@ function renderNet() {
   years.forEach(y => {
     const v = nets[y];
     const ttd = document.createElement('td');
+    ttd.className = 'data-cell';
     const vSpan = document.createElement('span');
     vSpan.className = v>=0?'net-pos':'net-neg';
     vSpan.textContent = (v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US');
     ttd.appendChild(vSpan);
-    if(prevNet !== null && NET_SHOW_CHG) {
-      const p = prevNet !== 0 ? ((v - prevNet) / Math.abs(prevNet) * 100) : null;
-      if(p !== null) {
-        const pSpan = document.createElement('span');
-        pSpan.className = 'cell-chg ' + (p>=0?'chg-up':'chg-dn');
-        pSpan.textContent = (p>=0?'+':'')+p.toFixed(1)+'%';
-        ttd.appendChild(pSpan);
+    if(prevNet !== null && (NET_SHOW_CHG || NET_SHOW_DOLLAR)) {
+      const bWrap = document.createElement('div');
+      bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+      if(NET_SHOW_CHG) {
+        const p = prevNet !== 0 ? ((v - prevNet) / Math.abs(prevNet) * 100) : null;
+        if(p !== null) {
+          const pSpan = document.createElement('span');
+          pSpan.className = 'cell-chg ' + (p>=0?'chg-up':'chg-dn');
+          pSpan.textContent = (p>=0?'+':'')+p.toFixed(1)+'%';
+          bWrap.appendChild(pSpan);
+        }
       }
-    }
-    if(prevNet !== null && NET_SHOW_DOLLAR) {
-      const diff = v - prevNet;
-      const dSpan = document.createElement('span');
-      dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
-      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
-      ttd.appendChild(dSpan);
+      if(NET_SHOW_DOLLAR) {
+        const diff = v - prevNet;
+        const dSpan = document.createElement('span');
+        dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
+        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        bWrap.appendChild(dSpan);
+      }
+      ttd.appendChild(bWrap);
     }
     ttr.appendChild(ttd);
     prevNet = v;
@@ -1180,18 +1198,23 @@ function renderNet() {
     vSpan.style.fontWeight = '600';
     vSpan.textContent = '$' + inc.toLocaleString('en-US');
     ctd.appendChild(vSpan);
-    if(p !== null && NET_SHOW_CHG) {
-      const pSpan = document.createElement('span');
-      pSpan.className = 'cell-chg ' + (isUp?'chg-up':'chg-dn');
-      pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%';
-      ctd.appendChild(pSpan);
-    }
-    if(prevInc !== null && NET_SHOW_DOLLAR) {
-      const diff = inc - prevInc;
-      const dSpan = document.createElement('span');
-      dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
-      dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
-      ctd.appendChild(dSpan);
+    if((p !== null && NET_SHOW_CHG) || (prevInc !== null && NET_SHOW_DOLLAR)) {
+      const bWrap = document.createElement('div');
+      bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
+      if(p !== null && NET_SHOW_CHG) {
+        const pSpan = document.createElement('span');
+        pSpan.className = 'cell-chg ' + (isUp?'chg-up':'chg-dn');
+        pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%';
+        bWrap.appendChild(pSpan);
+      }
+      if(prevInc !== null && NET_SHOW_DOLLAR) {
+        const diff = inc - prevInc;
+        const dSpan = document.createElement('span');
+        dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
+        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        bWrap.appendChild(dSpan);
+      }
+      ctd.appendChild(bWrap);
     }
     ctr.appendChild(ctd);
     prevInc = inc;
