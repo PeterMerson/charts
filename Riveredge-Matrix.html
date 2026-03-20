@@ -442,6 +442,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">$ Change</span>
     <button class="mode-btn" id="net-btn-show-dollar" onclick="toggleNetDollar()">Hidden</button>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="net-btn-line" onclick="setNetChartType('line')">Line</button>
+    <button class="mode-btn" id="net-btn-bar" onclick="setNetChartType('bar')">Bar</button>
+  </div>
 </div>
  
 <div class="main-layout">
@@ -574,7 +580,6 @@ const maintIncreaseMarkers = {
  
       // Draw green dashed vertical line
       ctx.beginPath();
-
       ctx.setLineDash([5, 3]);
       ctx.strokeStyle = 'rgba(63,185,80,0.7)';
       ctx.lineWidth = 1.5;
@@ -750,6 +755,20 @@ function toggleNetDollar() {
   btn.classList.toggle('active', NET_SHOW_DOLLAR);
   renderNet();
   scrollAllRight();
+}
+ 
+var NET_CHART_TYPE = 'line';
+function setNetChartType(type) {
+  NET_CHART_TYPE = type;
+  document.getElementById('net-btn-line').classList.toggle('active', type==='line');
+  document.getElementById('net-btn-bar').classList.toggle('active', type==='bar');
+  // Redraw whichever net chart is active
+  var netTitle = document.getElementById('net-panel-cat').textContent;
+  var years = getNetYears();
+  if(document.getElementById('net-chart-panel').style.display !== 'none') {
+    if(netTitle.indexOf('vs') > -1) renderCompareChart(years);
+    else renderNetChart(years);
+  }
 }
  
 function getYears(prefix) {
@@ -1323,6 +1342,7 @@ function renderNet() {
 }
  
 function renderNetChart(years, nets) {
+  var isBar = NET_CHART_TYPE === 'bar';
   if(!nets) {
     nets = {};
     years.forEach(y => {
@@ -1355,7 +1375,7 @@ function renderNetChart(years, nets) {
   const colors = vals.map(v => v>=0 ? 'rgba(63,185,80,0.82)' : 'rgba(248,81,73,0.82)');
   const borders = vals.map(v => v>=0 ? 'rgba(63,185,80,1)' : 'rgba(248,81,73,1)');
  
-  const isBar = CHART_TYPE==='bar';
+  // isBar already set at top of function using NET_CHART_TYPE
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,'rgba(63,185,80,0.2)'); grad.addColorStop(1,'rgba(63,185,80,0.02)');
  
@@ -1586,6 +1606,7 @@ document.addEventListener('keydown', function(e) {
  
 // ── TOTAL INCOME vs TOTAL EXPENSES COMPARE CHART ──
 function renderCompareChart(years) {
+  const isBar = NET_CHART_TYPE === 'bar';
   const vals_inc = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
     return Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
@@ -1620,7 +1641,7 @@ function renderCompareChart(years) {
   if(window._netChart){ window._netChart.destroy(); window._netChart=null; }
   const ctx = document.getElementById('net-trend-chart').getContext('2d');
  
-  const isBar = CHART_TYPE === 'bar';
+  // isBar already set at top of function using NET_CHART_TYPE
   const gradInc = ctx.createLinearGradient(0,0,0,180);
   gradInc.addColorStop(0,'rgba(88,166,255,0.18)'); gradInc.addColorStop(1,'rgba(88,166,255,0.02)');
   const gradExp = ctx.createLinearGradient(0,0,0,180);
@@ -1840,7 +1861,6 @@ function selectCapCat(cat, years) {
       plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
         callbacks:{title:items=>items[0].label, label:item=>' '+fmtFull(item.parsed.y)}
       }},
-
       scales:{
         x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
         y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
