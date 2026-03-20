@@ -268,7 +268,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
-    <button class="mode-btn active" id="inc-btn-show-chg" onclick="toggleChg('inc')">Visible</button>
+    <button class="mode-btn" id="inc-btn-show-chg" onclick="toggleChg('inc')">Hidden</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -350,7 +350,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
-    <button class="mode-btn active" id="exp-btn-show-chg" onclick="toggleChg('exp')">Visible</button>
+    <button class="mode-btn" id="exp-btn-show-chg" onclick="toggleChg('exp')">Hidden</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -427,7 +427,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
-    <button class="mode-btn active" id="net-btn-show-chg" onclick="toggleNetChg()">Visible</button>
+    <button class="mode-btn" id="net-btn-show-chg" onclick="toggleNetChg()">Hidden</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -593,13 +593,13 @@ const INC_COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1',
 const EXP_COLORS = ['#E63946','#2196F3','#43A047','#FF9800','#d29922','#8E24AA','#00ACC1','#6D4C41','#546E7A','#7CB342','#F4511E'];
  
 const state = {
-  inc: { mode:'range', showChg:true, showDollar:false, selectedCat:null, trendChart:null },
-  exp: { mode:'range', showChg:true, showDollar:false, selectedCat:null, trendChart:null }
+  inc: { mode:'range', showChg:false, showDollar:false, selectedCat:null, trendChart:null },
+  exp: { mode:'range', showChg:false, showDollar:false, selectedCat:null, trendChart:null }
 };
 var SHOW_CPI = false;
 var SHOW_PRINCIPAL = false;
 var CHART_TYPE = 'line';
-var NET_SHOW_CHG = true;
+var NET_SHOW_CHG = false;
 var NET_SHOW_DOLLAR = false;
  
 function initSelects(prefix) {
