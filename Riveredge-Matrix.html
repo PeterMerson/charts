@@ -93,7 +93,6 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.total-row { background: var(--ink) !important; cursor: default; border-top: 2px solid var(--gold); }
 .matrix tbody tr.total-row:hover { background: var(--ink2) !important; }
 .matrix td { padding: 7px 10px; text-align: right; border-right: 1px solid var(--paper3); white-space: nowrap; vertical-align: middle; line-height: 1.2; }
-.matrix td.data-cell { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .matrix td.cat-col { text-align: left; font-family: 'Source Serif 4', serif; font-size: 0.76rem; font-weight: 400; position: sticky; left: 0; z-index: 1; background: #fff; border-right: 2px solid var(--rule2); color: var(--ink); }
 /* sticky cat-col fix */
 .heat-up-1 td.cat-col, .heat-up-2 td.cat-col, .heat-up-3 td.cat-col { background: #fff !important; }
@@ -102,7 +101,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.total-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: var(--gold-light); background: var(--ink) !important; }
 .matrix tbody tr.total-row td { color: #f7f3ec; border-right-color: #3a3028; }
 .cell-val { font-weight: 500; color: var(--ink2); }
-.cell-chg { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 4px; border-radius: 2px; letter-spacing: 0.02em; }
+.cell-chg { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 1px 4px; border-radius: 2px; margin-left: 3px; vertical-align: middle; letter-spacing: 0.02em; }
 .chg-up { background: var(--up-bg); color: var(--up); }
 .chg-dn { background: var(--dn-bg); color: var(--dn); }
 .chg-neu { background: var(--paper3); color: var(--neutral); }
@@ -737,9 +736,12 @@ function render(prefix) {
       const p = prevVal!==null ? pct(prevVal,val) : null;
       const isUp = p!==null && p>=0;
       const td = document.createElement('td');
-      td.className = ('data-cell' + (p!==null?' '+heatClass(p,isUp):'')).trim();
+      if(p!==null) td.className = heatClass(p, isUp);
+      // Wrapper div keeps value on top line, badges on second line
+      const cellDiv = document.createElement('div');
+      cellDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
       const vSpan = document.createElement('span');
-      vSpan.className = 'cell-val'; vSpan.textContent = fmtFull(val); td.appendChild(vSpan);
+      vSpan.className = 'cell-val'; vSpan.textContent = fmtFull(val); cellDiv.appendChild(vSpan);
       if((p!==null && showChg) || (prevVal!==null && state[prefix].showDollar)) {
         const bWrap = document.createElement('div');
         bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
@@ -755,8 +757,9 @@ function render(prefix) {
           dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
           bWrap.appendChild(dSpan);
         }
-        td.appendChild(bWrap);
+        cellDiv.appendChild(bWrap);
       }
+      td.appendChild(cellDiv);
       tr.appendChild(td);
     });
     body.appendChild(tr);
@@ -819,10 +822,11 @@ function render(prefix) {
     const p = prevTotal!==null ? pct(prevTotal,val) : null;
     const isUp = p!==null && p>=0;
     const ttd = document.createElement('td');
-    ttd.className = 'data-cell';
+    const totDiv = document.createElement('div');
+    totDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
     const vSpan = document.createElement('span');
     vSpan.className = p===null?'':(isUp?'total-pos':'total-neg');
-    vSpan.textContent = fmtFull(val); ttd.appendChild(vSpan);
+    vSpan.textContent = fmtFull(val); totDiv.appendChild(vSpan);
     if((p!==null && showChg) || (p!==null && state[prefix].showDollar)) {
       const badgeWrap = document.createElement('div');
       badgeWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
@@ -838,8 +842,9 @@ function render(prefix) {
         dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
         badgeWrap.appendChild(dSpan);
       }
-      ttd.appendChild(badgeWrap);
+      totDiv.appendChild(badgeWrap);
     }
+    ttd.appendChild(totDiv);
     ttr.appendChild(ttd);
     prevTotal = val;
   });
@@ -1143,11 +1148,12 @@ function renderNet() {
   years.forEach(y => {
     const v = nets[y];
     const ttd = document.createElement('td');
-    ttd.className = 'data-cell';
+    const netDiv = document.createElement('div');
+    netDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
     const vSpan = document.createElement('span');
     vSpan.className = v>=0?'net-pos':'net-neg';
     vSpan.textContent = (v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US');
-    ttd.appendChild(vSpan);
+    netDiv.appendChild(vSpan);
     if(prevNet !== null && (NET_SHOW_CHG || NET_SHOW_DOLLAR)) {
       const bWrap = document.createElement('div');
       bWrap.style.cssText = 'display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;';
@@ -1167,8 +1173,9 @@ function renderNet() {
         dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
         bWrap.appendChild(dSpan);
       }
-      ttd.appendChild(bWrap);
+      netDiv.appendChild(bWrap);
     }
+    ttd.appendChild(netDiv);
     ttr.appendChild(ttd);
     prevNet = v;
   });
