@@ -673,7 +673,7 @@ function selectCat2(prefix, cat, years) {
  
   // Index vals to 100 at start year for line mode
   var baseVal2 = vals.find(function(v){return v>0;}) || 1;
-  var dispVals2 = !isBar ? vals.map(function(v){return baseVal2>0?(v/baseVal2)*100:100;}) : vals;
+  var dispVals2 = vals.map(function(v){return baseVal2>0?(v/baseVal2)*100:100;});
   var ds2=[{
       data:dispVals2,borderColor:color,
       backgroundColor:isBar?color+'cc':grad,
@@ -684,15 +684,15 @@ function selectCat2(prefix, cat, years) {
   }];
   var sc2={
     x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>isBar?'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K'):v.toFixed(0)},grid:{color:'#f0ebe0'},position:'left',
-       title:{display:!isBar,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
+    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>v.toFixed(0)},grid:{color:'#f0ebe0'},position:'left',
+       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
   };
   if(SHOW_CPI2){
     var cr=years.map(y=>CPI_U_DATA2[ALL_YEARS2.indexOf(y)]);
     var cb=cr[0];
-    ds2.push({data:cr.map(function(v){return (v/cb)*100;}),borderColor:'#c9a84c',backgroundColor:'transparent',
+    ds2.push({type:'line',data:cr.map(function(v){return (v/cb)*100;}),borderColor:'#c9a84c',backgroundColor:'transparent',
       borderWidth:3.5,borderDash:[5,3],pointRadius:0,fill:false,tension:0.25,
-      label:'CPI-U (indexed to '+years[0]+')',yAxisID:'y'});
+      label:'CPI-U (indexed to '+years[0]+')',yAxisID:'y',order:0});
   }
   state2[prefix].trendChart=new Chart(ctx,{
     type:isBar?'bar':'line',
@@ -704,11 +704,8 @@ function selectCat2(prefix, cat, years) {
         tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
-              if(!isBar) {
-                var actualDollar2=vals[item.dataIndex];
-                return ' '+(item.dataset.label||cat)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
-              }
-              return ' '+fmtFull2(item.parsed.y);
+              var actualDollar2=vals[item.dataIndex];
+              return ' '+(item.dataset.label||label)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
             }}
         }
       },
@@ -749,33 +746,47 @@ function selectTotal2(prefix, years, totalsByYear) {
   const grad=ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
  
-  state2[prefix].trendChart=new Chart(ctx,{
-    type:isBar?'bar':'line',
-    data:{labels:years,datasets:[{
-      data:vals,borderColor:color,
+  // Index vals to 100 at start year
+  const baseTotalVal2 = vals.find(function(v){return v>0;}) || 1;
+  const dispTotalVals2 = vals.map(function(v){return (v/baseTotalVal2)*100;});
+ 
+  // Build datasets with CPI overlay
+  var totalDs2 = [{
+      data:dispTotalVals2,borderColor:color,
       backgroundColor:isBar?color+'cc':grad,
       borderWidth:isBar?1:5,borderRadius:isBar?3:0,
       pointRadius:isBar?0:(years.length>15?4:6),pointHoverRadius:10,
       pointBackgroundColor:color,pointBorderColor:'#fff',pointBorderWidth:2.5,
       fill:!isBar,tension:isBar?0:0.25,label:label
-    }]},
+  }];
+  if(SHOW_CPI2) {
+    var cpiRT=years.map(y=>CPI_U_DATA2[ALL_YEARS2.indexOf(y)]);
+    var cpiT0=cpiRT[0];
+    totalDs2.push({type:'line',data:cpiRT.map(function(v){return (v/cpiT0)*100;}),
+      borderColor:'#c9a84c',backgroundColor:'transparent',
+      borderWidth:3.5,borderDash:[5,3],pointRadius:0,fill:false,tension:0.25,
+      label:'CPI-U (indexed to '+years[0]+')',yAxisID:'y',order:0});
+  }
+ 
+  state2[prefix].trendChart=new Chart(ctx,{
+    type:isBar?'bar':'line',
+    data:{labels:years,datasets:totalDs2},
     options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
         tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
-              if(!isBar) {
-                var actualDollar2=vals[item.dataIndex];
-                return ' '+(item.dataset.label||cat)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
-              }
-              return ' '+fmtFull2(item.parsed.y);
+              var actualDollar2=vals[item.dataIndex];
+              return ' '+(item.dataset.label||label)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
             }}
         }
       },
       scales:{
         x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
+        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>v.toFixed(0)},grid:{color:'#f0ebe0'},
+       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
       }
     }
   });
