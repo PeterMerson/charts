@@ -671,8 +671,11 @@ function selectCat2(prefix, cat, years) {
   const grad=ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
  
+  // Index vals to 100 at start year for line mode
+  var baseVal2 = vals.find(function(v){return v>0;}) || 1;
+  var dispVals2 = !isBar ? vals.map(function(v){return baseVal2>0?(v/baseVal2)*100:100;}) : vals;
   var ds2=[{
-      data:vals,borderColor:color,
+      data:dispVals2,borderColor:color,
       backgroundColor:isBar?color+'cc':grad,
       borderWidth:isBar?1:5,borderRadius:isBar?3:0,
       pointRadius:isBar?0:(years.length>15?4:6),pointHoverRadius:10,
@@ -681,12 +684,13 @@ function selectCat2(prefix, cat, years) {
   }];
   var sc2={
     x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'},position:'left'}
+    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>isBar?'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K'):v.toFixed(0)},grid:{color:'#f0ebe0'},position:'left',
+       title:{display:!isBar,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
   };
   if(SHOW_CPI2){
     var cr=years.map(y=>CPI_U_DATA2[ALL_YEARS2.indexOf(y)]);
-    var cb=cr[0],vb=vals[0];
-    ds2.push({data:cr.map(v=>vb*(v/cb)),borderColor:'#c9a84c',backgroundColor:'transparent',
+    var cb=cr[0];
+    ds2.push({data:cr.map(function(v){return (v/cb)*100;}),borderColor:'#c9a84c',backgroundColor:'transparent',
       borderWidth:3.5,borderDash:[5,3],pointRadius:0,fill:false,tension:0.25,
       label:'CPI-U (indexed to '+years[0]+')',yAxisID:'y'});
   }
@@ -694,10 +698,18 @@ function selectCat2(prefix, cat, years) {
     type:isBar?'bar':'line',
     data:{labels:years,datasets:ds2},
     options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
         tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
-          callbacks:{title:items=>items[0].label,label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull2(item.parsed.y)}
+          callbacks:{title:items=>items[0].label,label:item=>{
+              if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
+              if(!isBar) {
+                var actualDollar2=vals[item.dataIndex];
+                return ' '+(item.dataset.label||cat)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              }
+              return ' '+fmtFull2(item.parsed.y);
+            }}
         }
       },
       scales:sc2
@@ -751,7 +763,14 @@ function selectTotal2(prefix, years, totalsByYear) {
       plugins:{
         legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
         tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
-          callbacks:{title:items=>items[0].label,label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull2(item.parsed.y)}
+          callbacks:{title:items=>items[0].label,label:item=>{
+              if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
+              if(!isBar) {
+                var actualDollar2=vals[item.dataIndex];
+                return ' '+(item.dataset.label||cat)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              }
+              return ' '+fmtFull2(item.parsed.y);
+            }}
         }
       },
       scales:{
