@@ -612,7 +612,18 @@ const maintIncreaseMarkers = {
       // Badge background
       ctx.fillStyle = 'rgba(63,185,80,0.85)';
       ctx.beginPath();
-      ctx.roundRect(bx, by, bw, bh, 3);
+      // Manual rounded rect for browser compatibility
+      var rad = 3;
+      ctx.moveTo(bx + rad, by);
+      ctx.lineTo(bx + bw - rad, by);
+      ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + rad);
+      ctx.lineTo(bx + bw, by + bh - rad);
+      ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - rad, by + bh);
+      ctx.lineTo(bx + rad, by + bh);
+      ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - rad);
+      ctx.lineTo(bx, by + rad);
+      ctx.quadraticCurveTo(bx, by, bx + rad, by);
+      ctx.closePath();
       ctx.fill();
  
       // Badge text
@@ -879,7 +890,6 @@ function render(prefix) {
   // Add mortgage principal row and totals when toggled on
   if(prefix==='exp' && SHOW_PRINCIPAL) {
     // Add visible Mortgage Principal row
-
     const ptr = document.createElement('tr');
     ptr.classList.add('principal-row');
     const ptd0 = document.createElement('td');
@@ -1000,6 +1010,7 @@ function selectCat(prefix, cat, years) {
     const idx = ALL_YEARS.indexOf(y);
     return isMPIcat ? data[cat][idx] + (MORTGAGE_PRINCIPAL[idx]||0) : data[cat][idx];
   });
+  const firstNonZeroVal = vals.find(v => v > 0) || 1;
   const peak = Math.max(...vals);
   const peakYr = years[vals.indexOf(peak)];
   const latest = vals[vals.length-1];
@@ -1030,8 +1041,10 @@ function selectCat(prefix, cat, years) {
   const TAX_CERT_YEARS = [1997, 2009, 2021];
  
   // For RE Taxes: use indexed values and highlight certiorari dip years
-  const dispVals = isRETax && !isBar
-    ? vals.map(v => vals[0] > 0 ? (v / vals[0]) * 100 : 100)
+  // Index ALL categories to 100 at start year when in line mode
+  const baseVal = vals.find(v => v > 0) || 1;
+  const dispVals = !isBar
+    ? vals.map(v => baseVal > 0 ? (v / baseVal) * 100 : 100)
     : vals;
   const cpiIndexedForRE = isRETax && !isBar && SHOW_CPI
     ? years.map(y => { const ci = CPI_U_DATA[ALL_YEARS.indexOf(y)]; const cb = CPI_U_DATA[ALL_YEARS.indexOf(years[0])]; return (ci/cb)*100; })
@@ -1046,10 +1059,11 @@ function selectCat(prefix, cat, years) {
     : null;
  
   const datasets = [
-    { data: isRETax && !isBar ? dispVals : vals,
+    { data: !isBar ? dispVals : vals,
       borderColor:color,
       backgroundColor: isBar ? color+'cc' : grad,
       borderWidth: isBar ? 1 : 5, borderRadius: isBar ? 3 : 0,
+
       pointRadius: pointRadii || (isBar ? 0 : (years.length>15?4:6)),
       pointHoverRadius:10,
       pointBackgroundColor: pointColors || color,
@@ -1070,19 +1084,17 @@ function selectCat(prefix, cat, years) {
   if(SHOW_CPI) {
     const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
     const cpiBase = cpiRaw[0];
-    // For RE Taxes: pure index (100 = start year). For others: scaled to dollar values
-    const cpiIndexed = isRETax && !isBar
-      ? cpiRaw.map(v => (v/cpiBase)*100)
-      : cpiRaw.map(v => vals[0] * (v/cpiBase));
+    // ALL categories: pure 100-based index so CPI is always comparable
+    const cpiIndexed = cpiRaw.map(v => (v/cpiBase)*100);
     const cpiColor = isRETax && !isBar ? '#58a6ff' : '#c9a84c';
-    const cpiLabel = isRETax && !isBar ? 'US CPI-U (indexed to '+years[0]+')' : 'CPI-U (indexed to '+years[0]+')';
+    const cpiLabel = 'US CPI-U (indexed to '+years[0]+')';
     datasets.push({ data:cpiIndexed, borderColor:cpiColor, backgroundColor:'transparent',
       borderWidth:3.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25,
       label:cpiLabel, yAxisID:'y' });
   }
  
-  // RE Tax: y-axis shows index values, highlight certiorari note in tooltip
-  if(isRETax && !isBar) {
+  // All line charts: y-axis shows index values
+  if(!isBar) {
     scales.y.ticks = { font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a',
       callback: v => v.toFixed(0) };
     scales.y.title = { display:true, text:'Index ('+years[0]+' = 100)',
@@ -1095,21 +1107,22 @@ function selectCat(prefix, cat, years) {
     type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
       plugins:{ legend:{ display: showLegend, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } },
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
           callbacks:{ title:items=>items[0].label,
             label:item => {
-              if(isRETax && !isBar) {
-                if(item.dataset.label.indexOf('CPI') > -1) {
-                  return ' CPI-U Index: ' + item.parsed.y.toFixed(1);
-                }
-                // RE Taxes: show index value AND actual dollar amount
-                var actualVal = vals[item.dataIndex];
-                return ' RE Taxes: ' + item.parsed.y.toFixed(1) + '  ($' + actualVal.toLocaleString('en-US') + ')';
+              // CPI line always shows its index value
+              if(item.dataset.label.indexOf('CPI') > -1) {
+                return ' CPI-U Index: ' + item.parsed.y.toFixed(1);
               }
-              return item.dataset.label.indexOf('CPI') > -1
-                ? ' CPI-U (indexed): ' + item.parsed.y.toFixed(1)
-                : ' ' + fmtFull(item.parsed.y) + (SHOW_CPI ? ' · Index: ' + (vals[0]>0?(item.parsed.y/vals[0]*100).toFixed(1):'—') : '');
+              // All categories in line mode: show index + actual dollar amount
+              if(!isBar) {
+                var actualDollar = vals[item.dataIndex];
+                return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
+              }
+              // Bar mode: show dollar amount only
+              return ' ' + fmtFull(item.parsed.y);
             },
             afterBody: isRETax && !isBar ? function(items) {
               var yr = parseInt(items[0].label);
@@ -1184,7 +1197,11 @@ function selectTotal(prefix, years, totalsByYear) {
     type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>{
+              if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
+              return ' '+fmtFull(item.parsed.y);
+            } } } },
       scales:scales
     }
   });
@@ -1402,6 +1419,7 @@ function renderNetChart(years, nets) {
     type: isBar ? 'bar' : 'line',
     data:{ labels:years, datasets:[netDataset]},
     options:{ responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
       plugins:{ legend:{display:false},
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
           callbacks:{ title:i=>i[0].label, label:i=>i.dataset.label&&i.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+i.parsed.y.toFixed(1):(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US') }
@@ -1871,6 +1889,7 @@ function selectCapCat(cat, years) {
       fill:!isBar, tension:isBar?0:0.25, label:cat
     }]},
     options: { responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
       plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
         callbacks:{title:items=>items[0].label, label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y)}
       }},
