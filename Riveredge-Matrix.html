@@ -285,6 +285,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
+
 <div class="legend-bar">
   <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
@@ -347,6 +348,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="exp-range-controls">
     <span class="ctrl-label">From</span>
+
     <select id="exp-sel-from" onchange="render('exp')"></select>
     <span class="ctrl-label">To</span>
     <select id="exp-sel-to" onchange="render('exp')"></select>
@@ -364,6 +366,11 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">$ Change</span>
     <button class="mode-btn" id="exp-btn-show-dollar" onclick="toggleDollar('exp')">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mortgage Principal</span>
+    <button class="mode-btn" id="exp-btn-principal" onclick="togglePrincipalExp()" title="Include or exclude Mortgage Principal in Expense totals">Excluded</button>
   </div>
 </div>
  
@@ -859,6 +866,7 @@ function render(prefix) {
         if(p!==null && showChg) {
           const pSpan = document.createElement('span');
           pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
+
           pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; bWrap.appendChild(pSpan);
         }
         if(prevVal!==null && state[prefix].showDollar) {
@@ -952,6 +960,7 @@ function render(prefix) {
         dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
         dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
         badgeWrap.appendChild(dSpan);
+
       }
       totDiv.appendChild(badgeWrap);
     }
@@ -1442,11 +1451,25 @@ function toggleCPI() {
 }
  
 // ── TOGGLE MORTGAGE PRINCIPAL ──
+function togglePrincipalExp() {
+  // Sync with global toggle
+  togglePrincipal();
+  // Update this local button to match
+  const btn = document.getElementById('exp-btn-principal');
+  if(btn) {
+    btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
+    btn.classList.toggle('active', SHOW_PRINCIPAL);
+  }
+}
+ 
 function togglePrincipal() {
   SHOW_PRINCIPAL = !SHOW_PRINCIPAL;
   const btn = document.getElementById('btn-principal');
   btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
   btn.classList.toggle('active', SHOW_PRINCIPAL);
+  // Keep expense section button in sync
+  const expBtn = document.getElementById('exp-btn-principal');
+  if(expBtn) { expBtn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; expBtn.classList.toggle('active', SHOW_PRINCIPAL); }
   state.exp.totalSelected = false;
   render('exp');
   renderNet();
@@ -1486,7 +1509,6 @@ function toggleFS(prefix) {
   var panel = document.getElementById(panelId);
   if(!panel) return;
   var chartPanel = document.getElementById(prefix+'-chart-panel');
-
   if(!chartPanel || chartPanel.style.display === 'none') return;
   var btn = document.getElementById(prefix+'-expand-btn');
   var chart = prefix==='net' ? window._netChart : (state[prefix] ? state[prefix].trendChart : null);
