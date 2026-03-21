@@ -1041,11 +1041,9 @@ function selectCat(prefix, cat, years) {
   const TAX_CERT_YEARS = [1997, 2009, 2021];
  
   // For RE Taxes: use indexed values and highlight certiorari dip years
-  // Index ALL categories to 100 at start year when in line mode
+  // Index ALL categories to 100 at start year for both line AND bar modes
   const baseVal = vals.find(v => v > 0) || 1;
-  const dispVals = !isBar
-    ? vals.map(v => baseVal > 0 ? (v / baseVal) * 100 : 100)
-    : vals;
+  const dispVals = vals.map(v => baseVal > 0 ? (v / baseVal) * 100 : 100);
   const cpiIndexedForRE = isRETax && !isBar && SHOW_CPI
     ? years.map(y => { const ci = CPI_U_DATA[ALL_YEARS.indexOf(y)]; const cb = CPI_U_DATA[ALL_YEARS.indexOf(years[0])]; return (ci/cb)*100; })
     : null;
@@ -1059,11 +1057,10 @@ function selectCat(prefix, cat, years) {
     : null;
  
   const datasets = [
-    { data: !isBar ? dispVals : vals,
+    { data: dispVals,
       borderColor:color,
       backgroundColor: isBar ? color+'cc' : grad,
       borderWidth: isBar ? 1 : 5, borderRadius: isBar ? 3 : 0,
-
       pointRadius: pointRadii || (isBar ? 0 : (years.length>15?4:6)),
       pointHoverRadius:10,
       pointBackgroundColor: pointColors || color,
@@ -1081,25 +1078,23 @@ function selectCat(prefix, cat, years) {
     x:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] }, grid:{color:'#f0ebe0'} },
     y:{ ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K') }, grid:{color:'#f0ebe0'}, position:'left' }
   };
+  // CPI overlay: always show as dashed line regardless of bar/line mode
   if(SHOW_CPI) {
     const cpiRaw = years.map(y => CPI_U_DATA[ALL_YEARS.indexOf(y)]);
     const cpiBase = cpiRaw[0];
-    // ALL categories: pure 100-based index so CPI is always comparable
     const cpiIndexed = cpiRaw.map(v => (v/cpiBase)*100);
-    const cpiColor = isRETax && !isBar ? '#58a6ff' : '#c9a84c';
+    const cpiColor = isRETax ? '#58a6ff' : '#c9a84c';
     const cpiLabel = 'US CPI-U (indexed to '+years[0]+')';
-    datasets.push({ data:cpiIndexed, borderColor:cpiColor, backgroundColor:'transparent',
+    datasets.push({ type:'line', data:cpiIndexed, borderColor:cpiColor, backgroundColor:'transparent',
       borderWidth:3.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25,
-      label:cpiLabel, yAxisID:'y' });
+      label:cpiLabel, yAxisID:'y', order:0 });
   }
  
-  // All line charts: y-axis shows index values
-  if(!isBar) {
-    scales.y.ticks = { font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a',
-      callback: v => v.toFixed(0) };
-    scales.y.title = { display:true, text:'Index ('+years[0]+' = 100)',
-      font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a' };
-  }
+  // Y-axis always shows index values (data is always indexed)
+  scales.y.ticks = { font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a',
+    callback: v => v.toFixed(0) };
+  scales.y.title = { display:true, text:'Index ('+years[0]+' = 100)',
+    font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a' };
  
   const showLegend = SHOW_CPI;
  
@@ -1116,13 +1111,9 @@ function selectCat(prefix, cat, years) {
               if(item.dataset.label.indexOf('CPI') > -1) {
                 return ' CPI-U Index: ' + item.parsed.y.toFixed(1);
               }
-              // All categories in line mode: show index + actual dollar amount
-              if(!isBar) {
-                var actualDollar = vals[item.dataIndex];
-                return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
-              }
-              // Bar mode: show dollar amount only
-              return ' ' + fmtFull(item.parsed.y);
+              // All categories: index + actual dollar amount
+              var actualDollar = vals[item.dataIndex];
+              return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
             },
             afterBody: isRETax && !isBar ? function(items) {
               var yr = parseInt(items[0].label);
