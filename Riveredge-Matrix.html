@@ -1077,7 +1077,7 @@ function selectCat(prefix, cat, years) {
     const cpiColor = isRETax && !isBar ? '#58a6ff' : '#c9a84c';
     const cpiLabel = isRETax && !isBar ? 'US CPI-U (indexed to '+years[0]+')' : 'CPI-U (indexed to '+years[0]+')';
     datasets.push({ data:cpiIndexed, borderColor:cpiColor, backgroundColor:'transparent',
-      borderWidth:2.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25,
+      borderWidth:3.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25,
       label:cpiLabel, yAxisID:'y' });
   }
  
@@ -1108,8 +1108,8 @@ function selectCat(prefix, cat, years) {
                 return ' RE Taxes: ' + item.parsed.y.toFixed(1) + '  ($' + actualVal.toLocaleString('en-US') + ')';
               }
               return item.dataset.label.indexOf('CPI') > -1
-                ? ' CPI-U: ' + item.parsed.y.toFixed(1)
-                : ' ' + fmtFull(item.parsed.y);
+                ? ' CPI-U (indexed): ' + item.parsed.y.toFixed(1)
+                : ' ' + fmtFull(item.parsed.y) + (SHOW_CPI ? ' · Index: ' + (vals[0]>0?(item.parsed.y/vals[0]*100).toFixed(1):'—') : '');
             },
             afterBody: isRETax && !isBar ? function(items) {
               var yr = parseInt(items[0].label);
@@ -1177,14 +1177,14 @@ function selectTotal(prefix, years, totalsByYear) {
     const cpiBase = cpiRaw[0];
     const valBase = vals[0];
     const cpiIndexed = cpiRaw.map(v => valBase * (v / cpiBase));
-    datasets.push({ data:cpiIndexed, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:2, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U (indexed to '+years[0]+')', yAxisID:'y' });
+    datasets.push({ data:cpiIndexed, borderColor:'#c9a84c', backgroundColor:'transparent', borderWidth:3.5, borderDash:[5,3], pointRadius:0, fill:false, tension:0.25, label:'CPI-U (indexed to '+years[0]+')', yAxisID:'y' });
   }
  
   state[prefix].trendChart = new Chart(ctx, {
     type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
     options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label==='CPI-U'?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
+      plugins:{ legend:{ display:SHOW_CPI, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', boxWidth:20 } }, tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10, callbacks:{ title:items=>items[0].label, label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y) } } },
       scales:scales
     }
   });
@@ -1404,7 +1404,7 @@ function renderNetChart(years, nets) {
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false},
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
-          callbacks:{ title:i=>i[0].label, label:i=>(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US') }
+          callbacks:{ title:i=>i[0].label, label:i=>i.dataset.label&&i.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+i.parsed.y.toFixed(1):(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US') }
         },
         annotation:{ annotations:{ zeroLine:{ type:'line', yMin:0, yMax:0, borderColor:'rgba(139,148,158,0.5)', borderWidth:1 } } }
       },
@@ -1691,7 +1691,7 @@ function renderCompareChart(years) {
         tooltip:{ backgroundColor:'#1a1208', titleColor:'#c9a84c', bodyColor:'#f7f3ec', borderColor:'#3a3028', borderWidth:1, padding:10,
           callbacks:{
             title:i=>i[0].label,
-            label:i=>' '+i.dataset.label+': $'+i.parsed.y.toLocaleString('en-US'),
+            label:i=>i.dataset.label&&i.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+i.parsed.y.toFixed(1):' '+i.dataset.label+': $'+i.parsed.y.toLocaleString('en-US'),
             afterBody:function(items) {
               if(items.length<2) return '';
               var net = items[0].parsed.y - items[1].parsed.y;
@@ -1872,7 +1872,7 @@ function selectCapCat(cat, years) {
     }]},
     options: { responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
-        callbacks:{title:items=>items[0].label, label:item=>' '+fmtFull(item.parsed.y)}
+        callbacks:{title:items=>items[0].label, label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+item.parsed.y.toFixed(1):' '+fmtFull(item.parsed.y)}
       }},
       scales:{
         x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
