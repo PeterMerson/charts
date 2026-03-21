@@ -260,7 +260,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="inc-btn-range" onclick="setMode('inc','range')">Year Range</button>
-    <button class="mode-btn" id="inc-btn-single" onclick="setMode('inc','single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="inc-range-controls">
@@ -269,10 +269,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">To</span>
     <select id="inc-sel-to" onchange="render('inc')"></select>
   </div>
-  <div class="ctrl-group" id="inc-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="inc-sel-single" onchange="render('inc')"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -283,9 +280,14 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">$ Change</span>
     <button class="mode-btn" id="inc-btn-show-dollar" onclick="toggleDollar('inc')">Hidden</button>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="inc-btn-line" onclick="setChartType('line')">Line</button>
+    <button class="mode-btn" id="inc-btn-bar" onclick="setChartType('bar')">Bar</button>
+  </div>
 </div>
  
-
 <div class="legend-bar">
   <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
@@ -343,20 +345,16 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="exp-btn-range" onclick="setMode('exp','range')">Year Range</button>
-    <button class="mode-btn" id="exp-btn-single" onclick="setMode('exp','single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="exp-range-controls">
     <span class="ctrl-label">From</span>
-
     <select id="exp-sel-from" onchange="render('exp')"></select>
     <span class="ctrl-label">To</span>
     <select id="exp-sel-to" onchange="render('exp')"></select>
   </div>
-  <div class="ctrl-group" id="exp-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="exp-sel-single" onchange="render('exp')"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -366,6 +364,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">$ Change</span>
     <button class="mode-btn" id="exp-btn-show-dollar" onclick="toggleDollar('exp')">Hidden</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Chart Type</span>
+    <button class="mode-btn active" id="exp-btn-line" onclick="setChartType('line')">Line</button>
+    <button class="mode-btn" id="exp-btn-bar" onclick="setChartType('bar')">Bar</button>
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
@@ -426,7 +430,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="net-btn-range" onclick="setNetMode('range')">Year Range</button>
-    <button class="mode-btn" id="net-btn-single" onclick="setNetMode('single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="net-range-controls">
@@ -435,10 +439,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">To</span>
     <select id="net-sel-to" onchange="renderNet()"></select>
   </div>
-  <div class="ctrl-group" id="net-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="net-sel-single" onchange="renderNet()"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -454,6 +455,11 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">Chart Type</span>
     <button class="mode-btn active" id="net-btn-line" onclick="setNetChartType('line')">Line</button>
     <button class="mode-btn" id="net-btn-bar" onclick="setNetChartType('bar')">Bar</button>
+  </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Mortgage Principal</span>
+    <button class="mode-btn" id="net-btn-principal" onclick="togglePrincipalNet()" title="Include or exclude Mortgage Principal">Excluded</button>
   </div>
 </div>
  
@@ -504,7 +510,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="cap-btn-range" onclick="setCapMode('range')">Year Range</button>
-    <button class="mode-btn" id="cap-btn-single" onclick="setCapMode('single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="cap-range-controls">
@@ -513,10 +519,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">To</span>
     <select id="cap-sel-to" onchange="renderCap()"></select>
   </div>
-  <div class="ctrl-group" id="cap-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="cap-sel-single" onchange="renderCap()"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -707,7 +710,7 @@ var NET_SHOW_CHG = false;
 var NET_SHOW_DOLLAR = false;
  
 function initSelects(prefix) {
-  ['from','to','single'].forEach(id => {
+  ['from','to'].forEach(id => {
     const el = document.getElementById(prefix+'-sel-'+id);
     ALL_YEARS.forEach(y => {
       const o = document.createElement('option');
@@ -716,15 +719,12 @@ function initSelects(prefix) {
   });
   document.getElementById(prefix+'-sel-from').value = 2016;
   document.getElementById(prefix+'-sel-to').value = 2024;
-  document.getElementById(prefix+'-sel-single').value = 2024;
 }
  
 function setMode(prefix, m) {
   state[prefix].mode = m;
   document.getElementById(prefix+'-btn-range').classList.toggle('active', m==='range');
-  document.getElementById(prefix+'-btn-single').classList.toggle('active', m==='single');
   document.getElementById(prefix+'-range-controls').style.display = m==='range'?'flex':'none';
-  document.getElementById(prefix+'-single-controls').style.display = m==='single'?'flex':'none';
   render(prefix);
 }
  
@@ -779,17 +779,10 @@ function setNetChartType(type) {
 }
  
 function getYears(prefix) {
-  const s = state[prefix];
-  if (s.mode === 'single') {
-    const y = parseInt(document.getElementById(prefix+'-sel-single').value);
-    const idx = ALL_YEARS.indexOf(y);
-    return ALL_YEARS.slice(Math.max(0,idx-4), idx+1);
-  } else {
-    const from = parseInt(document.getElementById(prefix+'-sel-from').value);
-    const to   = parseInt(document.getElementById(prefix+'-sel-to').value);
-    const f = Math.min(from,to), t = Math.max(from,to);
-    return ALL_YEARS.filter(y => y>=f && y<=t);
-  }
+  const from = parseInt(document.getElementById(prefix+'-sel-from').value);
+  const to   = parseInt(document.getElementById(prefix+'-sel-to').value);
+  const f = Math.min(from,to), t = Math.max(from,to);
+  return ALL_YEARS.filter(y => y>=f && y<=t);
 }
  
 function fmtFull(v) { return '$'+Math.abs(v).toLocaleString('en-US'); }
@@ -866,7 +859,6 @@ function render(prefix) {
         if(p!==null && showChg) {
           const pSpan = document.createElement('span');
           pSpan.className = 'cell-chg '+(isUp?'chg-up':(p===0?'chg-neu':'chg-dn'));
-
           pSpan.textContent = (isUp?'+':'')+p.toFixed(1)+'%'; bWrap.appendChild(pSpan);
         }
         if(prevVal!==null && state[prefix].showDollar) {
@@ -887,6 +879,7 @@ function render(prefix) {
   // Add mortgage principal row and totals when toggled on
   if(prefix==='exp' && SHOW_PRINCIPAL) {
     // Add visible Mortgage Principal row
+
     const ptr = document.createElement('tr');
     ptr.classList.add('principal-row');
     const ptd0 = document.createElement('td');
@@ -960,7 +953,6 @@ function render(prefix) {
         dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
         dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
         badgeWrap.appendChild(dSpan);
-
       }
       totDiv.appendChild(badgeWrap);
     }
@@ -1203,6 +1195,13 @@ function setChartType(type) {
   CHART_TYPE = type;
   document.getElementById('btn-charttype-line').classList.toggle('active', type==='line');
   document.getElementById('btn-charttype-bar').classList.toggle('active', type==='bar');
+  // Sync inc/exp local buttons
+  ['inc','exp'].forEach(function(p) {
+    var lb = document.getElementById(p+'-btn-line');
+    var bb = document.getElementById(p+'-btn-bar');
+    if(lb) lb.classList.toggle('active', type==='line');
+    if(bb) bb.classList.toggle('active', type==='bar');
+  });
   // Redraw all active charts using stored state
   ['inc','exp'].forEach(prefix => {
     const years = window['_'+prefix+'TotalYears'] || getYears(prefix);
@@ -1221,17 +1220,10 @@ function setChartType(type) {
  
 // ── NET INCOME SECTION ──
 function getNetYears() {
-  const s = { mode: document.getElementById('net-btn-range').classList.contains('active') ? 'range' : 'single' };
-  if(s.mode==='single') {
-    const y = parseInt(document.getElementById('net-sel-single').value);
-    const idx = ALL_YEARS.indexOf(y);
-    return ALL_YEARS.slice(Math.max(0,idx-4), idx+1);
-  } else {
-    const from = parseInt(document.getElementById('net-sel-from').value);
-    const to   = parseInt(document.getElementById('net-sel-to').value);
-    const f = Math.min(from,to), t = Math.max(from,to);
-    return ALL_YEARS.filter(y => y>=f && y<=t);
-  }
+  const from = parseInt(document.getElementById('net-sel-from').value);
+  const to   = parseInt(document.getElementById('net-sel-to').value);
+  const f = Math.min(from,to), t = Math.max(from,to);
+  return ALL_YEARS.filter(y => y>=f && y<=t);
 }
  
 function renderNet() {
@@ -1423,9 +1415,7 @@ function renderNetChart(years, nets) {
  
 function setNetMode(m) {
   document.getElementById('net-btn-range').classList.toggle('active', m==='range');
-  document.getElementById('net-btn-single').classList.toggle('active', m==='single');
   document.getElementById('net-range-controls').style.display = m==='range'?'flex':'none';
-  document.getElementById('net-single-controls').style.display = m==='single'?'flex':'none';
   renderNet();
   // Redraw active chart if one is showing
   var netTitle = document.getElementById('net-panel-cat').textContent;
@@ -1451,6 +1441,12 @@ function toggleCPI() {
 }
  
 // ── TOGGLE MORTGAGE PRINCIPAL ──
+function togglePrincipalNet() {
+  togglePrincipal();
+  const btn = document.getElementById('net-btn-principal');
+  if(btn) { btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; btn.classList.toggle('active', SHOW_PRINCIPAL); }
+}
+ 
 function togglePrincipalExp() {
   // Sync with global toggle
   togglePrincipal();
@@ -1467,9 +1463,11 @@ function togglePrincipal() {
   const btn = document.getElementById('btn-principal');
   btn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded';
   btn.classList.toggle('active', SHOW_PRINCIPAL);
-  // Keep expense section button in sync
+  // Keep expense and net section buttons in sync
   const expBtn = document.getElementById('exp-btn-principal');
   if(expBtn) { expBtn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; expBtn.classList.toggle('active', SHOW_PRINCIPAL); }
+  const netBtn = document.getElementById('net-btn-principal');
+  if(netBtn) { netBtn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; netBtn.classList.toggle('active', SHOW_PRINCIPAL); }
   state.exp.totalSelected = false;
   render('exp');
   renderNet();
@@ -1726,9 +1724,7 @@ const CAP_DATA = {
 function setCapMode(m) {
   capState.mode = m;
   document.getElementById('cap-btn-range').classList.toggle('active', m==='range');
-  document.getElementById('cap-btn-single').classList.toggle('active', m==='single');
   document.getElementById('cap-range-controls').style.display = m==='range'?'flex':'none';
-  document.getElementById('cap-single-controls').style.display = m==='single'?'flex':'none';
   renderCap();
 }
  
@@ -1758,16 +1754,10 @@ function setCapChartType(type) {
 }
  
 function getCapYears() {
-  if(capState.mode === 'single') {
-    const y = parseInt(document.getElementById('cap-sel-single').value);
-    const idx = ALL_YEARS.indexOf(y);
-    return ALL_YEARS.slice(Math.max(0,idx-4), idx+1);
-  } else {
-    const from = parseInt(document.getElementById('cap-sel-from').value);
-    const to   = parseInt(document.getElementById('cap-sel-to').value);
-    const f = Math.min(from,to), t = Math.max(from,to);
-    return ALL_YEARS.filter(y => y>=f && y<=t);
-  }
+  const from = parseInt(document.getElementById('cap-sel-from').value);
+  const to   = parseInt(document.getElementById('cap-sel-to').value);
+  const f = Math.min(from,to), t = Math.max(from,to);
+  return ALL_YEARS.filter(y => y>=f && y<=t);
 }
  
 function scrollCapRight() {
@@ -1955,28 +1945,26 @@ initSelects('inc');
 initSelects('exp');
  
 // Init net selects
-['from','to','single'].forEach(id => {
+['from','to'].forEach(id => {
   const el = document.getElementById('net-sel-'+id);
   if(!el) return;
   ALL_YEARS.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; el.appendChild(o); });
 });
 document.getElementById('net-sel-from').value = 2016;
 document.getElementById('net-sel-to').value = 2024;
-document.getElementById('net-sel-single').value = 2024;
  
 render('inc');
 render('exp');
 renderNet();
  
 // Init capital selects
-['from','to','single'].forEach(id => {
+['from','to'].forEach(id => {
   const el = document.getElementById('cap-sel-'+id);
   if(!el) return;
   ALL_YEARS.forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; el.appendChild(o); });
 });
 document.getElementById('cap-sel-from').value = 2016;
 document.getElementById('cap-sel-to').value = 2024;
-document.getElementById('cap-sel-single').value = 2024;
 renderCap();
  
 // Scroll all matrix tables to the right so current year (2024) is visible
