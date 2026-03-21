@@ -236,7 +236,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="rep-btn-range" onclick="setMode2('rep','range')">Year Range</button>
-    <button class="mode-btn" id="rep-btn-single" onclick="setMode2('rep','single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="rep-range-controls">
@@ -245,10 +245,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">To</span>
     <select id="rep-sel-to" onchange="render2('rep')"></select>
   </div>
-  <div class="ctrl-group" id="rep-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="rep-sel-single" onchange="render2('rep')"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -265,6 +262,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <button class="mode-btn active" id="rep-btn-line" onclick="setChartType2('rep','line')">Line</button>
     <button class="mode-btn" id="rep-btn-bar" onclick="setChartType2('rep','bar')">Bar</button>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">CPI-U Overlay</span>
+    <button class="mode-btn" id="rep-btn-cpi" onclick="toggleCPI2('rep')">Off</button>
+  </div>
+ 
 </div>
  
 <div class="legend-bar">
@@ -322,7 +325,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group">
     <span class="ctrl-label">Mode</span>
     <button class="mode-btn active" id="utl-btn-range" onclick="setMode2('utl','range')">Year Range</button>
-    <button class="mode-btn" id="utl-btn-single" onclick="setMode2('utl','single')">Single Year</button>
+ 
   </div>
   <div class="ctrl-divider"></div>
   <div class="ctrl-group" id="utl-range-controls">
@@ -331,10 +334,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <span class="ctrl-label">To</span>
     <select id="utl-sel-to" onchange="render2('utl')"></select>
   </div>
-  <div class="ctrl-group" id="utl-single-controls" style="display:none;">
-    <span class="ctrl-label">Year</span>
-    <select id="utl-sel-single" onchange="render2('utl')"></select>
-  </div>
+ 
   <div class="ctrl-divider"></div>
   <div class="ctrl-group">
     <span class="ctrl-label">% Change</span>
@@ -351,6 +351,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <button class="mode-btn active" id="utl-btn-line" onclick="setChartType2('utl','line')">Line</button>
     <button class="mode-btn" id="utl-btn-bar" onclick="setChartType2('utl','bar')">Bar</button>
   </div>
+  <div class="ctrl-divider"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">CPI-U Overlay</span>
+    <button class="mode-btn" id="utl-btn-cpi" onclick="toggleCPI2('utl')">Off</button>
+  </div>
+ 
 </div>
  
 <div class="legend-bar">
@@ -428,6 +434,9 @@ const UTL_CATS = ['Fuel Oil', 'Electric & Gas'];
 const REP_COLORS = ['#1D6FA4', '#2196F3', '#8E24AA', '#F4511E', '#43A047', '#00ACC1', '#FF9800', '#E63946', '#6D4C41', '#546E7A', '#7CB342', '#d29922', '#bc8cff', '#f778ba', '#39d353', '#79c0ff', '#ffa657', '#58a6ff', '#f87171', '#a78bfa'];
 const UTL_COLORS = ['#FF6B35','#2196F3'];
  
+const CPI_U_DATA2 = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
+var SHOW_CPI2 = false;
+ 
 const state2 = {
   rep: { mode:'range', showChg:false, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false },
   utl: { mode:'range', showChg:false, showDollar:false, chartType:'line', selectedCat:null, trendChart:null, totalSelected:false }
@@ -435,7 +444,7 @@ const state2 = {
  
 // ── INIT SELECTS ──
 function initSelects2(prefix) {
-  ['from','to','single'].forEach(id => {
+  ['from','to'].forEach(id => {
     const el = document.getElementById(prefix+'-sel-'+id);
     ALL_YEARS2.forEach(y => {
       const o = document.createElement('option');
@@ -444,15 +453,13 @@ function initSelects2(prefix) {
   });
   document.getElementById(prefix+'-sel-from').value = 2015;
   document.getElementById(prefix+'-sel-to').value = 2024;
-  document.getElementById(prefix+'-sel-single').value = 2024;
+ 
 }
  
 function setMode2(prefix, m) {
   state2[prefix].mode = m;
   document.getElementById(prefix+'-btn-range').classList.toggle('active', m==='range');
-  document.getElementById(prefix+'-btn-single').classList.toggle('active', m==='single');
   document.getElementById(prefix+'-range-controls').style.display = m==='range'?'flex':'none';
-  document.getElementById(prefix+'-single-controls').style.display = m==='single'?'flex':'none';
   render2(prefix);
 }
  
@@ -483,17 +490,10 @@ function setChartType2(prefix, type) {
 }
  
 function getYears2(prefix) {
-  const s = state2[prefix];
-  if(s.mode === 'single') {
-    const y = parseInt(document.getElementById(prefix+'-sel-single').value);
-    const idx = ALL_YEARS2.indexOf(y);
-    return ALL_YEARS2.slice(Math.max(0,idx-4), idx+1);
-  } else {
-    const from = parseInt(document.getElementById(prefix+'-sel-from').value);
-    const to   = parseInt(document.getElementById(prefix+'-sel-to').value);
-    const f = Math.min(from,to), t = Math.max(from,to);
-    return ALL_YEARS2.filter(y => y>=f && y<=t);
-  }
+  const from = parseInt(document.getElementById(prefix+'-sel-from').value);
+  const to   = parseInt(document.getElementById(prefix+'-sel-to').value);
+  const f = Math.min(from,to), t = Math.max(from,to);
+  return ALL_YEARS2.filter(y => y>=f && y<=t);
 }
  
 function fmtFull2(v) { return '$'+Math.abs(v).toLocaleString('en-US'); }
@@ -573,6 +573,15 @@ function render2(prefix) {
     });
     body.appendChild(tr);
   });
+ 
+  // Add mortgage principal to rep totals when toggled
+  if(prefix==='rep' && SHOW_PRINCIPAL2) {
+    years.forEach(function(y) {
+      const pidx = ALL_YEARS2.indexOf(y);
+      // We need principal from main matrix data - use same MORTGAGE_PRINCIPAL if available
+      // Since this is a separate file, we'll show a note row instead
+    });
+  }
  
   // TOTAL ROW
   const ttr = document.createElement('tr');
@@ -662,25 +671,36 @@ function selectCat2(prefix, cat, years) {
   const grad=ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
  
-  state2[prefix].trendChart=new Chart(ctx,{
-    type:isBar?'bar':'line',
-    data:{labels:years,datasets:[{
+  var ds2=[{
       data:vals,borderColor:color,
       backgroundColor:isBar?color+'cc':grad,
       borderWidth:isBar?1:5,borderRadius:isBar?3:0,
       pointRadius:isBar?0:(years.length>15?4:6),pointHoverRadius:10,
       pointBackgroundColor:color,pointBorderColor:'#fff',pointBorderWidth:2.5,
-      fill:!isBar,tension:isBar?0:0.25,label:cat
-    }]},
+      fill:!isBar,tension:isBar?0:0.25,label:cat,yAxisID:'y'
+  }];
+  var sc2={
+    x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
+    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'},position:'left'}
+  };
+  if(SHOW_CPI2){
+    var cr=years.map(y=>CPI_U_DATA2[ALL_YEARS2.indexOf(y)]);
+    var cb=cr[0],vb=vals[0];
+    ds2.push({data:cr.map(v=>vb*(v/cb)),borderColor:'#c9a84c',backgroundColor:'transparent',
+      borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false,tension:0.25,
+      label:'CPI-U (indexed to '+years[0]+')',yAxisID:'y'});
+  }
+  state2[prefix].trendChart=new Chart(ctx,{
+    type:isBar?'bar':'line',
+    data:{labels:years,datasets:ds2},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
-        callbacks:{title:items=>items[0].label,label:item=>' '+fmtFull2(item.parsed.y)}
-      }},
-      scales:{
-
-        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
-      }
+      plugins:{
+        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
+        tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+          callbacks:{title:items=>items[0].label,label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull2(item.parsed.y)}
+        }
+      },
+      scales:sc2
     }
   });
 }
@@ -728,9 +748,12 @@ function selectTotal2(prefix, years, totalsByYear) {
       fill:!isBar,tension:isBar?0:0.25,label:label
     }]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
-        callbacks:{title:items=>items[0].label,label:item=>' '+fmtFull2(item.parsed.y)}
-      }},
+      plugins:{
+        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
+        tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+          callbacks:{title:items=>items[0].label,label:item=>item.dataset.label&&item.dataset.label.indexOf('CPI')>-1?' CPI-U: '+item.parsed.y.toFixed(1):' '+fmtFull2(item.parsed.y)}
+        }
+      },
       scales:{
         x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
         y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
@@ -829,6 +852,33 @@ const barYearLabels2 = {
   }
 };
 Chart.register(barYearLabels2);
+ 
+// ── PRINCIPAL TOGGLE FOR REPAIRS/UTILITIES ──
+var SHOW_PRINCIPAL2 = false;
+ 
+function toggleCPI2(prefix) {
+  SHOW_CPI2 = !SHOW_CPI2;
+  ['rep','utl'].forEach(function(p) {
+    var btn = document.getElementById(p+'-btn-cpi');
+    if(btn) { btn.textContent = SHOW_CPI2 ? 'On' : 'Off'; btn.classList.toggle('active', SHOW_CPI2); }
+  });
+  // Redraw active charts
+  ['rep','utl'].forEach(function(p) {
+    var years = getYears2(p);
+    if(state2[p].selectedCat) selectCat2(p, state2[p].selectedCat, years);
+    else if(state2[p].totalSelected) selectTotal2(p, years);
+  });
+}
+ 
+function togglePrincipal2(prefix) {
+  SHOW_PRINCIPAL2 = !SHOW_PRINCIPAL2;
+  ['rep','utl'].forEach(function(p) {
+    var btn = document.getElementById(p+'-btn-principal');
+    if(btn) { btn.textContent = SHOW_PRINCIPAL2 ? 'Included' : 'Excluded'; btn.classList.toggle('active', SHOW_PRINCIPAL2); }
+  });
+  render2('rep');
+  render2('utl');
+}
  
 // ── BOOT ──
 initSelects2('rep');
