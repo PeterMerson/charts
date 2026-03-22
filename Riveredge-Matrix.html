@@ -1486,6 +1486,8 @@ function togglePrincipal() {
   if(expBtn) { expBtn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; expBtn.classList.toggle('active', SHOW_PRINCIPAL); }
   const netBtn = document.getElementById('net-btn-principal');
   if(netBtn) { netBtn.textContent = SHOW_PRINCIPAL ? 'Included' : 'Excluded'; netBtn.classList.toggle('active', SHOW_PRINCIPAL); }
+  // Save whether total chart was active BEFORE re-render clears it
+  const expTotalWasSelected = state.exp.totalSelected;
   state.exp.totalSelected = false;
   render('exp');
   renderNet();
@@ -1499,19 +1501,11 @@ function togglePrincipal() {
     const years = getYears('exp');
     selectCat('exp', 'Mortgage Interest', years);
   }
-  // If Total Expenses chart is showing, redraw it with updated totals
-  if(state.exp.totalSelected && window._expTotalsByYear && window._expTotalYears) {
-    // Recalculate totals including/excluding principal
-    const years = window._expTotalYears;
-    const newTotals = {};
-    years.forEach(y => {
-      const idx = ALL_YEARS.indexOf(y);
-      let tot = Object.values(EXPENSES).reduce((s,arr) => s + (arr[idx]||0), 0);
-      if(SHOW_PRINCIPAL) tot += (MORTGAGE_PRINCIPAL[idx] || 0);
-      newTotals[y] = tot;
-    });
-    window._expTotalsByYear = newTotals;
-    selectTotal('exp', years, newTotals);
+  // If Total Expenses chart was showing, redraw it using freshly rendered totals
+  if(expTotalWasSelected) {
+    const freshYears = window['_expTotalYears'];
+    const freshTotals = window['_expTotalsByYear'];
+    if(freshYears && freshTotals) selectTotal('exp', freshYears, freshTotals);
   }
 }
  
