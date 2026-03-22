@@ -25,7 +25,7 @@ body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); 
  
 /* ── MASTHEAD ── */
 .masthead { background: var(--ink); color: var(--paper); padding: 0; border-bottom: 3px solid var(--gold-light); }
-.masthead-inner { max-width: 1400px; margin: 0 auto; padding: 18px 32px 14px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+.masthead-inner { max-width: 1400px; margin: 0 auto; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .masthead h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 900; letter-spacing: -0.01em; line-height: 1; color: #f7f3ec; }
 .masthead h1 em { color: var(--gold-light); font-style: normal; }
 .masthead-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: #f7f3ec; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
@@ -220,7 +220,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 <div class="masthead">
   <div class="masthead-inner">
     <div>
-      <h1>Riveredge <em>Income Matrix</em></h1>
+      <div class="section-title" style="color:#f7f3ec;">Riveredge <em>Income Matrix</em></div>
       
     </div>
     <div class="masthead-kpis">
@@ -587,6 +587,7 @@ const maintIncreaseMarkers = {
       const topY = y.top;
       const botY = y.bottom;
  
+
       // Draw green dashed vertical line
       ctx.beginPath();
       ctx.setLineDash([5, 3]);
@@ -889,7 +890,6 @@ function render(prefix) {
   // Add mortgage principal row and totals when toggled on
   if(prefix==='exp' && SHOW_PRINCIPAL) {
     // Add visible Mortgage Principal row
-
     const ptr = document.createElement('tr');
     ptr.classList.add('principal-row');
     const ptd0 = document.createElement('td');
