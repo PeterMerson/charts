@@ -978,12 +978,17 @@ function render(prefix) {
   ttr.onclick = () => {
     state[prefix].totalSelected = true;
     state[prefix].selectedCat = null;
+    // Store for redraw when principal toggle changes
+    if(prefix==='exp') { window._expTotalsByYear = totalsByYear; window._expTotalYears = years; }
     selectTotal(prefix, years, totalsByYear);
   };
   body.appendChild(ttr);
  
   // Redraw total chart if it was previously selected
-  if(state[prefix].totalSelected) selectTotal(prefix, years, totalsByYear);
+  if(state[prefix].totalSelected) {
+    if(prefix==='exp') { window._expTotalsByYear = totalsByYear; window._expTotalYears = years; }
+    selectTotal(prefix, years, totalsByYear);
+  }
   else if(selectedCat) selectCat(prefix, selectedCat, years);
 }
  
@@ -1494,6 +1499,20 @@ function togglePrincipal() {
     const years = getYears('exp');
     selectCat('exp', 'Mortgage Interest', years);
   }
+  // If Total Expenses chart is showing, redraw it with updated totals
+  if(state.exp.totalSelected && window._expTotalsByYear && window._expTotalYears) {
+    // Recalculate totals including/excluding principal
+    const years = window._expTotalYears;
+    const newTotals = {};
+    years.forEach(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      let tot = Object.values(EXPENSES).reduce((s,arr) => s + (arr[idx]||0), 0);
+      if(SHOW_PRINCIPAL) tot += (MORTGAGE_PRINCIPAL[idx] || 0);
+      newTotals[y] = tot;
+    });
+    window._expTotalsByYear = newTotals;
+    selectTotal('exp', years, newTotals);
+  }
 }
  
 // ── EXPAND PANEL (simple CSS fullscreen) ──
@@ -1673,7 +1692,6 @@ function renderCompareChart(years) {
   document.getElementById('net-chart-panel').style.display = 'block';
  
   if(window._netChart){ window._netChart.destroy(); window._netChart=null; }
-
   const ctx = document.getElementById('net-trend-chart').getContext('2d');
  
   // isBar already set at top of function using NET_CHART_TYPE
