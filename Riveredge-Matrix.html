@@ -309,6 +309,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="inc-ps-peak-val">—</div></div>
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="inc-ps-latest">—</div></div>
         <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="inc-ps-chg">—</div></div>
+        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="inc-ps-cpi" style="color:#c9a84c;">—</div></div>
       </div>
       <div id="inc-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any income category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="inc-chart-panel" style="display:none;position:relative;">
@@ -398,6 +399,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="exp-ps-peak-val">—</div></div>
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="exp-ps-latest">—</div></div>
         <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="exp-ps-chg">—</div></div>
+        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="exp-ps-cpi" style="color:#c9a84c;">—</div></div>
       </div>
       <div id="exp-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any expense category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="exp-chart-panel" style="display:none;position:relative;">
@@ -552,6 +554,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="cap-ps-peak-val">—</div></div>
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="cap-ps-latest">—</div></div>
         <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="cap-ps-chg">—</div></div>
+        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="cap-ps-cpi" style="color:#c9a84c;">—</div></div>
       </div>
       <div id="cap-panel-empty" class="panel-empty"><span class="arrow" style="color:#58a6ff;">←</span>Click either row<br>to graph over the<br>selected range</div>
       <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;">
@@ -587,7 +590,6 @@ const maintIncreaseMarkers = {
       const topY = y.top;
       const botY = y.bottom;
  
-
       // Draw green dashed vertical line
       ctx.beginPath();
       ctx.setLineDash([5, 3]);
@@ -1028,6 +1030,11 @@ function selectCat(prefix, cat, years) {
   const chgEl = document.getElementById(prefix+'-ps-chg');
   chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  const cpiEl = document.getElementById(prefix+'-ps-cpi');
+  if(cpiEl) {
+    const cpiChg = cpiRangeChange(years);
+    cpiEl.textContent = cpiChg !== null ? (cpiChg>=0?'+':'')+cpiChg.toFixed(1)+'%' : '—';
+  }
  
   document.getElementById(prefix+'-panel-stats-wrap').style.display = 'grid';
   document.getElementById(prefix+'-panel-empty').style.display = 'none';
@@ -1159,6 +1166,11 @@ function selectTotal(prefix, years, totalsByYear) {
   const chgEl = document.getElementById(prefix+'-ps-chg');
   chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  const cpiEl = document.getElementById(prefix+'-ps-cpi');
+  if(cpiEl) {
+    const cpiChg = cpiRangeChange(years);
+    cpiEl.textContent = cpiChg !== null ? (cpiChg>=0?'+':'')+cpiChg.toFixed(1)+'%' : '—';
+  }
   document.getElementById(prefix+'-panel-stats-wrap').style.display = 'grid';
   document.getElementById(prefix+'-panel-empty').style.display = 'none';
   document.getElementById(prefix+'-chart-panel').style.display = 'block';
@@ -1205,6 +1217,18 @@ function selectTotal(prefix, years, totalsByYear) {
       scales:scales
     }
   });
+}
+ 
+// ── CPI RANGE CHANGE HELPER ──
+function cpiRangeChange(years) {
+  if(!years || years.length < 2) return null;
+  const startIdx = ALL_YEARS.indexOf(years[0]);
+  const endIdx   = ALL_YEARS.indexOf(years[years.length-1]);
+  if(startIdx < 0 || endIdx < 0) return null;
+  const cpiStart = CPI_U_DATA[startIdx];
+  const cpiEnd   = CPI_U_DATA[endIdx];
+  if(!cpiStart) return null;
+  return ((cpiEnd - cpiStart) / cpiStart * 100);
 }
  
 // ── CHART TYPE TOGGLE ──
@@ -1874,6 +1898,11 @@ function selectCapCat(cat, years) {
   const chgEl = document.getElementById('cap-ps-chg');
   chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
+  const cpiElCap = document.getElementById('cap-ps-cpi');
+  if(cpiElCap) {
+    const cpiChgCap = cpiRangeChange(years);
+    cpiElCap.textContent = cpiChgCap !== null ? (cpiChgCap>=0?'+':'')+cpiChgCap.toFixed(1)+'%' : '—';
+  }
   document.getElementById('cap-panel-stats-wrap').style.display = 'grid';
   document.getElementById('cap-panel-empty').style.display = 'none';
   document.getElementById('cap-chart-panel').style.display = 'block';
