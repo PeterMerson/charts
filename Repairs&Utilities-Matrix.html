@@ -550,7 +550,7 @@ function render2(prefix) {
       cellDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
       const vSpan = document.createElement('span');
       vSpan.className='cell-val';
-      vSpan.textContent = val>0 ? fmtFull2(val) : '—';
+      vSpan.textContent = val!==0 ? (val<0 ? '−'+fmtFull2(Math.abs(val)) : fmtFull2(val)) : '—';
       cellDiv.appendChild(vSpan);
       if((p!==null && s.showChg) || (prevVal!==null && s.showDollar)) {
         const bWrap = document.createElement('div');
@@ -847,6 +847,7 @@ function toggleFS2(prefix) {
           ds.pointRadius=(ds.pointRadius||3)*1.8;
         });
         if(chart.config.type==='bar') chart.options.plugins.barYearLabels={enabled:true};
+
         chart.resize();chart.update('none');
       }
     },80);
