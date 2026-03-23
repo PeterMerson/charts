@@ -290,7 +290,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="rep-ps-peak">—</div></div>
         <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="rep-ps-peak-val">—</div></div>
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="rep-ps-latest">—</div></div>
-        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="rep-ps-chg">—</div></div>
+        <div style="grid-column:1/-1; display:flex; gap:16px; border-top:1px solid var(--paper3); padding-top:8px; margin-top:2px;">
+        <div style="flex:1;"><div class="pstat-label">Range Change</div><div class="pstat-val" id="rep-ps-chg">—</div></div>
+        <div style="flex:1;"><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="rep-ps-cpi" style="color:#c9a84c;">—</div></div>
+      </div>
       </div>
       <div id="rep-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any R&amp;M category<br>to see its trend chart</div>
       <div class="chart-panel" id="rep-chart-panel" style="display:none;position:relative;">
@@ -379,7 +382,10 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="utl-ps-peak">—</div></div>
         <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="utl-ps-peak-val">—</div></div>
         <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="utl-ps-latest">—</div></div>
-        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="utl-ps-chg">—</div></div>
+        <div style="grid-column:1/-1; display:flex; gap:16px; border-top:1px solid var(--paper3); padding-top:8px; margin-top:2px;">
+        <div style="flex:1;"><div class="pstat-label">Range Change</div><div class="pstat-val" id="utl-ps-chg">—</div></div>
+        <div style="flex:1;"><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="utl-ps-cpi" style="color:#c9a84c;">—</div></div>
+      </div>
       </div>
       <div id="utl-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any utility category<br>to see its trend chart</div>
       <div class="chart-panel" id="utl-chart-panel" style="display:none;position:relative;">
@@ -659,6 +665,8 @@ function selectCat2(prefix, cat, years) {
   const chgEl=document.getElementById(prefix+'-ps-chg');
   chgEl.textContent=(chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className='pstat-val '+(chgPct>=0?'up':'dn');
+  const cpiEl2=document.getElementById(prefix+'-ps-cpi');
+  if(cpiEl2){const cc=cpiRangeChange2(years);cpiEl2.textContent=cc!==null?(cc>=0?'+':'')+cc.toFixed(1)+'%':'—';}
  
   document.getElementById(prefix+'-panel-stats-wrap').style.display='grid';
   document.getElementById(prefix+'-panel-empty').style.display='none';
@@ -737,6 +745,8 @@ function selectTotal2(prefix, years, totalsByYear) {
   const chgEl=document.getElementById(prefix+'-ps-chg');
   chgEl.textContent=(chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className='pstat-val '+(chgPct>=0?'up':'dn');
+  const cpiEl2=document.getElementById(prefix+'-ps-cpi');
+  if(cpiEl2){const cc=cpiRangeChange2(years);cpiEl2.textContent=cc!==null?(cc>=0?'+':'')+cc.toFixed(1)+'%':'—';}
   document.getElementById(prefix+'-panel-stats-wrap').style.display='grid';
   document.getElementById(prefix+'-panel-empty').style.display='none';
   document.getElementById(prefix+'-chart-panel').style.display='block';
@@ -847,7 +857,6 @@ function toggleFS2(prefix) {
           ds.pointRadius=(ds.pointRadius||3)*1.8;
         });
         if(chart.config.type==='bar') chart.options.plugins.barYearLabels={enabled:true};
-
         chart.resize();chart.update('none');
       }
     },80);
@@ -910,6 +919,18 @@ function togglePrincipal2(prefix) {
   });
   render2('rep');
   render2('utl');
+}
+ 
+// ── CPI RANGE CHANGE HELPER ──
+function cpiRangeChange2(years) {
+  if(!years || years.length < 2) return null;
+  const startIdx = ALL_YEARS2.indexOf(years[0]);
+  const endIdx   = ALL_YEARS2.indexOf(years[years.length-1]);
+  if(startIdx < 0 || endIdx < 0) return null;
+  const cpiStart = CPI_U_DATA2[startIdx];
+  const cpiEnd   = CPI_U_DATA2[endIdx];
+  if(!cpiStart) return null;
+  return ((cpiEnd - cpiStart) / cpiStart * 100);
 }
  
 // ── BOOT ──
