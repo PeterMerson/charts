@@ -228,7 +228,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   </div>
 </div>
  
-<div class="info-note"><span>⚠ 2024 Fire &amp; Water Damages includes $228,074 one-time event &nbsp;·&nbsp; 2022 detail total is $225,695 vs. $199,709 in the audited statements — the $25,986 difference reflects a net credit or insurance reimbursement applied against gross repairs in the audited financials</span></div>
+<div class="info-note"><span>⚠ 2024 Fire &amp; Water Damages includes $228,074 one-time event &nbsp;·&nbsp; Insurance refunds netted against totals: 2022 −$25,986 · 2023 −$7,917 · 2024 −$4,726</span></div>
  
 <div class="section-rule"><span class="rule-label">Repairs &amp; Maintenance Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
  
@@ -423,15 +423,16 @@ const REPAIRS = {
   "Roadway Repairs": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20000,4000,0,0,0],
   "Miscellaneous A": [0,0,0,13582,0,0,0,0,0,0,0,0,5604,26202,0,0,0,0,0,1714,854,298,1279,910,339,1640,550,0,0,0,0,0,0,0,0],
   "Miscellaneous B": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2139,0,0,1157,0,0,0,0,0,0,0,0,0,0],
+  "Insurance Refunds": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-25986,-7917,-4726],
 };
 const UTILITIES = {
   "Fuel Oil": [58581,42490,48032,42259,46581,43457,60137,50178,35895,38440,97679,73822,72694,109272,106897,157170,147144,189501,234216,132461,183679,196876,237832,218702,282575,149523,118789,145558,163392,183863,117071,178490,292115,243083,267710],
   "Electric & Gas": [45981,45643,42713,50116,44424,45494,46362,42075,45344,51137,50524,56474,49645,58998,64154,74830,64351,71362,68239,58662,67891,51174,53638,53044,54842,50136,56403,54268,52569,48015,46191,53823,52882,47643,60882],
 };
  
-const REP_CATS = ['Pool & Supplies', 'Landscaping', 'Janitorial Supplies', 'Misc. Repairs & Contracting', 'Plumbing & Heating/Boiler', 'Water Damage & Mold', 'Elevator', 'Painting & Plastering', 'Doors, Locks & Windows', 'Laundry Room', 'Exterminating', 'Electric Repairs', 'Apartment Repairs', 'Storm Damage & Cleanup', 'Fencing', 'Exterior', 'Fire & Water Damages', 'Roadway Repairs', 'Miscellaneous A', 'Miscellaneous B'];
+const REP_CATS = ['Pool & Supplies', 'Landscaping', 'Janitorial Supplies', 'Misc. Repairs & Contracting', 'Plumbing & Heating/Boiler', 'Water Damage & Mold', 'Elevator', 'Painting & Plastering', 'Doors, Locks & Windows', 'Laundry Room', 'Exterminating', 'Electric Repairs', 'Apartment Repairs', 'Storm Damage & Cleanup', 'Fencing', 'Exterior', 'Fire & Water Damages', 'Roadway Repairs', 'Miscellaneous A', 'Miscellaneous B','Insurance Refunds'];
 const UTL_CATS = ['Fuel Oil', 'Electric & Gas'];
-const REP_COLORS = ['#1D6FA4', '#2196F3', '#8E24AA', '#F4511E', '#43A047', '#00ACC1', '#FF9800', '#E63946', '#6D4C41', '#546E7A', '#7CB342', '#d29922', '#bc8cff', '#f778ba', '#39d353', '#79c0ff', '#ffa657', '#58a6ff', '#f87171', '#a78bfa'];
+const REP_COLORS = ['#1D6FA4', '#2196F3', '#8E24AA', '#F4511E', '#43A047', '#00ACC1', '#FF9800', '#E63946', '#6D4C41', '#546E7A', '#7CB342', '#d29922', '#bc8cff', '#f778ba', '#39d353', '#79c0ff', '#ffa657', '#58a6ff', '#f87171', '#a78bfa','#9e9e9e'];
 const UTL_COLORS = ['#FF6B35','#2196F3'];
  
 const CPI_U_DATA2 = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
