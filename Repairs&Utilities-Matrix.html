@@ -632,6 +632,12 @@ function render2(prefix) {
  
   if(s.totalSelected) selectTotal2(prefix,years,totalsByYear);
   else if(s.selectedCat) selectCat2(prefix,s.selectedCat,years);
+ 
+  // Always scroll to show most recent year (far right) after render
+  setTimeout(function() {
+    var wrapper = document.getElementById(prefix+'-matrix-wrap');
+    if(wrapper) wrapper.scrollLeft = wrapper.scrollWidth;
+  }, 50);
 }
  
 function selectCat2(prefix, cat, years) {
