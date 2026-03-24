@@ -677,12 +677,12 @@ Chart.register(barYearLabels);
  
 // Maintenance charge increase years and percentages
 const MAINT_INCREASES = {
-  2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '+5%', 2024: '+9%'
+  2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '+5%', 2023: '+9%'
 };
 // Stagger heights so closely-spaced labels don't overlap
 // Lower number = higher on chart (closer to top), higher = lower
 const MAINT_OFFSETS = {
-  2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2024: 4
+  2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2023: 4
 };
  
 const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
@@ -1304,7 +1304,7 @@ function renderNet() {
   const nets = {};
   years.forEach(y => {
     const idx = ALL_YEARS.indexOf(y);
-    let inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+    let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
     let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
     if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
     nets[y] = inc - exp;
@@ -1367,7 +1367,7 @@ function renderNet() {
   let prevInc = null;
   years.forEach(y => {
     const idx = ALL_YEARS.indexOf(y);
-    const inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+    const inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
     let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
     if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
     const p = prevInc !== null ? pct(prevInc, inc) : null;
@@ -1409,7 +1409,7 @@ function renderNetChart(years, nets) {
     nets = {};
     years.forEach(y => {
       const idx = ALL_YEARS.indexOf(y);
-      let inc = Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+      let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
       let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
       if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
       nets[y] = inc - exp;
@@ -1700,7 +1700,7 @@ function renderCompareChart(years) {
   const isBar = NET_CHART_TYPE === 'bar';
   const vals_inc = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
-    return Object.values(INCOME).reduce((s,arr)=>s+arr[idx],0);
+    return Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
   });
   const vals_exp = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
