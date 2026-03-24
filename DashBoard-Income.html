@@ -121,7 +121,6 @@
     <div class="card-footer">Green = Total Income (excl. Special Assessments) &nbsp;·&nbsp; Red = Total Operating Expenses (gross) &nbsp;·&nbsp; Orange dashed = Expenses + Mortgage Principal (full cash requirement)</div>
   </div>
  
- 
   <!-- CHART 2: Net Surplus / Deficit -->
   <div class="chart-card" style="animation-delay:0.25s;">
     <div class="card-header">
@@ -146,7 +145,6 @@
     </div>
     <div class="card-footer">Green = surplus years &nbsp;·&nbsp; Red = deficit years &nbsp;·&nbsp; Orange = 2024 &nbsp;·&nbsp; Includes Mortgage Principal in full cash requirement &nbsp;·&nbsp; Red dashed line = 2006 surplus of $257,969</div>
   </div>
- 
  
   <!-- CHART: Total Expenses per Year (Surplus/Deficit) -->
   <div class="chart-card" style="animation-delay:0.38s;">
@@ -202,7 +200,6 @@
       </div>
     </div>
   </div>
- 
  
   <!-- CHART: Reserves per Unit vs Westchester -->
   <div class="chart-card" style="animation-delay:0.55s;">
@@ -270,7 +267,6 @@
 <script>
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
-// GROSS expenses — no adjustments to 2024
 const incRaw     = [1175653,1150811,1133735,1148098,1176289,1199091,1205655,1207776,1219649,1201838,1235657,1223933,1215986,1226535,1309588,1454039,1720108,1722145,1736837,1784540,1758926,1769448,1760891,1702178,1659232,1664369,1652452,1670183,1694196,1708893,1684945,1678636,1677006,1745779,1846671];
 const expRaw     = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,970285,979500,1116862,1215116,1162898,1253284,1323232,1383608,1353243,1377536,1418629,1324150,1306689,1352311,1365778,1274576,1470884,1413565,1271145,1346109,1384578,1423195,1293732,1403415,1563226,1582597,1910958];
 const expPrinRaw = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187103,1290682,1244194,1340742,1417321,1484831,1462139,1494688,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1394928,1435982,1477320,1350723,1463423,1626411,1649127,1981010];
@@ -301,11 +297,10 @@ function hideTT(){
 function cancelHideTT(){
   if(hideTTTimer) { clearTimeout(hideTTTimer); hideTTTimer = null; }
 }
-// Keep tooltip visible when mouse is over it
 tooltip.addEventListener('mouseenter', cancelHideTT);
 tooltip.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
  
-// CHART 1
+// CHART 1 — NOTE: mi2023 fixed (was mi2024)
 const ctx1=document.getElementById('chart1').getContext('2d');
 const gGrad=ctx1.createLinearGradient(0,0,0,380); gGrad.addColorStop(0,'rgba(63,185,80,0.18)'); gGrad.addColorStop(1,'rgba(63,185,80,0.01)');
 const rGrad=ctx1.createLinearGradient(0,0,0,380); rGrad.addColorStop(0,'rgba(248,81,73,0.12)'); rGrad.addColorStop(1,'rgba(248,81,73,0.01)');
@@ -320,7 +315,7 @@ const chart1=new Chart(ctx1,{type:'line',data:{labels:years,datasets:[
     mi2006:{type:'line',xMin:years.indexOf(2006),xMax:years.indexOf(2006),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+17%',position:'end',backgroundColor:'#1b5e20',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
     mi2008:{type:'line',xMin:years.indexOf(2008),xMax:years.indexOf(2008),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+3%',position:'end',backgroundColor:'#388e3c',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
     mi2013:{type:'line',xMin:years.indexOf(2013),xMax:years.indexOf(2013),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+5%',position:'end',backgroundColor:'#388e3c',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}},
-    mi2024:{type:'line',xMin:years.indexOf(2024),xMax:years.indexOf(2024),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+9%',position:'end',backgroundColor:'#2E7D32',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}}
+    mi2023:{type:'line',xMin:years.indexOf(2023),xMax:years.indexOf(2023),borderColor:'rgba(63,185,80,0.6)',borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'+9%',position:'end',backgroundColor:'#2E7D32',color:'#fff',font:{family:'Source Sans 3',size:9,weight:'600'},padding:{x:5,y:3},borderRadius:3,yAdjust:40}}
   }}
 },scales:{
   x:{grid:{color:'#21262d'},ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''},border:{display:false}},
@@ -332,7 +327,8 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
-  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004',pdf:'maintenance_increase_2004.pdf'},2005:{pct:'+13.5%',date:'Apr 1, 2005',pdf:'maintenance_increase_2005.pdf'},2006:{pct:'+17%',date:'Jan 1, 2006',pdf:'maintenance_increase_2006.pdf'},2008:{pct:'+3%',date:'Sep 1, 2008',pdf:'maintenance_increase_2008.pdf'},2013:{pct:'+5%',date:'Mar 1, 2013',pdf:'maintenance_increase_2013.pdf'},2024:{pct:'+9%',date:'Jan 1, 2024',pdf:'maintenance_increase_2024.pdf'}};
+  // FIXED: 2023 instead of 2024
+  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004',pdf:'maintenance_increase_2004.pdf'},2005:{pct:'+13.5%',date:'Apr 1, 2005',pdf:'maintenance_increase_2005.pdf'},2006:{pct:'+17%',date:'Jan 1, 2006',pdf:'maintenance_increase_2006.pdf'},2008:{pct:'+3%',date:'Sep 1, 2008',pdf:'maintenance_increase_2008.pdf'},2013:{pct:'+5%',date:'Mar 1, 2013',pdf:'maintenance_increase_2013.pdf'},2023:{pct:'+9%',date:'Jan 1, 2023',pdf:'maintenance_increase_2023.pdf'}};
   const mi=maintIncreases[yr];
   showTT(e,`<div class="tt-yr">${yr}${mi?` &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;white-space:nowrap;">📈 Maint. ${mi.pct} — ${mi.date}</span>`:''}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
@@ -344,8 +340,6 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
     ${mi && mi.pdf ? `<div class="tt-div"></div><div style="text-align:center;margin-top:2px;"><a href="${mi.pdf}" target="_blank" style="color:#e8c96a;font-size:0.82rem;font-weight:600;text-decoration:none;">📄 View Maintenance Memo</a></div>` : ''}`);
 });
 document.getElementById('chart1').addEventListener('mouseleave',hideTT);
- 
-// CHART 2
  
 // Arrow plugin for 2006 on Total Liquidity chart
 const arrow2006liq = {
@@ -433,7 +427,6 @@ document.getElementById('chart3').addEventListener('mousemove',e=>{
 });
 document.getElementById('chart3').addEventListener('mouseleave',hideTT);
  
- 
 // Arrow plugin for 2006 on Net Income chart
 const arrow2006net = {
   id: 'arrow2006net',
@@ -464,7 +457,7 @@ const arrow2006net = {
 };
 Chart.register(arrow2006net);
  
-// CHART NET: Surplus / Deficit
+// CHART NET
 const netRaw = [69749,35848,-22655,-9870,-5771,72442,89682,127037,193406,157205,48554,-66749,-28208,-114207,-107733,-30792,257969,227457,192182,324794,306368,260210,226375,394114,146776,206770,334945,275255,258214,231573,334222,215213,50595,96652,-134339];
 const REF_NET = 257969;
 const netColors = netRaw.map((v,i) => {
@@ -521,7 +514,7 @@ document.getElementById('chart_net').addEventListener('mousemove', e => {
 });
 document.getElementById('chart_net').addEventListener('mouseleave', hideTT);
  
-// CHART: Reserves per Unit vs Westchester Range
+// CHART: Reserves per Unit
 const actualPerUnit = [2427,1899,1144,1123,1324,1826,1948,2139,3586,3999,4154,4253,4565,3312,2346,1987,1717,3249,4429,6829,7970,7247,7286,9985,9172,9904,9928,11284,12509,14114,15309,15886,15543,14660,12511];
 const lowerPerUnit  = [1434,1494,1539,1585,1626,1672,1721,1761,1788,1828,1889,1943,1974,2019,2073,2143,2212,2274,2362,2353,2393,2468,2519,2556,2597,2600,2633,2689,2755,2805,2839,2973,3211,3343,3442];
 const upperPerUnit  = [2049,2135,2199,2265,2323,2389,2459,2516,2555,2611,2699,2776,2820,2884,2961,3061,3160,3249,3375,3362,3418,3525,3599,3652,3710,3715,3762,3842,3936,4008,4056,4248,4588,4776,4917];
@@ -530,88 +523,27 @@ const ctxPU = document.getElementById('chart_perunit').getContext('2d');
 const chartPU = new Chart(ctxPU, {
   type: 'line',
   data: { labels: years, datasets: [
-    {
-      label: 'Lower Bound',
-      data: lowerPerUnit,
-      borderColor: '#d29922',
-      borderWidth: 1,
-      borderDash: [4,4],
-      pointRadius: 0,
-      fill: false,
-      order: 1
-    },
-    {
-      label: 'Upper Bound (Westchester Range)',
-      data: upperPerUnit,
-      borderColor: '#d29922',
-      backgroundColor: 'rgba(210,153,34,0.18)',
-      borderWidth: 1,
-      borderDash: [4,4],
-      pointRadius: 0,
-      fill: '-1',
-      order: 1
-    },
-    {
-      label: 'Actual per Unit',
-      data: actualPerUnit,
-      borderColor: '#58a6ff',
-      backgroundColor: 'rgba(88,166,255,0.12)',
-      borderWidth: 2.5,
-      pointRadius: 2.5,
-      pointHoverRadius: 6,
-      pointBackgroundColor: '#58a6ff',
-      pointBorderColor: '#0d1117',
-      pointBorderWidth: 1.5,
-      fill: false,
-      tension: 0.12,
-      order: 2
-    }
+    { label:'Lower Bound', data:lowerPerUnit, borderColor:'#d29922', borderWidth:1, borderDash:[4,4], pointRadius:0, fill:false, order:1 },
+    { label:'Upper Bound (Westchester Range)', data:upperPerUnit, borderColor:'#d29922', backgroundColor:'rgba(210,153,34,0.18)', borderWidth:1, borderDash:[4,4], pointRadius:0, fill:'-1', order:1 },
+    { label:'Actual per Unit', data:actualPerUnit, borderColor:'#58a6ff', backgroundColor:'rgba(88,166,255,0.12)', borderWidth:2.5, pointRadius:2.5, pointHoverRadius:6, pointBackgroundColor:'#58a6ff', pointBorderColor:'#0d1117', pointBorderWidth:1.5, fill:false, tension:0.12, order:2 }
   ]},
   options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false },
-      annotation: {
-        annotations: {
-          vline2006: {
-            type: 'line',
-            xMin: years.indexOf(2006),
-            xMax: years.indexOf(2006),
-            borderColor: '#f85149',
-            borderWidth: 2,
-            borderDash: [6,4],
-            label: {
-              display: true,
-              content: '2006',
-              position: 'start',
-              backgroundColor: '#f85149',
-              color: '#fff',
-              font: { family: 'Source Sans 3', size: 10, weight: '600' },
-              padding: { x: 6, y: 3 },
-              borderRadius: 4
-            }
-          }
-        }
-      }
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{display:false}, tooltip:{enabled:false},
+      annotation:{ annotations:{ vline2006:{ type:'line', xMin:years.indexOf(2006), xMax:years.indexOf(2006), borderColor:'#f85149', borderWidth:2, borderDash:[6,4], label:{ display:true, content:'2006', position:'start', backgroundColor:'#f85149', color:'#fff', font:{family:'Source Sans 3',size:10,weight:'600'}, padding:{x:6,y:3}, borderRadius:4 } } } }
     },
-    scales: {
-      x: { grid: { color: '#21262d' }, ticks: { font: { family: 'Source Sans 3', size: 10 }, color: '#8b949e', maxRotation: 45, callback: (v,i) => years[i]%5===0?years[i]:'' }, border: { display: false } },
-      y: { grid: { color: '#21262d' }, beginAtZero: true,
-        ticks: { font: { family: 'Source Sans 3', size: 10 }, color: '#8b949e', callback: v => '$'+v.toLocaleString() },
-        title: { display: true, text: 'Dollars per Unit', font: { family: 'Source Sans 3', size: 11 }, color: '#8b949e' },
-        border: { display: false }
-      }
+    scales:{
+      x:{ grid:{color:'#21262d'}, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',maxRotation:45,callback:(v,i)=>years[i]%5===0?years[i]:''}, border:{display:false} },
+      y:{ grid:{color:'#21262d'}, beginAtZero:true, ticks:{font:{family:'Source Sans 3',size:10},color:'#8b949e',callback:v=>'$'+v.toLocaleString()}, title:{display:true,text:'Dollars per Unit',font:{family:'Source Sans 3',size:11},color:'#8b949e'}, border:{display:false} }
     }
   }
 });
 document.getElementById('chart_perunit').addEventListener('mousemove', e => {
   const pts = chartPU.getElementsAtEventForMode(e,'index',{intersect:false},true);
   if(!pts.length) return hideTT();
-  const i = pts[0].index, yr = years[i];
-  const actual = actualPerUnit[i], lo = lowerPerUnit[i], hi = upperPerUnit[i];
+  const i=pts[0].index, yr=years[i];
+  const actual=actualPerUnit[i], lo=lowerPerUnit[i], hi=upperPerUnit[i];
   let status, sc;
   if(actual>=hi){ status='✅ Above Westchester High'; sc='#3fb950'; }
   else if(actual>=lo){ status='✔ Within Westchester Range'; sc='#58a6ff'; }
@@ -626,7 +558,7 @@ document.getElementById('chart_perunit').addEventListener('mousemove', e => {
 });
 document.getElementById('chart_perunit').addEventListener('mouseleave', hideTT);
  
-// CHART: Total Expenses per Year (Surplus/Deficit)
+// CHART: Total Expenses per Year
 const cashReqRaw2 = [1105904,1114963,1156390,1157968,1182060,1126649,1115973,1080739,1026243,1044633,1187104,1290682,1244194,1340742,1417321,1484831,1462139,1494688,1544655,1459746,1452558,1509238,1534516,1308064,1512456,1457599,1317507,1394928,1435982,1477320,1350723,1463423,1626411,1649127,1981010];
 const surplusRaw2 = [69749,35848,0,0,0,72442,89682,127037,193406,157205,48553,0,0,0,0,0,257969,227457,192182,324794,306368,260210,226375,394114,146776,206770,334945,275255,258214,231573,334222,215213,50595,96652,0];
 const deficitRaw2 = [0,0,22655,9870,5771,0,0,0,0,0,0,66749,28208,114207,107733,30792,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,134339];
@@ -635,22 +567,16 @@ const prinRaw2    = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,1
  
 const IDX_2006b = years.indexOf(2006);
 const IDX_2024b = years.indexOf(2024);
- 
 const baseColors2 = cashReqRaw2.map((_,i) => i===IDX_2024b ? 'rgba(210,153,34,0.82)' : 'rgba(29,111,164,0.82)');
 const baseBorders2 = cashReqRaw2.map((_,i) => i===IDX_2024b ? 'rgba(210,153,34,1)' : 'rgba(29,111,164,1)');
- 
-// Years post-2006 where cash requirement was below 2006 level
-const below2006Idx = [19,20,23,25,26,27,28,30]; // indices of 2009,2010,2013,2015,2016,2017,2018,2020
+const below2006Idx = [19,20,23,25,26,27,28,30];
 const REF_2006 = 1462139;
  
-// Arrow + gold star plugin
 const arrow2006b = {
   id: 'arrow2006b',
   afterDatasetsDraw(chart) {
     if (chart.canvas.id !== 'chart_totexp') return;
     const { ctx, scales: { x, y } } = chart;
- 
-    // Draw ▼ arrow and 2006 label
     const xPos = x.getPixelForValue(IDX_2006b);
     const topVal = cashReqRaw2[IDX_2006b] + surplusRaw2[IDX_2006b];
     const yPos = y.getPixelForValue(topVal);
@@ -670,8 +596,6 @@ const arrow2006b = {
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'bottom';
     ctx.fillText('2006', xPos, yPos - 19);
- 
-    // Draw ⭐ gold stars above bars below 2006 level
     below2006Idx.forEach(i => {
       const bx = x.getPixelForValue(i);
       const topV = cashReqRaw2[i] + surplusRaw2[i];
@@ -681,11 +605,9 @@ const arrow2006b = {
       ctx.textBaseline = 'bottom';
       ctx.fillText('⭐', bx, by - 3);
     });
- 
     ctx.restore();
   }
 };
-
 Chart.register(arrow2006b);
  
 const ctxTE = document.getElementById('chart_totexp').getContext('2d');
