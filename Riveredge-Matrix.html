@@ -115,7 +115,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .panel-header { background: var(--ink); padding: 12px 16px; border-bottom: 2px solid var(--gold); }
 .panel-cat { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--paper); margin-bottom: 2px; }
 .panel-range { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9a8f7e; }
-.panel-stats { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; border-bottom: 1px solid var(--paper3); background: var(--paper2); }
+.panel-stats { padding: 12px 16px; display: flex; flex-direction: row; align-items: flex-start; gap: 0; border-bottom: 1px solid var(--paper3); background: var(--paper2); }
 .pstat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--neutral); margin-bottom: 2px; }
 .pstat-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--ink); }
 .pstat-val.up { color: var(--up); } .pstat-val.dn { color: var(--dn); }
@@ -305,11 +305,15 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div class="panel-range" id="inc-panel-range">Click any income category in the matrix</div>
       </div>
       <div id="inc-panel-stats-wrap" class="panel-stats" style="display:none;">
-        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="inc-ps-peak">—</div></div>
-        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="inc-ps-peak-val">—</div></div>
-        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="inc-ps-latest">—</div></div>
-        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="inc-ps-chg">—</div></div>
-        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="inc-ps-cpi" style="color:#c9a84c;">—</div></div>
+        <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
+          <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="inc-ps-peak">—</div></div>
+          <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="inc-ps-peak-val">—</div></div>
+          <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="inc-ps-latest">—</div></div>
+        </div>
+        <div style="display:flex; gap:32px; align-items:flex-start; flex:1; justify-content:center; padding-left:24px;">
+          <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="inc-ps-chg">—</div></div>
+          <div><div class="pstat-label" style="color:#b8902a;">CPI Same Period</div><div class="pstat-val" id="inc-ps-cpi" style="color:#c9a84c;">—</div></div>
+        </div>
       </div>
       <div id="inc-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any income category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="inc-chart-panel" style="display:none;position:relative;">
@@ -395,11 +399,15 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div class="panel-range" id="exp-panel-range">Click any expense category in the matrix</div>
       </div>
       <div id="exp-panel-stats-wrap" class="panel-stats" style="display:none;">
-        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="exp-ps-peak">—</div></div>
-        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="exp-ps-peak-val">—</div></div>
-        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="exp-ps-latest">—</div></div>
-        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="exp-ps-chg">—</div></div>
-        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="exp-ps-cpi" style="color:#c9a84c;">—</div></div>
+        <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
+          <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="exp-ps-peak">—</div></div>
+          <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="exp-ps-peak-val">—</div></div>
+          <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="exp-ps-latest">—</div></div>
+        </div>
+        <div style="display:flex; gap:32px; align-items:flex-start; flex:1; justify-content:center; padding-left:24px;">
+          <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="exp-ps-chg">—</div></div>
+          <div><div class="pstat-label" style="color:#b8902a;">CPI Same Period</div><div class="pstat-val" id="exp-ps-cpi" style="color:#c9a84c;">—</div></div>
+        </div>
       </div>
       <div id="exp-panel-empty" class="panel-empty"><span class="arrow">←</span>Click any expense category<br>row in the matrix to see<br>its trend over the selected<br>year range</div>
       <div class="chart-panel" id="exp-chart-panel" style="display:none;position:relative;">
@@ -550,11 +558,15 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         <div class="panel-range" id="cap-panel-range">Click a row to graph</div>
       </div>
       <div id="cap-panel-stats-wrap" class="panel-stats" style="display:none;background:#edf2ff;">
-        <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="cap-ps-peak">—</div></div>
-        <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="cap-ps-peak-val">—</div></div>
-        <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="cap-ps-latest">—</div></div>
-        <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="cap-ps-chg">—</div></div>
-        <div><div class="pstat-label">CPI Same Period</div><div class="pstat-val" id="cap-ps-cpi" style="color:#c9a84c;">—</div></div>
+        <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
+          <div><div class="pstat-label">Peak Year</div><div class="pstat-val" id="cap-ps-peak">—</div></div>
+          <div><div class="pstat-label">Peak Value</div><div class="pstat-val" id="cap-ps-peak-val">—</div></div>
+          <div><div class="pstat-label">Latest Value</div><div class="pstat-val" id="cap-ps-latest">—</div></div>
+        </div>
+        <div style="display:flex; gap:32px; align-items:flex-start; flex:1; justify-content:center; padding-left:24px;">
+          <div><div class="pstat-label">Range Change</div><div class="pstat-val" id="cap-ps-chg">—</div></div>
+          <div><div class="pstat-label" style="color:#b8902a;">CPI Same Period</div><div class="pstat-val" id="cap-ps-cpi" style="color:#c9a84c;">—</div></div>
+        </div>
       </div>
       <div id="cap-panel-empty" class="panel-empty"><span class="arrow" style="color:#58a6ff;">←</span>Click either row<br>to graph over the<br>selected range</div>
       <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;">
