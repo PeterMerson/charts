@@ -1485,8 +1485,11 @@ function toggleCPI() {
   btn.classList.toggle('active', SHOW_CPI);
   // Redraw active charts
   ['inc','exp'].forEach(prefix => {
-    if(state[prefix].selectedCat) {
-      const years = getYears(prefix);
+    const years = getYears(prefix);
+    if(state[prefix].totalSelected && window['_'+prefix+'TotalsByYear']) {
+      // Total row is selected — redraw using stored totals
+      selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
+    } else if(state[prefix].selectedCat) {
       selectCat(prefix, state[prefix].selectedCat, years);
     }
   });
