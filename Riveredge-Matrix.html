@@ -254,6 +254,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#5a5040;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
   </div>
 </div>
+<div class="info-note"><span>ⓘ Special Assessments are shown as a separate row (italic) but are <strong>excluded from Total Income</strong> — they are one-time, non-recurring charges. &nbsp;Two assessments were levied: <strong>1993</strong> ($170,050) and <strong>2002–2006</strong> ($763,620 total). &nbsp;Total collected 1990–2024: <strong>$933,670</strong>. &nbsp;Hover over the row label for details.</span></div>
 <div class="section-rule"><span class="rule-label">Income Analysis</span><div class="rule-line"></div><span class="rule-label">Select range below</span></div>
  
 <div class="controls-bar">
@@ -699,7 +700,8 @@ const INCOME = {
   "Transfer Fees":       [8750,10189,1026,6276,11231,11798,8481,11693,15735,20941,30057,17042,16019,15271,30594,18224,13233,9309,7818,7233,0,3251,3707,11602,10126,7378,4956,6121,4364,3457,3234,13024,12598,7599,4378],
   "Interest":            [32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776],
   "Miscellaneous":       [11836,3284,4076,8433,9582,15376,9882,12994,11548,20226,6502,7569,9256,4955,7103,8617,14022,5131,5529,26690,7146,11997,9663,37358,13735,19712,12367,8729,8247,7976,3356,11189,8643,9734,6421],
-  "Storage":             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1719,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023]
+  "Storage":             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1719,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023],
+  "SpecialAssessment":   [0,0,0,170050,0,0,0,0,0,0,0,0,63771,191313,189681,191313,127542,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 };
  
 // ── EXPENSE DATA ──
@@ -721,7 +723,7 @@ const MORTGAGE_PRINCIPAL = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,
 const CPI_U_DATA = [130.7, 136.2, 140.3, 144.5, 148.2, 152.4, 156.9, 160.5, 163.0, 166.6, 172.2, 177.1, 179.9, 184.0, 188.9, 195.3, 201.6, 207.3, 215.3, 214.5, 218.1, 224.9, 229.6, 233.0, 236.7, 237.0, 240.0, 245.1, 251.1, 255.7, 258.8, 270.9, 292.7, 304.7, 314.2];
 const INC_CATS = Object.keys(INCOME);
 const EXP_CATS = Object.keys(EXPENSES);
-const INC_COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1','#FF9800'];
+const INC_COLORS = ['#1D6FA4','#2196F3','#8E24AA','#F4511E','#43A047','#00ACC1','#FF9800','#9e9e9e'];
 const EXP_COLORS = ['#E63946','#2196F3','#43A047','#FF9800','#d29922','#8E24AA','#00ACC1','#6D4C41','#546E7A','#7CB342','#F4511E'];
  
 const state = {
@@ -845,16 +847,22 @@ function render(prefix) {
   years.forEach(y => totals[y] = 0);
  
   cats.forEach((cat) => {
+    const isSA = (prefix==='inc' && cat==='SpecialAssessment');
     const tr = document.createElement('tr');
     if(selectedCat === cat) tr.classList.add('selected');
+    // Special Assessment row: muted italic style
+    if(isSA) {
+      tr.style.cssText = 'opacity:0.7; font-style:italic;';
+    }
  
     // When principal is toggled on, combine it with Mortgage Interest row
     const isMPI = prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
-    const rowLabel = isMPI ? 'Mortgage Interest + Principal' : cat;
+    const rowLabel = isMPI ? 'Mortgage Interest + Principal' : isSA ? 'Special Assessments ⓘ' : cat;
  
     tr.onclick = () => selectCat(prefix, cat, years);
     const td0 = document.createElement('td');
     td0.className = 'cat-col';
+    if(isSA) td0.title = '1993: $170,050  |  2002-2006: $763,620  |  Total collected: $933,670  |  Excluded from Income totals';
     td0.textContent = rowLabel;
     if(isMPI) { td0.style.color = 'var(--gold)'; td0.style.fontStyle = 'italic'; }
     tr.appendChild(td0);
@@ -863,7 +871,7 @@ function render(prefix) {
       // Add principal to Mortgage Interest value when toggled
       const baseVal = data[cat][idx];
       const val = isMPI ? baseVal + (MORTGAGE_PRINCIPAL[idx] || 0) : baseVal;
-      totals[y] += val;
+      if(!isSA) totals[y] += val;  // exclude Special Assessments from totals
       const prevIdx = yi>0 ? ALL_YEARS.indexOf(years[yi-1]) : -1;
       // For MPI row, previous value must also include principal for correct % and $ change
       const prevVal = prevIdx>=0
