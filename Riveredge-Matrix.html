@@ -294,7 +294,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 </div>
  
 <div class="main-layout">
-  <div class="matrix-wrap"><table class="matrix"><thead id="inc-matrix-head"></thead><tbody id="inc-matrix-body"></tbody></table></div>
+  <div class="matrix-wrap" id="inc-matrix-wrap"><table class="matrix"><thead id="inc-matrix-head"></thead><tbody id="inc-matrix-body"></tbody></table></div>
   <div class="right-panel">
     <div class="panel-card" id="inc-panel-card">
       <div class="panel-header">
@@ -352,7 +352,6 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="ctrl-group" id="exp-range-controls">
     <span class="ctrl-label">From</span>
     <select id="exp-sel-from" onchange="render('exp')"></select>
-
     <span class="ctrl-label">To</span>
     <select id="exp-sel-to" onchange="render('exp')"></select>
   </div>
@@ -385,7 +384,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 </div>
  
 <div class="main-layout">
-  <div class="matrix-wrap"><table class="matrix"><thead id="exp-matrix-head"></thead><tbody id="exp-matrix-body"></tbody></table></div>
+  <div class="matrix-wrap" id="exp-matrix-wrap"><table class="matrix"><thead id="exp-matrix-head"></thead><tbody id="exp-matrix-body"></tbody></table></div>
   <div class="right-panel">
     <div class="panel-card" id="exp-panel-card">
       <div class="panel-header">
@@ -1005,6 +1004,12 @@ function render(prefix) {
     selectTotal(prefix, years, totalsByYear);
   }
   else if(selectedCat) selectCat(prefix, selectedCat, years);
+ 
+  // Always scroll table to show most recent year (far right) after render
+  setTimeout(function() {
+    var wrapper = document.getElementById(prefix+'-matrix-wrap');
+    if(wrapper) wrapper.scrollLeft = wrapper.scrollWidth;
+  }, 50);
 }
  
 function selectCat(prefix, cat, years) {
