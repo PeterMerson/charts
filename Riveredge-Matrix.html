@@ -1429,7 +1429,7 @@ function renderNetChart(years, nets) {
   document.getElementById('net-ps-latest').textContent = (latest>=0?'+':'-')+'$'+Math.abs(latest).toLocaleString('en-US');
   var defEl2 = document.getElementById('net-ps-defyrs');
   if(defEl2) defEl2.textContent = defYrs+' year'+(defYrs!==1?'s':'');
-  document.getElementById('net-panel-stats-wrap').style.display='grid';
+  document.getElementById('net-panel-stats-wrap').style.display='flex';
   document.getElementById('net-panel-empty').style.display='none';
   document.getElementById('net-chart-panel').style.display='block';
  
@@ -1456,11 +1456,11 @@ function renderNetChart(years, nets) {
       label:'Net Income'
     };
   var netScales = {
-    x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
+    x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:90, callback:(v,i)=>years[i] } },
     y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
   };
   // Store for fullscreen
-  window._netChart = new Chart(ctx, {
+    window._netChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data:{ labels:years, datasets:[netDataset]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -1729,7 +1729,7 @@ function renderCompareChart(years) {
   const defEl = document.getElementById('net-ps-defyrs');
   if(defEl) defEl.textContent = defYrs + ' deficit yr'+(defYrs!==1?'s':'');
  
-  document.getElementById('net-panel-stats-wrap').style.display = 'grid';
+  document.getElementById('net-panel-stats-wrap').style.display = 'flex';
   document.getElementById('net-panel-empty').style.display = 'none';
   document.getElementById('net-chart-panel').style.display = 'block';
  
@@ -1742,7 +1742,7 @@ function renderCompareChart(years) {
   const gradExp = ctx.createLinearGradient(0,0,0,180);
   gradExp.addColorStop(0,'rgba(248,81,73,0.12)'); gradExp.addColorStop(1,'rgba(248,81,73,0.01)');
  
-  window._netChart = new Chart(ctx, {
+    window._netChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data:{ labels:years, datasets:[
       { label:'Total Income', data:vals_inc,
@@ -1775,7 +1775,7 @@ function renderCompareChart(years) {
         }
       },
       scales:{
-        x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:45, callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i] } },
+        x:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', maxRotation:90, callback:(v,i)=>years[i] } },
         y:{ grid:{color:'#f0ebe0'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#8b7a6a', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K') } }
       }
     }
@@ -1933,7 +1933,7 @@ function selectCapCat(cat, years) {
     const cpiChgCap = cpiRangeChange(years);
     cpiElCap.textContent = cpiChgCap !== null ? (cpiChgCap>=0?'+':'')+cpiChgCap.toFixed(1)+'%' : '—';
   }
-  document.getElementById('cap-panel-stats-wrap').style.display = 'grid';
+  document.getElementById('cap-panel-stats-wrap').style.display = 'flex';
   document.getElementById('cap-panel-empty').style.display = 'none';
   document.getElementById('cap-chart-panel').style.display = 'block';
  
@@ -1945,6 +1945,7 @@ function selectCapCat(cat, years) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33'); grad.addColorStop(1,color+'05');
  
+  
   capState.trendChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data: { labels:years, datasets:[{
@@ -1965,7 +1966,7 @@ function selectCapCat(cat, years) {
           }}
       }},
       scales:{
-        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
+        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:90,callback:(v,i)=>years[i]},grid:{color:'#f0ebe0'}},
         y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#f0ebe0'}}
       }
     }
