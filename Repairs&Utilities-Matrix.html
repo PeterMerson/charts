@@ -105,8 +105,8 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .chg-up { background: var(--up-bg); color: var(--up); }
 .chg-dn { background: var(--dn-bg); color: var(--dn); }
 .chg-neu { background: var(--paper3); color: var(--neutral); }
-.heat-up-3 { background: #1a5c2a20; } .heat-up-2 { background: #1a5c2a12; } .heat-up-1 { background: #1a5c2a07; }
-.heat-dn-3 { background: #8b1a1a1a; } .heat-dn-2 { background: #8b1a1a10; } .heat-dn-1 { background: #8b1a1a06; }
+.heat-up-3 { background: transparent; } .heat-up-2 { background: transparent; } .heat-up-1 { background: transparent; }
+.heat-dn-3 { background: transparent; } .heat-dn-2 { background: transparent; } .heat-dn-1 { background: transparent; }
 .total-pos { color: #6fcf82 !important; font-weight: 700; } .total-neg { color: #f47a70 !important; font-weight: 700; }
  
 /* ── RIGHT PANEL ── */
@@ -271,11 +271,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 </div>
  
 <div class="legend-bar">
-  <div class="leg-item"><div class="leg-dot" style="background:var(--up-bg);border:1px solid var(--up-mid)"></div> Increase</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--dn-bg);border:1px solid var(--dn-mid)"></div> Decrease</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--paper3);border:1px solid var(--rule)"></div> No change / first year</div>
-  <span style="color:var(--rule2)">|</span>
-  <span>Darker shading = larger % change &nbsp;·&nbsp; Click any row to see trend chart →</span>
+  <span>Click any row to see trend chart →</span>
 </div>
  
 <div class="main-layout">
@@ -718,7 +714,8 @@ function selectCat2(prefix, cat, years) {
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
               var actualDollar2=vals[item.dataIndex];
-              return ' '+(item.dataset.label||label)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              if(!isBar) return ' '+cat+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              return ' '+fmtFull2(actualDollar2);
             }}
         }
       },
@@ -794,7 +791,8 @@ function selectTotal2(prefix, years, totalsByYear) {
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
               var actualDollar2=vals[item.dataIndex];
-              return ' '+(item.dataset.label||label)+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              if(!isBar) return ' '+cat+': '+item.parsed.y.toFixed(1)+'  ('+fmtFull2(actualDollar2)+')';
+              return ' '+fmtFull2(actualDollar2);
             }}
         }
       },
