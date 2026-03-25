@@ -210,6 +210,42 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
  
+ 
+/* ── MY UNIT CALCULATOR ── */
+.myunit-bar { max-width:1400px; margin:12px auto 0; padding:0 32px; }
+.myunit-panel {
+  background: linear-gradient(135deg, #0d2240 0%, #1a3a5c 100%);
+  border: 2px solid var(--gold-light);
+  border-radius: 8px;
+  padding: 16px 24px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.myunit-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--gold-light); white-space:nowrap; }
+.myunit-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.myunit-label { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:#9a8f7e; white-space:nowrap; }
+.myunit-select { font-family:'IBM Plex Mono',monospace; font-size:0.78rem; background:#0d2240; border:1px solid var(--gold); color:var(--gold-light); padding:6px 28px 6px 10px; border-radius:4px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c9a84c'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; min-width:120px; }
+.myunit-select:focus { outline:2px solid var(--gold-light); }
+.myunit-info { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+.myunit-stat { text-align:center; padding:4px 12px; border-left:1px solid rgba(201,168,76,0.3); }
+.myunit-stat-label { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.1em; color:#9a8f7e; margin-bottom:2px; }
+.myunit-stat-val { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--gold-light); }
+.myunit-toggle { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; padding:6px 14px; border-radius:4px; border:1px solid var(--gold); background:transparent; color:var(--gold-light); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+.myunit-toggle.active { background:var(--gold); color:#0d2240; font-weight:700; }
+.myunit-toggle:hover:not(.active) { background:rgba(201,168,76,0.15); }
+.myunit-compare { display:none; flex-direction:column; gap:0; margin-top:12px; max-width:1400px; margin-left:auto; margin-right:auto; padding:0 32px; }
+.myunit-compare.visible { display:flex; }
+.compare-card { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:14px 20px; box-shadow:var(--shadow); }
+.compare-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; color:var(--ink); margin-bottom:10px; border-bottom:2px solid var(--gold-light); padding-bottom:6px; }
+.compare-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; max-height:520px; overflow-y:auto; padding-right:4px; }
+.compare-item { background:var(--paper2); border:1px solid var(--rule); border-radius:4px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; }
+.compare-item.selected-apt { background: #ddeaf7; border-color: var(--selected); }
+.compare-apt { font-family:'IBM Plex Mono',monospace; font-size:0.75rem; font-weight:600; color:var(--ink); }
+.compare-apt-type { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--muted,#8b949e); }
+.compare-shares { font-family:'Playfair Display',serif; font-size:0.9rem; color:var(--gold); font-weight:700; }
+.compare-cost { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--ink2); }
+/* My Unit mode: highlight cells */
+.myunit-mode .cell-val { color: var(--gold) !important; }
 </style>
 </head>
 <body>
@@ -231,6 +267,35 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="mkpi"><div class="mkpi-label">35-yr Peak</div><div class="mkpi-val gd">$1,846,671</div></div>
       <div class="mkpi"><div class="mkpi-label">Special Assess. Excl.</div><div class="mkpi-val gd">All Years</div></div>
     </div>
+  </div>
+</div>
+ 
+<div class="myunit-bar">
+  <div class="myunit-panel">
+    <div class="myunit-title">🏢 My Unit Calculator</div>
+    <div class="myunit-select-wrap">
+      <span class="myunit-label">Select Apartment</span>
+      <select class="myunit-select" id="myunit-apt-select" onchange="onMyUnitChange()">
+        <option value="">— Choose your apt —</option>
+      </select>
+    </div>
+    <div class="myunit-info" id="myunit-info" style="display:none;">
+      <div class="myunit-stat"><div class="myunit-stat-label">Apt Type</div><div class="myunit-stat-val" id="mu-type">—</div></div>
+      <div class="myunit-stat"><div class="myunit-stat-label">Building</div><div class="myunit-stat-val" id="mu-building">—</div></div>
+      <div class="myunit-stat"><div class="myunit-stat-label">Shares</div><div class="myunit-stat-val" id="mu-shares">—</div></div>
+      <div class="myunit-stat"><div class="myunit-stat-label">% of Building</div><div class="myunit-stat-val" id="mu-pct">—</div></div>
+      <div class="myunit-stat"><div class="myunit-stat-label">2024 Maint.</div><div class="myunit-stat-val" id="mu-maint">—</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;">
+      <button class="myunit-toggle" id="myunit-view-btn" onclick="toggleMyUnitView()" title="Switch matrix between building totals and your unit's share">My Unit View: Off</button>
+      <button class="myunit-toggle" id="myunit-compare-btn" onclick="toggleCompare()" title="Compare your unit's costs to all other apartments">Compare Apts</button>
+    </div>
+  </div>
+</div>
+<div class="myunit-compare" id="myunit-compare-panel">
+  <div class="compare-card" id="compare-card-inner">
+    <div class="compare-title" id="compare-title">Apartment Cost Comparison — 2024 Total Expenses</div>
+    <div class="compare-grid" id="compare-grid"></div>
   </div>
 </div>
  
@@ -892,7 +957,7 @@ function render(prefix) {
           const diff = val - prevVal;
           const dSpan = document.createElement('span');
           dSpan.className = 'cell-chg '+(diff>=0?'chg-up':diff===0?'chg-neu':'chg-dn');
-          dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+          dSpan.textContent = fmtDiff(diff);
           bWrap.appendChild(dSpan);
         }
         cellDiv.appendChild(bWrap);
@@ -977,7 +1042,7 @@ function render(prefix) {
         const diff = val - prevTotal;
         const dSpan = document.createElement('span');
         dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
-        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        dSpan.textContent = fmtDiff(diff);
         badgeWrap.appendChild(dSpan);
       }
       totDiv.appendChild(badgeWrap);
@@ -1322,7 +1387,8 @@ function renderNet() {
     netDiv.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:2px;';
     const vSpan = document.createElement('span');
     vSpan.className = v>=0?'net-pos':'net-neg';
-    vSpan.textContent = (v>=0?'+':'-')+'$'+Math.abs(v).toLocaleString('en-US');
+    const vDisplay = (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(v * MY_UNIT.shares / TOTAL_SHARES) : v;
+    vSpan.textContent = (vDisplay>=0?'+':'-')+'$'+Math.abs(vDisplay).toLocaleString('en-US');
     netDiv.appendChild(vSpan);
     if(prevNet !== null && (NET_SHOW_CHG || NET_SHOW_DOLLAR)) {
       const bWrap = document.createElement('div');
@@ -1340,7 +1406,7 @@ function renderNet() {
         const diff = v - prevNet;
         const dSpan = document.createElement('span');
         dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
-        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        dSpan.textContent = fmtDiff(diff);
         bWrap.appendChild(dSpan);
       }
       netDiv.appendChild(bWrap);
@@ -1373,7 +1439,8 @@ function renderNet() {
     const vSpan = document.createElement('span');
     vSpan.style.color = '#58a6ff';
     vSpan.style.fontWeight = '600';
-    vSpan.textContent = '$' + inc.toLocaleString('en-US');
+    const incDisplay = (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(inc * MY_UNIT.shares / TOTAL_SHARES) : inc;
+    vSpan.textContent = '$' + incDisplay.toLocaleString('en-US');
     ctd.appendChild(vSpan);
     if((p !== null && NET_SHOW_CHG) || (prevInc !== null && NET_SHOW_DOLLAR)) {
       const bWrap = document.createElement('div');
@@ -1388,7 +1455,7 @@ function renderNet() {
         const diff = inc - prevInc;
         const dSpan = document.createElement('span');
         dSpan.className = 'cell-chg ' + (diff>=0?'chg-up':'chg-dn');
-        dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+        dSpan.textContent = fmtDiff(diff);
         bWrap.appendChild(dSpan);
       }
       ctd.appendChild(bWrap);
@@ -1397,9 +1464,8 @@ function renderNet() {
     prevInc = inc;
   });
   ctr.onclick = () => renderCompareChart(years);
-  body.appendChild(ctr);
+  if(!MYUNIT_VIEW_ON) body.appendChild(ctr);
  
-  // Scroll to show most recent year on right
   setTimeout(function() {
     var wrapper = document.getElementById('net-matrix-wrap');
     if(wrapper) wrapper.scrollLeft = wrapper.scrollWidth;
@@ -1888,7 +1954,7 @@ function renderCap() {
           const diff = val - prevVal;
           const dSpan = document.createElement('span');
           dSpan.className = 'cell-chg '+(diff>=0?'chg-up':'chg-dn');
-          dSpan.textContent = (diff>=0?'+':'-')+'$'+Math.abs(diff).toLocaleString('en-US');
+          dSpan.textContent = fmtDiff(diff);
           bWrap.appendChild(dSpan);
         }
         cellDiv.appendChild(bWrap);
@@ -2032,6 +2098,309 @@ function toggleFSCap() {
     },80);
   }
 }
+ 
+ 
+// ══════════════════════════════════════════
+//  MY UNIT CALCULATOR
+// ══════════════════════════════════════════
+const APARTMENTS = [
+  {apt:'1B', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1C', shares:511, type:'Jr 2BR', building:'Woodside'},
+  {apt:'1D', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1E', shares:644, type:'2BR', building:'Woodside'},
+  {apt:'1G', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1H', shares:566, type:'Jr 2BR', building:'Riverside'},
+  {apt:'1J', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1K', shares:369, type:'Studio', building:'Riverside'},
+  {apt:'1L', shares:369, type:'Studio', building:'Riverside'},
+  {apt:'1M', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1N', shares:566, type:'Jr 2BR', building:'Riverside'},
+  {apt:'1O', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1P', shares:671, type:'2BR', building:'Riverside'},
+  {apt:'1Q', shares:644, type:'3BR', building:'Woodside'},
+  {apt:'1R', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1S', shares:511, type:'Jr 2BR', building:'Woodside'},
+  {apt:'1T', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'2A', shares:337, type:'Studio', building:'Woodside'},
+  {apt:'2B', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2C', shares:524, type:'Jr 2BR', building:'Woodside'},
+  {apt:'2D', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2E', shares:657, type:'2BR', building:'Woodside'},
+  {apt:'2F', shares:676, type:'3BR', building:'Riverside'},
+  {apt:'2G', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2H', shares:571, type:'Jr 2BR', building:'Riverside'},
+  {apt:'2J', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2K', shares:371, type:'Studio', building:'Riverside'},
+  {apt:'2L', shares:371, type:'Studio', building:'Riverside'},
+  {apt:'2M', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2N', shares:571, type:'Jr 2BR', building:'Riverside'},
+  {apt:'2O', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2P', shares:676, type:'2BR', building:'Riverside'},
+  {apt:'2Q', shares:657, type:'3BR', building:'Woodside'},
+  {apt:'2R', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2S', shares:524, type:'Jr 2BR', building:'Woodside'},
+  {apt:'2T', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2U', shares:337, type:'Studio', building:'Woodside'},
+  {apt:'3A', shares:347, type:'Studio', building:'Woodside'},
+  {apt:'3B', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3C', shares:529, type:'Jr 2BR', building:'Woodside'},
+  {apt:'3D', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3E', shares:662, type:'2BR', building:'Woodside'},
+  {apt:'3F', shares:681, type:'3BR', building:'Riverside'},
+  {apt:'3G', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3H', shares:576, type:'Jr 2BR', building:'Riverside'},
+  {apt:'3J', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3K', shares:373, type:'Studio', building:'Riverside'},
+  {apt:'3L', shares:373, type:'Studio', building:'Riverside'},
+  {apt:'3M', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3N', shares:576, type:'Jr 2BR', building:'Riverside'},
+  {apt:'3O', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3P', shares:681, type:'2BR', building:'Riverside'},
+  {apt:'3Q', shares:662, type:'3BR', building:'Woodside'},
+  {apt:'3R', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3S', shares:529, type:'Jr 2BR', building:'Woodside'},
+  {apt:'3T', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3U', shares:347, type:'Studio', building:'Woodside'},
+  {apt:'4A', shares:349, type:'Studio', building:'Woodside'},
+  {apt:'4B', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4C', shares:534, type:'Jr 2BR', building:'Woodside'},
+  {apt:'4D', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4E', shares:667, type:'2BR', building:'Woodside'},
+  {apt:'4F', shares:686, type:'3BR', building:'Riverside'},
+  {apt:'4G', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4H', shares:581, type:'Jr 2BR', building:'Riverside'},
+  {apt:'4J', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4K', shares:375, type:'Studio', building:'Riverside'},
+  {apt:'4L', shares:375, type:'Studio', building:'Riverside'},
+  {apt:'4M', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4N', shares:581, type:'Jr 2BR', building:'Riverside'},
+  {apt:'4O', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4P', shares:686, type:'2BR', building:'Riverside'},
+  {apt:'4Q', shares:667, type:'3BR', building:'Woodside'},
+  {apt:'4R', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4S', shares:534, type:'Jr 2BR', building:'Woodside'},
+  {apt:'4T', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4U', shares:349, type:'Studio', building:'Woodside'},
+  {apt:'5A', shares:351, type:'Studio', building:'Woodside'},
+  {apt:'5B', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5C', shares:539, type:'Jr 2BR', building:'Woodside'},
+  {apt:'5D', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5E', shares:672, type:'2BR', building:'Woodside'},
+  {apt:'5F', shares:691, type:'3BR', building:'Riverside'},
+  {apt:'5G', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5H', shares:586, type:'Jr 2BR', building:'Riverside'},
+  {apt:'5J', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5K', shares:377, type:'Studio', building:'Riverside'},
+  {apt:'5L', shares:377, type:'Studio', building:'Riverside'},
+  {apt:'5M', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5N', shares:586, type:'Jr 2BR', building:'Riverside'},
+  {apt:'5O', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5P', shares:691, type:'2BR', building:'Riverside'},
+  {apt:'5Q', shares:672, type:'3BR', building:'Woodside'},
+  {apt:'5R', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5S', shares:539, type:'Jr 2BR', building:'Woodside'},
+  {apt:'5T', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5U', shares:351, type:'Studio', building:'Woodside'},
+  {apt:'6A', shares:353, type:'Studio', building:'Woodside'},
+  {apt:'6B', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6C', shares:544, type:'Jr 2BR', building:'Woodside'},
+  {apt:'6D', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6E', shares:677, type:'2BR', building:'Woodside'},
+  {apt:'6F', shares:696, type:'3BR', building:'Riverside'},
+  {apt:'6G', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6H', shares:591, type:'Jr 2BR', building:'Riverside'},
+  {apt:'6J', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6K', shares:379, type:'Studio', building:'Riverside'},
+  {apt:'6L', shares:379, type:'Studio', building:'Riverside'},
+  {apt:'6M', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6N', shares:591, type:'Jr 2BR', building:'Riverside'},
+  {apt:'6O', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6P', shares:696, type:'2BR', building:'Riverside'},
+  {apt:'6Q', shares:677, type:'3BR', building:'Woodside'},
+  {apt:'6R', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6S', shares:544, type:'Jr 2BR', building:'Woodside'},
+  {apt:'6T', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6U', shares:353, type:'Studio', building:'Woodside'},
+  {apt:'7A', shares:355, type:'Studio', building:'Woodside'},
+  {apt:'7B', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7C', shares:549, type:'Jr 2BR', building:'Woodside'},
+  {apt:'7D', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7E', shares:682, type:'2BR', building:'Woodside'},
+  {apt:'7F', shares:701, type:'3BR', building:'Riverside'},
+  {apt:'7G', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7H', shares:596, type:'Jr 2BR', building:'Riverside'},
+  {apt:'7J', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7K', shares:381, type:'Studio', building:'Riverside'},
+  {apt:'7L', shares:381, type:'Studio', building:'Riverside'},
+  {apt:'7M', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7N', shares:596, type:'Jr 2BR', building:'Riverside'},
+  {apt:'7O', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7P', shares:701, type:'2BR', building:'Riverside'},
+  {apt:'7Q', shares:682, type:'3BR', building:'Woodside'},
+  {apt:'7R', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7S', shares:549, type:'Jr 2BR', building:'Woodside'},
+  {apt:'7T', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7U', shares:355, type:'Studio', building:'Woodside'},
+  {apt:'8A', shares:357, type:'Studio', building:'Woodside'},
+  {apt:'8B', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8C', shares:554, type:'Jr 2BR', building:'Woodside'},
+  {apt:'8D', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8E', shares:687, type:'2BR', building:'Woodside'},
+  {apt:'8F', shares:706, type:'3BR', building:'Riverside'},
+  {apt:'8G', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8H', shares:601, type:'Jr 2BR', building:'Riverside'},
+  {apt:'8J', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8K', shares:383, type:'Studio', building:'Riverside'},
+  {apt:'8L', shares:383, type:'Studio', building:'Riverside'},
+  {apt:'8M', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8N', shares:601, type:'Jr 2BR', building:'Riverside'},
+  {apt:'8O', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8P', shares:706, type:'2BR', building:'Riverside'},
+  {apt:'8Q', shares:687, type:'3BR', building:'Woodside'},
+  {apt:'8R', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8S', shares:554, type:'Jr 2BR', building:'Woodside'},
+  {apt:'8T', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8U', shares:357, type:'Studio', building:'Woodside'},
+];
+const TOTAL_SHARES = 85027;
+ 
+var MY_UNIT = null;
+var MYUNIT_VIEW_ON = false;
+var COMPARE_OPEN = false;
+ 
+// Populate dropdown grouped by apt type
+function initMyUnitDropdown() {
+  const sel = document.getElementById('myunit-apt-select');
+  const groups = {'Studio':[], '1BR':[], 'Jr 2BR':[], '2BR':[], '3BR':[]};
+  APARTMENTS.forEach(a => { if(groups[a.type]) groups[a.type].push(a); });
+  Object.entries(groups).forEach(([type, apts]) => {
+    const og = document.createElement('optgroup');
+    og.label = type + ' (' + apts.length + ' apts)';
+    apts.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.apt;
+      o.textContent = 'Apt ' + a.apt + ' — ' + a.shares + ' shares (' + a.building + ')';
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+}
+ 
+function onMyUnitChange() {
+  const aptNum = document.getElementById('myunit-apt-select').value;
+  if(!aptNum) { MY_UNIT = null; document.getElementById('myunit-info').style.display='none'; return; }
+  MY_UNIT = APARTMENTS.find(a => a.apt === aptNum);
+  if(!MY_UNIT) return;
+  const pct = (MY_UNIT.shares / TOTAL_SHARES * 100).toFixed(3);
+  // 2024 maintenance charge allocation
+  const maint2024 = Math.round(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(2024)] * MY_UNIT.shares / TOTAL_SHARES);
+  document.getElementById('mu-type').textContent = MY_UNIT.type;
+  document.getElementById('mu-building').textContent = MY_UNIT.building;
+  document.getElementById('mu-shares').textContent = MY_UNIT.shares.toLocaleString();
+  document.getElementById('mu-pct').textContent = pct + '%';
+  document.getElementById('mu-maint').textContent = '$' + maint2024.toLocaleString();
+  document.getElementById('myunit-info').style.display = 'flex';
+  // Redraw if view is on
+  if(MYUNIT_VIEW_ON) { render('inc'); render('exp'); renderNet(); }
+  // Refresh compare if open
+  if(COMPARE_OPEN) renderComparePanel();
+}
+ 
+function toggleMyUnitView() {
+  if(!MY_UNIT) { alert('Please select your apartment first.'); return; }
+  MYUNIT_VIEW_ON = !MYUNIT_VIEW_ON;
+  const btn = document.getElementById('myunit-view-btn');
+  btn.textContent = 'My Unit View: ' + (MYUNIT_VIEW_ON ? 'ON' : 'Off');
+  btn.classList.toggle('active', MYUNIT_VIEW_ON);
+  render('inc'); render('exp'); renderNet(); renderCap();
+}
+ 
+function toggleCompare() {
+  if(!MY_UNIT) { alert('Please select your apartment first.'); return; }
+  COMPARE_OPEN = !COMPARE_OPEN;
+  const btn = document.getElementById('myunit-compare-btn');
+  btn.classList.toggle('active', COMPARE_OPEN);
+  btn.textContent = COMPARE_OPEN ? 'Hide Comparison' : 'Compare Apts';
+  const panel = document.getElementById('myunit-compare-panel');
+  panel.classList.toggle('visible', COMPARE_OPEN);
+  if(COMPARE_OPEN) renderComparePanel();
+}
+ 
+function renderComparePanel() {
+  if(!MY_UNIT) return;
+  // Use 2024 Total Expenses as comparison metric
+  const yr2024idx = ALL_YEARS.indexOf(2024);
+  const totalExp2024 = Object.values(EXPENSES).reduce((s,arr) => s + arr[yr2024idx], 0);
+  const totalInc2024 = Object.keys(INCOME).reduce((s,cat) => cat==='SpecialAssessment'?s:s+(INCOME[cat][yr2024idx]||0), 0);
+ 
+  document.getElementById('compare-title').textContent =
+    'Apartment Cost Comparison — 2024 · Your unit: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.type + ', ' + MY_UNIT.shares + ' shares)';
+ 
+  const grid = document.getElementById('compare-grid');
+  grid.innerHTML = '';
+ 
+  // Group by type for color coding
+  const typeColors = {'Studio':'#8E24AA','1BR':'#1D6FA4','Jr 2BR':'#43A047','2BR':'#F4511E','3BR':'#d29922'};
+ 
+  // Sort by shares descending, then apt number ascending for consistent ordering
+  const sorted = [...APARTMENTS].sort((a,b) => {
+    if(b.shares !== a.shares) return b.shares - a.shares;
+    return a.apt.localeCompare(b.apt);
+  });
+ 
+  sorted.forEach(a => {
+    const myExpShare = Math.round(totalExp2024 * a.shares / TOTAL_SHARES);
+    const myIncShare = Math.round(totalInc2024 * a.shares / TOTAL_SHARES);
+    const myMaint = Math.round(INCOME['Maintenance Charges'][yr2024idx] * a.shares / TOTAL_SHARES);
+    const color = typeColors[a.type] || '#666';
+    const isMe = a.apt === MY_UNIT.apt;
+    const item = document.createElement('div');
+    item.className = 'compare-item' + (isMe ? ' selected-apt' : '');
+    item.innerHTML = `
+      <div>
+        <div class="compare-apt" style="color:${isMe?'#1a3d5c':color}">${isMe?'★ ':''} Apt ${a.apt}</div>
+        <div class="compare-apt-type">${a.type} · ${a.building} · ${a.shares} sh</div>
+        <div class="compare-cost" style="margin-top:3px;">Exp: <strong>$${myExpShare.toLocaleString()}</strong></div>
+        <div class="compare-cost">Maint: <strong>$${myMaint.toLocaleString()}</strong>/yr</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="compare-shares" style="color:${isMe?'var(--selected)':color}">${(a.shares/TOTAL_SHARES*100).toFixed(2)}%</div>
+        <div class="compare-cost" style="margin-top:2px;">$${Math.round(myMaint/12).toLocaleString()}/mo</div>
+      </div>`;
+    grid.appendChild(item);
+  });
+}
+ 
+// Override fmtFull to apply My Unit scaling when view is on
+const _origFmtFull = fmtFull;
+function fmtFullUnit(v) {
+  if(MYUNIT_VIEW_ON && MY_UNIT) {
+    const scaled = Math.round(v * MY_UNIT.shares / TOTAL_SHARES);
+    return '$' + Math.abs(scaled).toLocaleString('en-US');
+  }
+  return _origFmtFull(v);
+}
+ 
+// Patch render functions to use unit-scaled values
+const _origFmtFullGlobal = window.fmtFull;
+window.fmtFull = function(v) {
+  if(MYUNIT_VIEW_ON && MY_UNIT) {
+    const scaled = Math.round(v * MY_UNIT.shares / TOTAL_SHARES);
+    return '$' + Math.abs(scaled).toLocaleString('en-US');
+  }
+  return '$' + Math.abs(v).toLocaleString('en-US');
+};
+ 
+// Helper: format a dollar difference, scaling to unit share when My Unit View is on
+window.fmtDiff = function(diff) {
+  if(MYUNIT_VIEW_ON && MY_UNIT) {
+    diff = Math.round(diff * MY_UNIT.shares / TOTAL_SHARES);
+  }
+  return (diff >= 0 ? '+' : '-') + '$' + Math.abs(diff).toLocaleString('en-US');
+};
+ 
+// Init on load
+initMyUnitDropdown();
  
 // ── BOOT ──
 initSelects('inc');
