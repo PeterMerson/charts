@@ -262,9 +262,18 @@
 <div class="page-footer">Riveredge Financial Dashboard &nbsp;·&nbsp; Personal Use &nbsp;·&nbsp; Data: Audited Annual Reports 1990–2024 &nbsp;·&nbsp; Mortgage Principal excluded from Operating Expenses</div>
 <div id="tooltip"></div>
  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <script>
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+ 
+function initDashboard() {
 const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
 const incRaw     = [1175653,1150811,1133735,1148098,1176289,1199091,1205655,1207776,1219649,1201838,1235657,1223933,1215986,1226535,1309588,1454039,1720108,1722145,1736837,1784540,1758926,1769448,1760891,1702178,1659232,1664369,1652452,1670183,1694196,1708893,1684945,1678636,1677006,1745779,1846671];
@@ -300,7 +309,7 @@ function cancelHideTT(){
 tooltip.addEventListener('mouseenter', cancelHideTT);
 tooltip.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
  
-// CHART 1 — NOTE: mi2023 fixed (was mi2024)
+// CHART 1
 const ctx1=document.getElementById('chart1').getContext('2d');
 const gGrad=ctx1.createLinearGradient(0,0,0,380); gGrad.addColorStop(0,'rgba(63,185,80,0.18)'); gGrad.addColorStop(1,'rgba(63,185,80,0.01)');
 const rGrad=ctx1.createLinearGradient(0,0,0,380); rGrad.addColorStop(0,'rgba(248,81,73,0.12)'); rGrad.addColorStop(1,'rgba(248,81,73,0.01)');
@@ -327,8 +336,7 @@ document.getElementById('chart1').addEventListener('mousemove',e=>{
   const i=pts[0].index,yr=years[i],inc=incRaw[i],exp=expRaw[i],ep=expPrinRaw[i];
   const net=inc-exp,nc=net>=0?'#3fb950':'#f85149',ns=net>=0?'+':'−';
   const nf=inc-ep,nfc=nf>=0?'#3fb950':'#f85149',nfs=nf>=0?'+':'−';
-  // FIXED: 2023 instead of 2024
-  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004',pdf:'maintenance_increase_2004.pdf'},2005:{pct:'+13.5%',date:'Apr 1, 2005',pdf:'maintenance_increase_2005.pdf'},2006:{pct:'+17%',date:'Jan 1, 2006',pdf:'maintenance_increase_2006.pdf'},2008:{pct:'+3%',date:'Sep 1, 2008',pdf:'maintenance_increase_2008.pdf'},2013:{pct:'+5%',date:'Mar 1, 2013',pdf:'maintenance_increase_2013.pdf'},2023:{pct:'+9%',date:'Jan 1, 2023',pdf:'maintenance_increase_2023.pdf'}};
+  const maintIncreases={2004:{pct:'+9.8%',date:'Jan 1, 2004',pdf:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf'},2005:{pct:'+13.5%',date:'Apr 1, 2005',pdf:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf'},2006:{pct:'+17%',date:'Jan 1, 2006',pdf:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf'},2008:{pct:'+3%',date:'Sep 1, 2008',pdf:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf'},2013:{pct:'+5%',date:'Mar 1, 2013',pdf:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf'},2023:{pct:'+9%',date:'Jan 1, 2023',pdf:'https://petermerson.github.io/charts/maintenance_increase_2024.pdf'}};
   const mi=maintIncreases[yr];
   showTT(e,`<div class="tt-yr">${yr}${mi?` &nbsp;<span style="background:#2E7D32;color:#fff;font-size:0.72rem;padding:2px 7px;border-radius:4px;white-space:nowrap;">📈 Maint. ${mi.pct} — ${mi.date}</span>`:''}</div>
     <div class="tt-row"><span class="tt-lbl" style="color:#3fb950">Total Income</span><span class="tt-val" style="color:#3fb950">$${inc.toLocaleString()}</span></div>
@@ -647,6 +655,12 @@ document.getElementById('chart_totexp').addEventListener('mousemove', e => {
     ${is2024?`<div style="font-size:0.76rem;color:#8b949e;margin-top:3px;">Incl. $228,074 Fire & Water</div>`:''}`)
 });
 document.getElementById('chart_totexp').addEventListener('mouseleave', hideTT);
+} // end initDashboard
+ 
+loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
+  .then(() => loadScript('https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js'))
+  .then(() => initDashboard())
+  .catch(err => console.error('Failed to load chart libraries:', err));
 </script>
 </body>
 </html>
