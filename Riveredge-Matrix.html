@@ -1484,16 +1484,19 @@ function renderNetChart(years, nets) {
       nets[y] = inc - exp;
     });
   }
-  const vals = years.map(y => nets[y]);
+  const vals = years.map(y => {
+    const raw = nets[y];
+    return (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(raw * MY_UNIT.shares / TOTAL_SHARES) : raw;
+  });
   const defYrs = vals.filter(v=>v<0).length;
   const peak = Math.max(...vals);
   const peakYr = years[vals.indexOf(peak)];
   const latest = vals[vals.length-1];
  
-  document.getElementById('net-panel-cat').textContent = 'Net Income — Surplus / Deficit';
+  document.getElementById('net-panel-cat').textContent = 'Net Income — Surplus / Deficit' + (MYUNIT_VIEW_ON && MY_UNIT ? '  (Apt '+MY_UNIT.apt+')' : '');
   document.getElementById('net-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
   document.getElementById('net-ps-peak').textContent = peakYr;
-  document.getElementById('net-ps-peak-val').textContent = '+$'+peak.toLocaleString('en-US');
+  document.getElementById('net-ps-peak-val').textContent = (peak>=0?'+':'-')+'$'+Math.abs(peak).toLocaleString('en-US');
   document.getElementById('net-ps-latest').textContent = (latest>=0?'+':'-')+'$'+Math.abs(latest).toLocaleString('en-US');
   var defEl2 = document.getElementById('net-ps-defyrs');
   if(defEl2) defEl2.textContent = defYrs+' year'+(defYrs!==1?'s':'');
@@ -1770,15 +1773,17 @@ document.addEventListener('keydown', function(e) {
 // ── TOTAL INCOME vs TOTAL EXPENSES COMPARE CHART ──
 function renderCompareChart(years) {
   const isBar = NET_CHART_TYPE === 'bar';
+  const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
   const vals_inc = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
-    return Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
+    const raw = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
+    return Math.round(raw * scale);
   });
   const vals_exp = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
     let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
     if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
-    return exp;
+    return Math.round(exp * scale);
   });
  
   const peak_inc = Math.max(...vals_inc);
