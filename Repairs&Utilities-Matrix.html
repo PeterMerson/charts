@@ -10,15 +10,15 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  
 :root {
-  --ink: #1a1208; --ink2: #2e2416;
-  --paper: #f7f3ec; --paper2: #ede8df; --paper3: #e4ddd2;
-  --rule: #c9bfaa; --rule2: #b8ad9a;
+  --ink: #0d2240; --ink2: #1a3a5c;
+  --paper: #f8f9fb; --paper2: #edf1f7; --paper3: #dde4ef;
+  --rule: #b0bdd4; --rule2: #9aabc5;
   --gold: #8b6914; --gold-light: #c9a84c;
   --up: #1a5c2a; --up-bg: #e8f4ea; --up-mid: #c2e0c8;
   --dn: #8b1a1a; --dn-bg: #f7e8e8; --dn-mid: #e8b8b8;
-  --neutral: #5a5040;
-  --selected: #1a3d5c; --selected-bg: #e8f0f7;
-  --shadow: 0 2px 16px rgba(26,18,8,0.12);
+  --neutral: #3a4a5c;
+  --selected: #1a3d5c; --selected-bg: #ddeaf7;
+  --shadow: 0 2px 16px rgba(13,34,64,0.12);
 }
  
 body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); color: var(--ink); min-height: 100vh; font-size: 13px; }
@@ -698,9 +698,9 @@ function selectCat2(prefix, cat, years) {
       fill:!isBar,tension:isBar?0:0.25,label:cat,yAxisID:'y'
   }];
   var sc2={
-    x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>v.toFixed(0)},grid:{color:'#f0ebe0'},position:'left',
-       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
+    x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#dde4ef'}},
+    y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>v.toFixed(0)},grid:{color:'#dde4ef'},position:'left',
+       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#4a6080'}}
   };
   if(SHOW_CPI2){
     var cr=years.map(y=>CPI_U_DATA2[ALL_YEARS2.indexOf(y)]);
@@ -715,8 +715,8 @@ function selectCat2(prefix, cat, years) {
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
-        tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',boxWidth:20}},
+        tooltip:{backgroundColor:'#0d2240',titleColor:'#c9a84c',bodyColor:'#f0f4fa',borderColor:'#2a4a6a',borderWidth:1,padding:10,
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
               var actualDollar2=vals[item.dataIndex];
@@ -792,8 +792,8 @@ function selectTotal2(prefix, years, totalsByYear) {
     options:{responsive:true,maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',boxWidth:20}},
-        tooltip:{backgroundColor:'#1a1208',titleColor:'#c9a84c',bodyColor:'#f7f3ec',borderColor:'#3a3028',borderWidth:1,padding:10,
+        legend:{display:SHOW_CPI2,labels:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',boxWidth:20}},
+        tooltip:{backgroundColor:'#0d2240',titleColor:'#c9a84c',bodyColor:'#f0f4fa',borderColor:'#2a4a6a',borderWidth:1,padding:10,
           callbacks:{title:items=>items[0].label,label:item=>{
               if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
               var actualDollar2=vals[item.dataIndex];
@@ -803,9 +803,9 @@ function selectTotal2(prefix, years, totalsByYear) {
         }
       },
       scales:{
-        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#f0ebe0'}},
-        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a',callback:v=>v.toFixed(0)},grid:{color:'#f0ebe0'},
-       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#8b7a6a'}}
+        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:45,callback:(v,i)=>years.length>12?(years[i]%5===0?years[i]:''):years[i]},grid:{color:'#dde4ef'}},
+        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>v.toFixed(0)},grid:{color:'#dde4ef'},
+       title:{display:true,text:'Index ('+years[0]+' = 100)',font:{family:'IBM Plex Mono',size:9},color:'#4a6080'}}
       }
     }
   });
@@ -890,7 +890,7 @@ const barYearLabels2 = {
     if(!x||!y) return;
     ctx.save();
     ctx.font='bold 10px IBM Plex Mono,monospace';
-    ctx.fillStyle='#2e2416';ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillStyle='#1a3a5c';ctx.textAlign='center';ctx.textBaseline='bottom';
     data.labels.forEach((label,i)=>{
       const meta=chart.getDatasetMeta(0);
       if(!meta||!meta.data[i]) return;
