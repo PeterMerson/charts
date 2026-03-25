@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Historical Financial Breakdowns 1990–2023</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --surface2: #1c2230;
+  --border: #30363d; --gold: #c9a84c; --gold-light: #e8c96a;
+  --text: #e6edf3; --muted: #8b949e;
+  --green: #3fb950; --red: #f85149;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+body { font-family: "Source Sans 3", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+ 
+.dashboard-header {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  border-bottom: 1px solid var(--border); padding: 28px 48px 24px; position: relative; overflow: hidden;
+}
+.dashboard-header::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 50%, rgba(31,78,121,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.header-inner { max-width: 1300px; margin: 0 auto; position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.header-title-block h1 { font-family: "Playfair Display", serif; font-size: 2rem; font-weight: 900; color: var(--text); letter-spacing: -0.02em; line-height: 1.1; }
+.header-title-block h1 span { color: var(--gold-light); }
+.header-subtitle { font-size: 0.85rem; color: #c9d1d9; margin-top: 5px; letter-spacing: 0.03em; }
+.gold-rule { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); }
+ 
+.year-nav { max-width: 1300px; margin: 0 auto; padding: 20px 48px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.nav-label { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); font-weight: 600; white-space: nowrap; }
+.year-btn { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.year-btn:hover { border-color: var(--gold); color: var(--gold-light); }
+.year-btn.active { background: var(--gold); color: #0d1117; border-color: var(--gold); font-weight: 600; }
+.nav-arrows { display: flex; gap: 8px; margin-left: auto; }
+.nav-arrow { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; padding: 6px 14px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; transition: all 0.15s; }
+.nav-arrow:hover { border-color: var(--gold); color: var(--gold-light); }
+.nav-arrow:disabled { opacity: 0.3; cursor: default; }
+ 
+.year-display { max-width: 1300px; margin: 0 auto; padding: 20px 48px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.year-title { font-family: "Playfair Display", serif; font-size: 2.4rem; font-weight: 900; color: var(--gold-light); }
+.year-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+.kpi { text-align: right; padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); min-width: 120px; }
+.kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #c9d1d9; margin-bottom: 3px; }
+.kpi-value { font-family: "Playfair Display", serif; font-size: 1.2rem; font-weight: 700; }
+.kpi-value.green { color: var(--green); } .kpi-value.gold { color: var(--gold-light); } .kpi-value.red { color: var(--red); }
+ 
+.dashboard-body { max-width: 1300px; margin: 0 auto; padding: 24px 48px 60px; display: flex; flex-direction: column; gap: 24px; }
+.pie-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.card-header { padding: 16px 22px 12px; border-bottom: 1px solid var(--border); }
+.card-title { font-family: "Playfair Display", serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.card-subtitle { font-size: 0.74rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.formula-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,0.12); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.3); padding: 3px 10px; border-radius: 99px; font-size: 0.72rem; }
+.card-body { padding: 18px 22px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.card-footer { padding: 9px 22px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--muted); background: rgba(0,0,0,0.15); }
+ 
+.pie-layout { display: flex; gap: 18px; align-items: flex-start; }
+.pie-svg-wrap { flex-shrink: 0; width: 190px; }
+.pie-svg { width: 100%; height: auto; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)); }
+.wedge { cursor: pointer; transition: opacity 0.18s, filter 0.18s; }
+.wedge:hover, .wedge.wactive { filter: brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.15)); opacity: 1 !important; }
+.wedge.dimmed { opacity: 0.22; }
+ 
+.detail-panel { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; min-height: 160px; display: flex; flex-direction: column; justify-content: center; }
+.detail-panel.has-data { border-color: #58a6ff44; background: #161f2e; }
+.detail-placeholder { color: var(--muted); font-size: 0.85rem; text-align: center; line-height: 1.7; }
+.detail-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 4px; }
+.detail-name { font-family: "Playfair Display", serif; font-size: 1.1rem; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.detail-swatch { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+.detail-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.83rem; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .dval { font-weight: 600; }
+.detail-row .dpct { font-family: "Playfair Display", serif; font-size: 1.3rem; font-weight: 700; color: var(--gold-light); }
+.bar-track { height: 5px; background: #21262d; border-radius: 99px; margin-top: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+ 
+.legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 2px; }
+.legend-item { display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; transition: background 0.15s; font-size: 0.75rem; }
+.legend-item:hover { background: #21262d; border-color: var(--border); }
+.legend-item.lactive { background: #1c2a3a; border-color: #58a6ff44; }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.legend-text { color: var(--text); flex: 1; }
+.legend-pct { color: var(--gold-light); font-weight: 600; margin-left: auto; font-size: 0.72rem; }
+.legend-item.excess-item .legend-text { color: #B0BEC5; font-style: italic; }
+.legend-item.excess-item .legend-pct { color: #90A4AE; }
+ 
+.net-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.strip-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+.strip-stat.info-only { border-color: rgba(201,168,76,0.35); background: rgba(201,168,76,0.06); }
+.strip-info-tag { display: inline-block; margin-top: 5px; font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-light); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); border-radius: 99px; padding: 1px 8px; }
+.strip-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #c9d1d9; margin-bottom: 4px; }
+.strip-value { font-family: "Playfair Display", serif; font-size: 1.2rem; }
+.strip-value.green { color: var(--green); } .strip-value.red { color: var(--red); } .strip-value.gold { color: var(--gold-light); }
+.strip-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+ 
+.page-footer { text-align: center; padding: 18px 48px; border-top: 1px solid var(--border); font-size: 0.73rem; color: var(--muted); }
+#tooltip { position: fixed; background: #1c2230; color: var(--text); border: 1px solid var(--border); padding: 9px 13px; border-radius: 9px; font-size: 0.8rem; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 9999; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+#tooltip.visible { opacity: 1; }
+#tooltip strong { display: block; color: var(--gold-light); margin-bottom: 2px; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.animate-in { animation: fadeIn 0.35s ease forwards; }
+</style>
+</head>
+<body>
+ 
+<div class="dashboard-header">
+  <div class="header-inner">
+    <div class="header-title-block">
+      <h1>Riveredge <span>Historical Financial Breakdowns</span></h1>
+      <div class="header-subtitle">RIVEREDGE OWNERS, INC. &nbsp;·&nbsp; 1-3 DAVID LANE, YONKERS NY &nbsp;·&nbsp; AUDITED ANNUAL STATEMENTS 1990–2023 &nbsp;·&nbsp; Special Assessments Excluded from Income &nbsp;·&nbsp; Mortgage Principal Payments are not included in Expenses but are noted below</div>
+    </div>
+  </div>
+</div>
+<div class="gold-rule"></div>
+ 
+<div class="year-nav">
+  <span class="nav-label">Select Year →</span>
+  <div id="year-btn-container" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  <div class="nav-arrows">
+    <button class="nav-arrow" id="btn-prev" onclick="navigateYear(-1)">◀ Prev</button>
+    <button class="nav-arrow" id="btn-next" onclick="navigateYear(1)">Next ▶</button>
+  </div>
+</div>
+ 
+<div class="year-display">
+  <div class="year-title" id="year-title">2023</div>
+  <div class="year-kpis" id="year-kpis"></div>
+</div>
+ 
+<div class="dashboard-body">
+  <div class="pie-row">
+    <div class="chart-card animate-in" id="income-card">
+      <div class="card-header">
+        <div class="card-title" id="inc-card-title">Income Breakdown</div>
+        <div class="card-subtitle">
+          <div class="formula-badge">Income Source ➗ Total Income</div>
+          <span id="inc-total-label">Total: —</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pie-layout">
+          <div class="pie-svg-wrap">
+            <svg class="pie-svg" id="income-svg" viewBox="-10 -10 220 220" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div class="detail-panel" id="inc-detail">
+            <div class="detail-placeholder">👆 Click any slice<br>to see details</div>
+          </div>
+        </div>
+        <div class="legend-grid" id="inc-legend"></div>
+      </div>
+      <div class="card-footer">Special Assessments excluded from all calculations</div>
+    </div>
+ 
+    <div class="chart-card animate-in" id="expense-card">
+      <div class="card-header">
+        <div class="card-title" id="exp-card-title">Expense Breakdown</div>
+        <div class="card-subtitle">
+          <div class="formula-badge">Expense Item ➗ Total Income</div>
+          <span id="exp-total-label">Total: —</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pie-layout">
+          <div class="pie-svg-wrap">
+            <svg class="pie-svg" id="expense-svg" viewBox="-10 -10 220 220" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div class="detail-panel" id="exp-detail">
+            <div class="detail-placeholder">👆 Click any slice<br>to see details</div>
+          </div>
+        </div>
+        <div class="legend-grid" id="exp-legend"></div>
+      </div>
+      <div class="card-footer">Expense % calculated against Total Income — Excess Maint. shows surplus income</div>
+    </div>
+  </div>
+  <div class="net-strip" id="net-strip"></div>
+</div>
+ 
+<div class="page-footer">
+  Riveredge Historical Financial Breakdowns &nbsp;·&nbsp; Special Assessments Excluded &nbsp;·&nbsp; Source: Audited Annual Financial Statements 1990–2023
+  &nbsp;·&nbsp; <span style="color:var(--gold-light);">●</span> Generated by Claude AI (Anthropic)
+</div>
+<div id="tooltip"></div>
+ 
+<script>
+const YEAR_DATA = {
+  1990: {prin:0,inc:[1020324,87315,15025,8750,32403,11836,0],exp:[265982,104562,110540,433000,82760,18834,36400,25250,9624,4350,14602],incTotal:1175653,expTotal:1105904,net:69749},
+  1991: {prin:0,inc:[1020324,84893,15000,10189,17121,3284,0],exp:[273827,88133,111036,433000,85751,22208,35843,27000,9996,10206,17963],incTotal:1150811,expTotal:1114963,net:35848},
+  1992: {prin:0,inc:[1020324,85403,15000,1026,7906,4076,0],exp:[277303,90745,125652,433000,113059,23521,31908,27000,8468,8521,17213],incTotal:1133735,expTotal:1156390,net:-22655},
+  1993: {prin:0,inc:[1027976,83638,15550,6276,6225,8433,0],exp:[295757,92375,133297,433000,93777,22324,35336,27000,8586,7994,8522],incTotal:1148098,expTotal:1157968,net:-9870},
+  1994: {prin:0,inc:[1048884,83792,15600,11231,7200,9582,0],exp:[302044,91005,137797,433000,109903,23100,32978,30000,8995,5905,7333],incTotal:1176289,expTotal:1182060,net:-5771},
+  1995: {prin:0,inc:[1066534,82754,15600,11798,7029,15376,0],exp:[267846,88951,127715,433000,83332,26217,34155,30000,17993,7106,10334],incTotal:1199091,expTotal:1126649,net:72442},
+  1996: {prin:0,inc:[1074031,82684,15600,8481,14977,9882,0],exp:[241053,106499,130715,433000,79472,26181,34296,30000,14000,9445,11312],incTotal:1205655,expTotal:1115973,net:89682},
+  1997: {prin:0,inc:[1073289,80162,15600,11693,14038,12994,0],exp:[135681,92253,137073,426831,73216,26264,36149,30750,5038,94442,23042],incTotal:1207776,expTotal:1080739,net:127037},
+  1998: {prin:55958,inc:[1073379,78700,15600,15735,24687,11548,0],exp:[252250,81239,143621,305677,62731,29617,38515,31000,4627,10713,10295],incTotal:1219649,expTotal:970285,net:249364},
+  1999: {prin:65133,inc:[1042612,77113,14300,20941,26646,20226,0],exp:[235110,89577,141939,301364,83622,34158,35989,31000,9055,6243,11443],incTotal:1201838,expTotal:979500,net:222338},
+  2000: {prin:70241,inc:[1069444,76065,17283,30057,36306,6502,0],exp:[266507,148203,142862,296226,128259,31445,41865,31000,6903,13782,9811],incTotal:1235657,expTotal:1116863,net:118794},
+  2001: {prin:75566,inc:[1075712,80649,17838,17042,25123,7569,0],exp:[276498,130296,157841,290886,232217,36238,38131,31232,7286,12597,10894],incTotal:1223933,expTotal:1224116,net:-183},
+  2002: {prin:81296,inc:[1069345,86754,27727,16019,6885,9256,0],exp:[288391,122339,162718,289478,117152,47531,48819,31000,7639,32421,15410],incTotal:1215986,expTotal:1162898,net:53088},
+  2003: {prin:87458,inc:[1088387,87193,26278,15271,4451,4955,0],exp:[299670,168270,172346,305153,141385,46519,46157,31000,5303,24977,12504],incTotal:1226535,expTotal:1253284,net:-26749},
+  2004: {prin:94089,inc:[1161724,84212,23477,30594,2478,7103,0],exp:[351533,171051,166694,298482,156003,60106,49395,31000,14056,12651,12261],incTotal:1309588,expTotal:1323232,net:-13644},
+  2005: {prin:101223,inc:[1308354,83814,29926,18224,5104,8617,0],exp:[372308,232000,188198,291305,120358,63743,46115,33250,9202,16887,10242],incTotal:1454039,expTotal:1383608,net:70431},
+  2006: {prin:108896,inc:[1571429,85139,28597,13233,7688,14022,0],exp:[397399,211495,185106,275460,110046,64626,47102,34000,11909,8050,8050],incTotal:1720108,expTotal:1353243,net:366865},
+  2007: {prin:117152,inc:[1570096,87939,39492,9309,10178,5131,0],exp:[407434,259964,166463,250029,108752,68873,46998,31333,12223,9261,16206],incTotal:1722145,expTotal:1377536,net:344609},
+  2008: {prin:126026,inc:[1587982,87407,35355,7818,12746,5529,0],exp:[378212,302455,164760,240100,156132,52752,53504,30000,19675,4950,16089],incTotal:1736837,expTotal:1418629,net:318208},
+  2009: {prin:135596,inc:[1620174,88235,33798,7233,8410,26690,1719],exp:[301570,191123,155977,230771,178962,49013,49606,30000,15650,104876,16602],incTotal:1786259,expTotal:1324150,net:462109},
+  2010: {prin:145869,inc:[1620174,88043,36357,0,5139,7146,2067],exp:[314334,251570,158597,220137,174561,57164,50564,30000,21137,10560,18065],incTotal:1758926,expTotal:1306689,net:452237},
+  2011: {prin:156927,inc:[1620174,88352,34675,3251,9512,11997,1487],exp:[321051,248050,166778,208911,192528,59481,55463,39816,21851,12285,26097],incTotal:1769448,expTotal:1352311,net:417137},
+  2012: {prin:168738,inc:[1620174,87530,31954,3707,7863,9663,0],exp:[315063,291470,182676,197128,160652,57732,53133,39816,17196,31756,19156],incTotal:1760891,expTotal:1365778,net:395113},
+  2013: {prin:33488,inc:[1531251,85794,29333,11602,6840,37358,0],exp:[326072,271746,180957,147614,132144,57757,51562,41807,32294,8979,23644],incTotal:1702178,expTotal:1274576,net:427602},
+  2014: {prin:41572,inc:[1513447,86622,28676,10126,6626,13735,0],exp:[346985,337417,187354,141878,229776,64292,56237,42643,27383,8520,28399],incTotal:1659232,expTotal:1470884,net:188348},
+  2015: {prin:44034,inc:[1513447,85896,26581,7378,11355,19712,0],exp:[365790,199659,205605,141555,263380,71196,52724,43496,38772,11069,20319],incTotal:1664369,expTotal:1413565,net:250804},
+  2016: {prin:46362,inc:[1507782,87949,28937,4956,10461,12367,0],exp:[360439,175192,205640,139217,150620,65161,54226,44246,43820,7961,24623],incTotal:1652452,expTotal:1271145,net:381307},
+  2017: {prin:48819,inc:[1513404,87754,30524,6121,12997,8729,10654],exp:[366335,199826,220249,136748,163940,63759,56376,45131,41666,27642,24437],incTotal:1670183,expTotal:1346109,net:324074},
+  2018: {prin:51404,inc:[1513404,86302,31379,4364,27950,8247,22550],exp:[379323,215961,223696,134153,154212,66478,60748,46033,31278,48669,24027],incTotal:1694196,expTotal:1384578,net:309618},
+  2019: {prin:54125,inc:[1513404,86251,30853,3457,40294,7976,26658],exp:[399172,231878,238312,131439,139146,67615,61180,46954,37334,46161,24004],incTotal:1708893,expTotal:1423195,net:285698},
+  2020: {prin:56991,inc:[1513404,83510,26325,3234,27550,3356,27566],exp:[381895,163262,239114,128522,134721,64733,60629,47893,34416,9225,29322],incTotal:1684945,expTotal:1293732,net:391213},
+  2021: {prin:60008,inc:[1513404,80949,26000,13024,5624,11189,28446],exp:[240345,232313,236860,125512,230215,73682,63439,48552,48244,76978,27275],incTotal:1678636,expTotal:1403415,net:275221},
+  2022: {prin:63185,inc:[1503542,81578,25635,12598,13889,8643,31121],exp:[365157,344997,235531,122321,199709,76529,71560,49341,46731,24450,26900],incTotal:1677006,expTotal:1563226,net:113780},
+  2023: {prin:66530,inc:[1513404,81329,26280,7599,76136,9734,31297],exp:[369302,290726,249503,120862,224945,86587,72322,51150,52920,39560,24720],incTotal:1745779,expTotal:1582597,net:163182}
+};
+const INC_LABELS=["Maintenance Charges", "Parking", "Laundry", "Transfer Fees", "Interest", "Miscellaneous", "Storage"];
+const EXP_LABELS=["Real Estate Taxes", "Utilities", "Payroll", "Mortgage Interest", "Repairs & Maint.", "Insurance", "Security", "Management Fee", "Water & Sewer", "Legal & Audit", "Corp Tax & Misc."];
+const INC_COLORS=["#1D6FA4", "#2196F3", "#8E24AA", "#F4511E", "#43A047", "#00ACC1", "#FF9800"];
+const EXP_COLORS=["#E63946", "#2196F3", "#43A047", "#FF9800", "#d29922", "#8E24AA", "#00ACC1", "#6D4C41", "#546E7A", "#7CB342", "#F4511E"];
+const ALL_HIST_YEARS=[2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995, 1994, 1993, 1992, 1991, 1990];
+ 
+ 
+let currentYear = 2023;
+let incActive = null;
+let expActive = null;
+ 
+// Build year buttons
+const container = document.getElementById('year-btn-container');
+ALL_HIST_YEARS.forEach(yr => {
+  const btn = document.createElement('button');
+  btn.className = 'year-btn' + (yr === 2022 ? ' active' : '');
+  btn.textContent = yr;
+  btn.id = 'ybtn-' + yr;
+  btn.onclick = () => setYear(yr);
+  container.appendChild(btn);
+});
+ 
+function setYear(yr) {
+  currentYear = yr;
+  document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ybtn-' + yr);
+  if(btn) { btn.classList.add('active'); btn.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'}); }
+  document.getElementById('btn-prev').disabled = (ALL_HIST_YEARS.indexOf(yr) === ALL_HIST_YEARS.length - 1);
+  document.getElementById('btn-next').disabled = (ALL_HIST_YEARS.indexOf(yr) === 0);
+  incActive = null; expActive = null;
+  render();
+}
+ 
+function navigateYear(dir) {
+  const idx = ALL_HIST_YEARS.indexOf(currentYear);
+  const newIdx = idx - dir;
+  if(newIdx >= 0 && newIdx < ALL_HIST_YEARS.length) setYear(ALL_HIST_YEARS[newIdx]);
+}
+ 
+function fmt(v) { return '$' + Math.abs(v).toLocaleString('en-US'); }
+ 
+function polar(cx, cy, r, deg) {
+  const rad = (deg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+function arc(cx, cy, r, s, e) {
+  const sp = polar(cx,cy,r,s), ep = polar(cx,cy,r,e);
+  const lg = (e-s) > 180 ? 1 : 0;
+  return `M ${cx} ${cy} L ${sp.x} ${sp.y} A ${r} ${r} 0 ${lg} 1 ${ep.x} ${ep.y} Z`;
+}
+ 
+function render() {
+  const d = YEAR_DATA[currentYear];
+  const net = d.net;
+  const netClass = net >= 0 ? 'green' : 'red';
+  const netSign = net >= 0 ? '+' : '-';
+ 
+  document.getElementById('year-title').textContent = currentYear;
+  document.getElementById('inc-card-title').textContent = currentYear + ' Income Breakdown';
+  document.getElementById('exp-card-title').textContent = currentYear + ' Expense Breakdown';
+  document.getElementById('inc-total-label').textContent = 'Total: ' + fmt(d.incTotal);
+  document.getElementById('exp-total-label').textContent = 'Total: ' + fmt(d.expTotal) + (net >= 0 ? ' · Surplus: +' + fmt(net) : ' · Deficit: -' + fmt(Math.abs(net)));
+ 
+  document.getElementById('year-kpis').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Total Income</div><div class="kpi-value gold">${fmt(d.incTotal)}</div><div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">Excl. Special Assessments</div></div>
+    <div class="kpi"><div class="kpi-label">Total Expenses</div><div class="kpi-value red">${fmt(d.expTotal)}</div></div>
+    <div class="kpi"><div class="kpi-label">Net ${net>=0?"Surplus":"Deficit"}</div><div class="kpi-value ${netClass}">${netSign}${Math.abs(net).toLocaleString('en-US')}</div></div>
+  `;
+ 
+  const ratio = (d.incTotal / d.expTotal * 100).toFixed(1);
+  document.getElementById('net-strip').innerHTML = `
+    <div class="strip-stat"><div class="strip-label">Total Income</div><div class="strip-value gold">${fmt(d.incTotal)}</div><div class="strip-sub">Excl. Special Assessments</div></div>
+    <div class="strip-stat"><div class="strip-label">Total Expenses</div><div class="strip-value red">${fmt(d.expTotal)}</div><div class="strip-sub">All operating expenses</div></div>
+    <div class="strip-stat"><div class="strip-label">Net ${net>=0?"Surplus":"Deficit"}</div><div class="strip-value ${netClass}">${netSign}${Math.abs(net).toLocaleString('en-US')}</div><div class="strip-sub">Income covers ${ratio}% of expenses</div></div>
+    <div class="strip-stat info-only"><div class="strip-label">Mortgage Principal</div><div class="strip-value gold">${d.prin > 0 ? fmt(d.prin) : 'None'}</div><div class="strip-sub">${currentYear} principal payment</div><div class="strip-info-tag">⚠ Not included in numbers — information only</div></div>
+  `;
+ 
+  // Build income pie — denominator = incTotal
+  buildPie('inc', d.inc, d.incTotal, d.incTotal, INC_LABELS, INC_COLORS, false);
+  // Build expense pie — denominator = incTotal (same as 2024 file), add Excess/Deficit slice
+  buildExpensePie(d.exp, d.expTotal, d.incTotal, d.net);
+ 
+  // Animate
+  ['income-card','expense-card'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('animate-in');
+    void el.offsetWidth;
+    el.classList.add('animate-in');
+  });
+}
+ 
+function buildPie(prefix, vals, total, denom, labels, colors, isExp) {
+  const svgId = prefix==='inc' ? 'income-svg' : 'expense-svg';
+  const svg = document.getElementById(svgId);
+  const legend = document.getElementById(prefix + '-legend');
+  const detail = document.getElementById(prefix + '-detail');
+  svg.innerHTML = ''; legend.innerHTML = '';
+ 
+  const cx = 100, cy = 100, r = 90;
+  let startAngle = 0;
+ 
+  vals.forEach((v, i) => {
+    if(v <= 0) return;
+    const sweep = (v / total) * 360;
+    const endAngle = startAngle + sweep;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', arc(cx,cy,r,startAngle,endAngle));
+    path.setAttribute('fill', colors[i]);
+    path.setAttribute('stroke','#161b22');
+    path.setAttribute('stroke-width','2');
+    path.classList.add('wedge');
+ 
+    const activeIdx = prefix==='inc' ? incActive : expActive;
+    if(activeIdx !== null) {
+      if(activeIdx === i) path.classList.add('wactive');
+      else path.classList.add('dimmed');
+    }
+ 
+    // % label inside slice
+    if(sweep > 8) {
+      const mid = startAngle + sweep/2;
+      const lp = polar(cx,cy,r*0.65,mid);
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', lp.x); txt.setAttribute('y', lp.y);
+      txt.setAttribute('text-anchor','middle'); txt.setAttribute('dominant-baseline','central');
+      txt.setAttribute('fill','#fff'); txt.setAttribute('font-size', sweep>30?'7':'5.5');
+      txt.setAttribute('font-weight','bold'); txt.setAttribute('font-family','Source Sans 3,sans-serif');
+      txt.setAttribute('pointer-events','none');
+      txt.textContent = (v/denom*100).toFixed(1)+'%';
+      svg.appendChild(txt);
+    }
+ 
+    path.addEventListener('click', () => selectSlice(prefix, i, vals, total, denom, labels, colors, false));
+    path.addEventListener('mouseenter', e => showTip(e, labels[i], fmt(v), (v/denom*100).toFixed(1)+'%'));
+    path.addEventListener('mouseleave', hideTip);
+    svg.insertBefore(path, svg.firstChild);
+ 
+    // Legend item
+    const item = document.createElement('div');
+    item.className = 'legend-item' + (activeIdx===i?' lactive':'');
+    item.innerHTML = `<div class="legend-dot" style="background:${colors[i]}"></div><span class="legend-text">${labels[i]}</span><span class="legend-pct">${(v/denom*100).toFixed(1)}%</span>`;
+    item.onclick = () => selectSlice(prefix, i, vals, total, denom, labels, colors, false);
+    legend.appendChild(item);
+ 
+    startAngle = endAngle;
+  });
+ 
+  // Show detail based on active state
+  const activeIdx2 = prefix==='inc' ? incActive : expActive;
+  if(activeIdx2 === null) {
+    detail.className = 'detail-panel';
+    detail.innerHTML = '<div class="detail-placeholder">👆 Click any slice<br>to see details</div>';
+  } else {
+    // Find the active slice data
+    let ai = -1;
+    vals.forEach((v,i) => { if(v > 0) ai++; if(ai === activeIdx2) {
+      const pct = v/denom*100;
+      detail.className = 'detail-panel has-data';
+      detail.innerHTML = `
+        <div class="detail-label">Selected Category</div>
+        <div class="detail-name"><div class="detail-swatch" style="background:${colors[i]}"></div>${labels[i]}</div>
+        <div class="detail-row"><span>Amount</span><span class="dval">${fmt(v)}</span></div>
+        <div class="detail-row"><span>% of Total Income</span><span class="dpct">${pct.toFixed(1)}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(pct,100)}%;background:${colors[i]}"></div></div>
+      `;
+    }});
+  }
+}
+ 
+function buildExpensePie(expVals, expTotal, incTotal, net) {
+  const svg = document.getElementById('expense-svg');
+  const legend = document.getElementById('exp-legend');
+  const detail = document.getElementById('exp-detail');
+  svg.innerHTML = ''; legend.innerHTML = '';
+ 
+  const cx = 100, cy = 100, r = 90;
+  // Use incTotal as denominator (same as 2024 file)
+  // Add Excess Maint (Surplus) or show deficit slice
+  const excessLabel = net >= 0 ? 'Excess Maint (Surplus)' : 'Deficit';
+  const excessColor = net >= 0 ? '#B0BEC5' : '#f44336';
+  const excessVal = Math.abs(net);
+ 
+  // Build full slice list including excess/deficit
+  const allLabels = [...EXP_LABELS, excessLabel];
+  const allColors = [...EXP_COLORS, excessColor];
+  const allVals   = [...expVals, excessVal];
+  const total = incTotal; // pie sums to incTotal
+ 
+  let startAngle = 0;
+  allVals.forEach((v, i) => {
+    if(v <= 0) return;
+    const sweep = (v / total) * 360;
+    const endAngle = startAngle + sweep;
+    const isExcess = (i === allVals.length - 1);
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', arc(cx,cy,r,startAngle,endAngle));
+    path.setAttribute('fill', allColors[i]);
+    path.setAttribute('stroke','#161b22');
+    path.setAttribute('stroke-width','2');
+    if(isExcess) path.setAttribute('stroke-dasharray','4,2');
+    path.classList.add('wedge');
+ 
+    if(expActive !== null) {
+      if(expActive === i) path.classList.add('wactive');
+      else path.classList.add('dimmed');
+    }
+ 
+    if(sweep > 8) {
+      const mid = startAngle + sweep/2;
+      const lp = polar(cx,cy,r*0.65,mid);
+      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      txt.setAttribute('x', lp.x); txt.setAttribute('y', lp.y);
+      txt.setAttribute('text-anchor','middle'); txt.setAttribute('dominant-baseline','central');
+      txt.setAttribute('fill', isExcess ? '#546E7A' : '#fff');
+      txt.setAttribute('font-size', sweep>30?'7':'5.5');
+      txt.setAttribute('font-weight','bold'); txt.setAttribute('font-family','Source Sans 3,sans-serif');
+      txt.setAttribute('pointer-events','none');
+      txt.textContent = (v/total*100).toFixed(1)+'%';
+      svg.appendChild(txt);
+    }
+ 
+    path.addEventListener('click', () => selectExpSlice(i, allVals, total, allLabels, allColors, net));
+    path.addEventListener('mouseenter', e => {
+      const sign = isExcess ? (net>=0?'+':'-') : '';
+      showTip(e, allLabels[i], sign+fmt(v), (v/total*100).toFixed(1)+'%');
+    });
+    path.addEventListener('mouseleave', hideTip);
+    svg.insertBefore(path, svg.firstChild);
+ 
+    // Legend
+    const item = document.createElement('div');
+    item.className = 'legend-item' + (expActive===i?' lactive':'') + (isExcess?' excess-item':'');
+    item.innerHTML = `<div class="legend-dot" style="background:${allColors[i]};${isExcess?'border:1px dashed #546E7A;':''}"></div><span class="legend-text">${allLabels[i]}</span><span class="legend-pct">${(v/total*100).toFixed(1)}%</span>`;
+    item.onclick = () => selectExpSlice(i, allVals, total, allLabels, allColors, net);
+    legend.appendChild(item);
+ 
+    startAngle = endAngle;
+  });
+ 
+  if(expActive === null) {
+    detail.className = 'detail-panel';
+    detail.innerHTML = '<div class="detail-placeholder">👆 Click any slice<br>to see details</div>';
+  } else {
+    const v = allVals[expActive];
+    const pct = v/total*100;
+    const isExcess = (expActive === allVals.length - 1);
+    const sign = isExcess ? (net>=0?'+':'-') : '';
+    detail.className = 'detail-panel has-data';
+    detail.innerHTML = `
+      <div class="detail-label">Selected Category</div>
+      <div class="detail-name"><div class="detail-swatch" style="background:${allColors[expActive]}"></div>${allLabels[expActive]}</div>
+      <div class="detail-row"><span>Amount</span><span class="dval">${sign}${fmt(v)}</span></div>
+      <div class="detail-row"><span>% of Total Income</span><span class="dpct">${pct.toFixed(1)}%</span></div>
+      ${isExcess ? '<div class="detail-row" style="font-size:0.75rem;color:var(--muted);"><span>' + (net>=0 ? '✓ Surplus — income exceeded expenses' : '⚠ Deficit — expenses exceeded income') + '</span></div>' : ''}
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(pct,100)}%;background:${allColors[expActive]}"></div></div>
+    `;
+  }
+}
+ 
+function selectSlice(prefix, idx, vals, total, denom, labels, colors, isExp) {
+  if(prefix==='inc') incActive = incActive===idx ? null : idx;
+  else expActive = expActive===idx ? null : idx;
+  render();
+}
+ 
+function selectExpSlice(idx, vals, total, labels, colors, net) {
+  expActive = expActive===idx ? null : idx;
+  render();
+}
+ 
+function showTip(e, label, val, pct) {
+  const t = document.getElementById('tooltip');
+  t.innerHTML = `<strong>${label}</strong>${val} &nbsp;·&nbsp; ${pct} of income`;
+  t.classList.add('visible');
+  t.style.left = (e.clientX+14)+'px'; t.style.top = (e.clientY-10)+'px';
+}
+function hideTip() { document.getElementById('tooltip').classList.remove('visible'); }
+document.addEventListener('mousemove', e => {
+  const t = document.getElementById('tooltip');
+  if(t.classList.contains('visible')) { t.style.left=(e.clientX+14)+'px'; t.style.top=(e.clientY-10)+'px'; }
+});
+ 
+setYear(2022);
+</script>
+</body>
+</html>
