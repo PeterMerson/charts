@@ -246,6 +246,63 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .compare-cost { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--ink2); }
 /* My Unit mode: highlight cells */
 .myunit-mode .cell-val { color: var(--gold) !important; }
+ 
+/* ── PRINT / EXPORT ── */
+@media print {
+  body { background: #fff !important; color: #000 !important; font-size: 11px; }
+  .masthead, .myunit-bar, .myunit-compare, .controls-bar, .section-rule,
+  .legend-bar, .right-panel, .page-footer, .info-note,
+  #btn-print, #fs-backdrop, .expand-btn,
+  .gold-rule-full { display: none !important; }
+  .section-divider { margin-top: 16px !important; }
+  .section-divider-inner { border-radius: 4px !important; padding: 8px 14px !important; }
+  .main-layout { grid-template-columns: 1fr !important; padding: 0 8px !important; }
+  .matrix-wrap { overflow: visible !important; box-shadow: none !important; border: 1px solid #ccc !important; }
+  table.matrix { font-size: 9px !important; }
+  .matrix thead th, .matrix td { padding: 4px 6px !important; }
+  .print-header { display: block !important; }
+  .print-footer { display: block !important; }
+  @page { margin: 15mm 10mm; size: landscape; }
+}
+.print-header { display: none; max-width: 1400px; margin: 0 auto; padding: 0 32px 8px; }
+.print-footer { display: none; max-width: 1400px; margin: 8px auto 0; padding: 0 32px; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #666; border-top: 1px solid #ccc; padding-top: 6px; }
+ 
+/* Print modal overlay */
+#print-modal { display:none; position:fixed; inset:0; background:rgba(13,34,64,0.92); z-index:99999; overflow-y:auto; }
+#print-modal.open { display:block; }
+#print-modal-inner { background:#fff; max-width:1200px; margin:30px auto; border-radius:8px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.5); }
+#print-modal-header { background:#0d2240; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #c9a84c; }
+#print-modal-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#f7f3ec; }
+#print-modal-meta { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:#c9a84c; margin-top:3px; }
+.print-modal-btn { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; padding:8px 18px; border-radius:4px; cursor:pointer; border:1px solid; transition:all 0.15s; }
+.print-modal-btn.primary { background:#c9a84c; color:#0d2240; border-color:#c9a84c; font-weight:700; }
+.print-modal-btn.primary:hover { background:#e8c96a; }
+.print-modal-btn.secondary { background:transparent; color:#f7f3ec; border-color:#3a3028; margin-left:8px; }
+.print-modal-btn.secondary:hover { border-color:#c9a84c; color:#c9a84c; }
+#print-modal-body { padding:24px 32px; }
+#print-modal-body h3 { font-family:'Playfair Display',serif; font-size:1rem; color:#0d2240; margin:16px 0 8px; border-bottom:2px solid #c9a84c; padding-bottom:4px; }
+#print-modal-body h3:first-child { margin-top:0; }
+#print-modal-body table { width:100%; border-collapse:collapse; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; margin-bottom:4px; }
+#print-modal-body thead tr { background:#0d2240; }
+#print-modal-body thead th { padding:6px 10px; color:#c9bfaa; text-align:right; font-size:0.65rem; border-right:1px solid #3a3028; white-space:nowrap; }
+#print-modal-body thead th.cat { text-align:left; border-right:2px solid #c9a84c; min-width:160px; }
+#print-modal-body tbody tr { border-bottom:1px solid #eee; }
+#print-modal-body tbody tr:nth-child(even) { background:#f8f9fb; }
+#print-modal-body tbody td { padding:5px 10px; text-align:right; border-right:1px solid #eee; white-space:nowrap; color:#1a3a5c; }
+#print-modal-body tbody td.cat { text-align:left; font-family:'Source Serif 4',serif; font-weight:500; color:#0d2240; border-right:2px solid #b0bdd4; }
+#print-modal-body tfoot tr { background:#0d2240; border-top:2px solid #c9a84c; }
+#print-modal-body tfoot td { padding:6px 10px; text-align:right; color:#f7f3ec; font-weight:700; border-right:1px solid #3a3028; }
+#print-modal-body tfoot td.cat { text-align:left; color:#c9a84c; font-family:'Playfair Display',serif; }
+#print-modal-body tfoot td.print-pos { color:#6fcf82 !important; font-weight:700; }
+#print-modal-body tfoot td.print-neg { color:#f47a70 !important; font-weight:700; }
+.print-pos { color:#1a5c2a !important; font-weight:600; }
+.print-neg { color:#8b1a1a !important; font-weight:600; }
+/* Wide table: chunk headers repeat on each page */
+#print-modal-body table { page-break-inside: auto; }
+#print-modal-body thead { display: table-header-group; }
+#print-modal-body tr { page-break-inside: avoid; }
+/* For very wide ranges split into sub-tables visually */
+.print-chunk-label { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:#888; text-align:right; margin-bottom:2px; }
 </style>
 </head>
 <body>
@@ -318,7 +375,9 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <button class="mode-btn active" id="btn-charttype-line" onclick="setChartType('line')" title="Line chart">Line</button>
       <button class="mode-btn" id="btn-charttype-bar" onclick="setChartType('bar')" title="Bar chart">Bar</button>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#5a5040;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#9a8f7e;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
+    <div style="width:1px;height:20px;background:#3a3028;"></div>
+    <button class="mode-btn" id="btn-print" onclick="openPrintView()" title="Open a clean printable snapshot of all matrices" style="border-color:#c9a84c;color:#c9a84c;background:transparent;">🖨 Print / Export PDF</button>
   </div>
 </div>
 <div class="info-note"><span>ⓘ Special Assessments are shown as a separate row (italic) but are <strong>excluded from Total Income</strong> — they are one-time, non-recurring charges. &nbsp;Two assessments were levied: <strong>1993</strong> ($170,050) and <strong>2002–2006</strong> ($763,620 total). &nbsp;Total collected 1990–2024: <strong>$933,670</strong>. &nbsp;Hover over the row label for details.</span></div>
@@ -1993,18 +2052,21 @@ function selectCapCat(cat, years) {
       ? '2px solid #58a6ff' : '';
   });
  
-  const vals = years.map(y => CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0);
+  const rawVals = years.map(y => CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0);
+  const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
+  const vals = rawVals.map(v => Math.round(v * scale));
   const peak = Math.max(...vals);
   const peakYr = years[vals.indexOf(peak)];
   const latest = vals[vals.length-1];
   const first = vals[0];
   const chgPct = first > 0 ? ((latest-first)/first*100) : 0;
+  const catLabel = cat + ((MYUNIT_VIEW_ON && MY_UNIT) ? ' — Apt '+MY_UNIT.apt : '');
  
-  document.getElementById('cap-panel-cat').textContent = cat;
+  document.getElementById('cap-panel-cat').textContent = catLabel;
   document.getElementById('cap-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
   document.getElementById('cap-ps-peak').textContent = peakYr;
-  document.getElementById('cap-ps-peak-val').textContent = fmtFull(peak);
-  document.getElementById('cap-ps-latest').textContent = fmtFull(latest);
+  document.getElementById('cap-ps-peak-val').textContent = '$'+peak.toLocaleString('en-US');
+  document.getElementById('cap-ps-latest').textContent = '$'+latest.toLocaleString('en-US');
   const chgEl = document.getElementById('cap-ps-chg');
   chgEl.textContent = (chgPct>=0?'+':'')+chgPct.toFixed(1)+'%';
   chgEl.className = 'pstat-val '+(chgPct>=0?'up':'dn');
@@ -2025,7 +2087,6 @@ function selectCapCat(cat, years) {
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33'); grad.addColorStop(1,color+'05');
  
-  
   capState.trendChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data: { labels:years, datasets:[{
@@ -2034,7 +2095,7 @@ function selectCapCat(cat, years) {
       borderWidth: isBar?1:5, borderRadius: isBar?3:0,
       pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
       pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2.5,
-      fill:!isBar, tension:isBar?0:0.25, label:cat
+      fill:!isBar, tension:isBar?0:0.25, label:catLabel
     }]},
     options: { responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
@@ -2042,8 +2103,7 @@ function selectCapCat(cat, years) {
         callbacks:{title:items=>items[0].label,
           label:item=>{
             if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
-
-            return ' '+fmtFull(item.parsed.y);
+            return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
           }}
       }},
       scales:{
@@ -2341,10 +2401,12 @@ function toggleCompare() {
  
 function renderComparePanel() {
   if(!MY_UNIT) return;
-  // Use 2024 Total Expenses as comparison metric
   const yr2024idx = ALL_YEARS.indexOf(2024);
   const totalExp2024 = Object.values(EXPENSES).reduce((s,arr) => s + arr[yr2024idx], 0);
   const totalInc2024 = Object.keys(INCOME).reduce((s,cat) => cat==='SpecialAssessment'?s:s+(INCOME[cat][yr2024idx]||0), 0);
+  const totalLiq2024 = LIQUIDITY_DATA[yr2024idx];
+  // Westchester standard: $3,500–$5,000 per unit in 2025 dollars, CPI-adjusted to 2024 ≈ $3,442–$4,917
+  const WLOW = 3442; const WHIGH = 4917;
  
   document.getElementById('compare-title').textContent =
     'Apartment Cost Comparison — 2024 · Your unit: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.type + ', ' + MY_UNIT.shares + ' shares)';
@@ -2352,10 +2414,8 @@ function renderComparePanel() {
   const grid = document.getElementById('compare-grid');
   grid.innerHTML = '';
  
-  // Group by type for color coding
   const typeColors = {'Studio':'#8E24AA','1BR':'#1D6FA4','Jr 2BR':'#43A047','2BR':'#F4511E','3BR':'#d29922'};
  
-  // Sort by shares descending, then apt number ascending for consistent ordering
   const sorted = [...APARTMENTS].sort((a,b) => {
     if(b.shares !== a.shares) return b.shares - a.shares;
     return a.apt.localeCompare(b.apt);
@@ -2363,8 +2423,13 @@ function renderComparePanel() {
  
   sorted.forEach(a => {
     const myExpShare = Math.round(totalExp2024 * a.shares / TOTAL_SHARES);
-    const myIncShare = Math.round(totalInc2024 * a.shares / TOTAL_SHARES);
     const myMaint = Math.round(INCOME['Maintenance Charges'][yr2024idx] * a.shares / TOTAL_SHARES);
+    const myLiq = Math.round(totalLiq2024 * a.shares / TOTAL_SHARES);
+    // Westchester status for this unit's liquidity share
+    let liqStatus, liqColor;
+    if(myLiq >= WHIGH) { liqStatus = '✅ Above range'; liqColor = '#1a5c2a'; }
+    else if(myLiq >= WLOW) { liqStatus = '✔ Within range'; liqColor = '#1D6FA4'; }
+    else { liqStatus = '⚠ Below range'; liqColor = '#8b1a1a'; }
     const color = typeColors[a.type] || '#666';
     const isMe = a.apt === MY_UNIT.apt;
     const item = document.createElement('div');
@@ -2374,11 +2439,13 @@ function renderComparePanel() {
         <div class="compare-apt" style="color:${isMe?'#1a3d5c':color}">${isMe?'★ ':''} Apt ${a.apt}</div>
         <div class="compare-apt-type">${a.type} · ${a.building} · ${a.shares} sh</div>
         <div class="compare-cost" style="margin-top:3px;">Exp: <strong>$${myExpShare.toLocaleString()}</strong></div>
-        <div class="compare-cost">Maint: <strong>$${myMaint.toLocaleString()}</strong>/yr</div>
+        <div class="compare-cost">Maint: <strong>$${myMaint.toLocaleString()}</strong>/yr &nbsp;·&nbsp; $${Math.round(myMaint/12).toLocaleString()}/mo</div>
+        <div class="compare-cost" style="margin-top:3px;">Liquidity share: <strong>$${myLiq.toLocaleString()}</strong></div>
+        <div class="compare-cost" style="color:${liqColor};font-weight:600;">${liqStatus}</div>
       </div>
       <div style="text-align:right;">
         <div class="compare-shares" style="color:${isMe?'var(--selected)':color}">${(a.shares/TOTAL_SHARES*100).toFixed(2)}%</div>
-        <div class="compare-cost" style="margin-top:2px;">$${Math.round(myMaint/12).toLocaleString()}/mo</div>
+        <div class="compare-cost" style="margin-top:4px;color:#888;font-size:0.6rem;">Westchester<br>$${WLOW.toLocaleString()}–$${WHIGH.toLocaleString()}</div>
       </div>`;
     grid.appendChild(item);
   });
@@ -2414,6 +2481,265 @@ window.fmtDiff = function(diff) {
  
 // Init on load
 initMyUnitDropdown();
+ 
+ 
+// ══════════════════════════════════════════
+//  PRINT / EXPORT
+// ══════════════════════════════════════════
+function openPrintView() {
+  const modal = document.getElementById('print-modal');
+  const body  = document.getElementById('print-modal-body');
+  body.innerHTML = '';
+ 
+  // Determine year range from income selectors (use inc range as master)
+  const fromYr = parseInt(document.getElementById('inc-sel-from').value);
+  const toYr   = parseInt(document.getElementById('inc-sel-to').value);
+  const f = Math.min(fromYr, toYr), t = Math.max(fromYr, toYr);
+  const years  = ALL_YEARS.filter(y => y >= f && y <= t);
+ 
+  const unitLabel = (MYUNIT_VIEW_ON && MY_UNIT)
+    ? '  ·  My Unit View: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.type + ', ' + MY_UNIT.shares + ' shares, ' + (MY_UNIT.shares/TOTAL_SHARES*100).toFixed(3) + '% of building)'
+    : '  ·  Building Totals';
+  const principalLabel = SHOW_PRINCIPAL ? '  ·  Mortgage Principal Included' : '';
+ 
+  document.querySelector('#print-modal-header #print-modal-meta').textContent =
+    'Year Range: ' + f + ' – ' + t + '  ·  ' + years.length + ' years' + unitLabel + principalLabel +
+    '  ·  Source: Audited Annual Financial Statements 1990–2024';
+ 
+  function scaleVal(v) {
+    return (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(v * MY_UNIT.shares / TOTAL_SHARES) : v;
+  }
+  function fmt(v) { return '$' + Math.abs(scaleVal(v)).toLocaleString('en-US'); }
+  function fmtNet(v) { const sv = scaleVal(v); return (sv>=0?'+':'-')+'$'+Math.abs(sv).toLocaleString('en-US'); }
+ 
+  const CHUNK = 12; // max years per table chunk to fit landscape page
+ 
+  function buildTableChunk(title, cats, data, specialExclude, chunkYears, isFirst, totalsAcc) {
+    const tbl = document.createElement('table');
+    // THEAD
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    const thc = document.createElement('th'); thc.className='cat';
+    thc.textContent = isFirst ? 'Category' : ''; hr.appendChild(thc);
+    chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; hr.appendChild(th); });
+    thead.appendChild(hr); tbl.appendChild(thead);
+    // TBODY
+    const tbody = document.createElement('tbody');
+    cats.forEach(cat => {
+      if(!data[cat]) return;
+      const isSA = specialExclude && cat==='SpecialAssessment';
+      const tr = document.createElement('tr');
+      const td0 = document.createElement('td'); td0.className='cat';
+      td0.textContent = isSA ? 'Special Assessments (excl.)' : cat;
+      if(isSA) td0.style.cssText = 'opacity:0.6;font-style:italic;';
+      tr.appendChild(td0);
+      chunkYears.forEach(y => {
+        const idx = ALL_YEARS.indexOf(y);
+        const val = data[cat][idx] || 0;
+        if(!isSA) totalsAcc[y] = (totalsAcc[y]||0) + val;
+        const td = document.createElement('td');
+        td.textContent = val !== 0 ? fmt(val) : '—';
+        if(val < 0) td.classList.add('print-neg');
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    // TFOOT
+    const tfoot = document.createElement('tfoot');
+    const tr = document.createElement('tr');
+    const td0f = document.createElement('td'); td0f.className='cat';
+    td0f.textContent = title.includes('Income') ? 'Total Income' : 'Total Expenses';
+    tr.appendChild(td0f);
+    chunkYears.forEach(y => {
+      const val = totalsAcc[y]||0;
+      const td = document.createElement('td');
+      td.textContent = fmt(val);
+      td.classList.add(val >= 0 ? 'print-pos' : 'print-neg');
+      tr.appendChild(td);
+    });
+    tfoot.appendChild(tr); tbl.appendChild(tfoot);
+    return tbl;
+  }
+ 
+  function buildTable(title, cats, data, specialExclude) {
+    const h3 = document.createElement('h3'); h3.textContent = title; body.appendChild(h3);
+    // Pre-calculate totals across ALL years so chunks share the same totals object
+    const totalsAcc = {};
+    // Chunk years
+    for(let i=0; i<years.length; i+=CHUNK) {
+      const chunkYears = years.slice(i, i+CHUNK);
+      const isFirst = i===0;
+      if(!isFirst) {
+        // small continuation label
+        const lbl = document.createElement('div');
+        lbl.className = 'print-chunk-label';
+        lbl.textContent = title + ' (continued) — ' + chunkYears[0] + '–' + chunkYears[chunkYears.length-1];
+        body.appendChild(lbl);
+      }
+      const tbl = buildTableChunk(title, cats, data, specialExclude, chunkYears, isFirst, totalsAcc);
+      tbl.style.marginBottom = '12px';
+      body.appendChild(tbl);
+    }
+  }
+ 
+  // Income Table
+  buildTable('Income', Object.keys(INCOME), INCOME, true);
+ 
+  // Expense Table
+  buildTable('Expenses', Object.keys(EXPENSES), EXPENSES, false);
+ 
+  // Net Income Table — chunked
+  const h3net = document.createElement('h3'); h3net.textContent = 'Net Income — Surplus / Deficit'; body.appendChild(h3net);
+  for(let i=0; i<years.length; i+=CHUNK) {
+    const chunkYears = years.slice(i, i+CHUNK);
+    if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Net Income (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
+    const netTbl = document.createElement('table');
+    const netHead = document.createElement('thead');
+    const nhr = document.createElement('tr');
+    const nthc = document.createElement('th'); nthc.className='cat'; nthc.textContent= i===0 ? '' : ''; nhr.appendChild(nthc);
+    chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; nhr.appendChild(th); });
+    netHead.appendChild(nhr); netTbl.appendChild(netHead);
+    const netBody = document.createElement('tbody');
+    const ntr = document.createElement('tr');
+    const ntd0 = document.createElement('td'); ntd0.className='cat'; ntd0.textContent='Net Income (Income − Expenses)'; ntr.appendChild(ntd0);
+    chunkYears.forEach(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
+      let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+      if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+      const net = inc - exp;
+      const td = document.createElement('td');
+      td.textContent = fmtNet(net);
+      td.classList.add(net >= 0 ? 'print-pos' : 'print-neg');
+      ntr.appendChild(td);
+    });
+    netBody.appendChild(ntr); netTbl.appendChild(netBody);
+    netTbl.style.marginBottom = '12px';
+    body.appendChild(netTbl);
+  }
+ 
+  // Capital & Liquidity Table — chunked
+  const h3cap = document.createElement('h3'); h3cap.textContent = 'Capital Expenditures & Total Liquidity'; body.appendChild(h3cap);
+  for(let i=0; i<years.length; i+=CHUNK) {
+    const chunkYears = years.slice(i, i+CHUNK);
+    if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Capital & Liquidity (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
+    const capTbl = document.createElement('table');
+    const capHead = document.createElement('thead');
+    const chr = document.createElement('tr');
+    const cthc = document.createElement('th'); cthc.className='cat'; cthc.textContent= i===0 ? 'Category' : ''; chr.appendChild(cthc);
+    chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; chr.appendChild(th); });
+    capHead.appendChild(chr); capTbl.appendChild(capHead);
+    const capBody = document.createElement('tbody');
+    [['Capital Expenditures', CAPEX_DATA],['Total Liquidity (Cash & Equiv + Reserve)', LIQUIDITY_DATA]].forEach(([label, arr]) => {
+      const tr = document.createElement('tr');
+      const td0 = document.createElement('td'); td0.className='cat';
+      td0.textContent = label + ((MYUNIT_VIEW_ON && MY_UNIT) ? ' (Apt '+MY_UNIT.apt+' share)' : '');
+      tr.appendChild(td0);
+      chunkYears.forEach(y => {
+        const idx = ALL_YEARS.indexOf(y);
+        const val = arr[idx] || 0;
+        const td = document.createElement('td');
+        td.textContent = fmt(val);
+        tr.appendChild(td);
+      });
+      capBody.appendChild(tr);
+    });
+    capTbl.appendChild(capBody);
+    capTbl.style.marginBottom = '12px';
+    body.appendChild(capTbl);
+  }
+ 
+  // Note at bottom
+  const note = document.createElement('p');
+  note.style.cssText = 'font-family:IBM Plex Mono,monospace;font-size:0.65rem;color:#666;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;';
+  note.textContent = 'Riveredge Owners, Inc.  ·  1-3 David Lane, Yonkers NY  ·  Audited Annual Financial Statements 1990–2024  ·  Mortgage Principal ' + (SHOW_PRINCIPAL ? 'included' : 'excluded') + '  ·  Special Assessments excluded from Income totals';
+  body.appendChild(note);
+ 
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+ 
+function closePrintModal() {
+  document.getElementById('print-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+ 
+function printToPDFWindow() {
+  // Grab the rendered HTML from the modal body
+  const headerMeta = document.querySelector('#print-modal-header #print-modal-meta').textContent;
+  const bodyHTML = document.getElementById('print-modal-body').innerHTML;
+ 
+  const printCSS = `
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@400;600&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'IBM Plex Mono', monospace; background: #fff; color: #0d2240; font-size: 10px; padding: 0; margin: 0; }
+    .print-doc-header { background: #0d2240; color: #f7f3ec; padding: 12px 20px; border-bottom: 3px solid #c9a84c; margin-bottom: 16px; }
+    .print-doc-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: #f7f3ec; }
+    .print-doc-title em { color: #c9a84c; font-style: normal; }
+    .print-doc-meta { font-size: 0.65rem; color: #c9a84c; margin-top: 4px; line-height: 1.5; }
+    .content { padding: 0 20px 20px; }
+    h3 { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: #0d2240; margin: 14px 0 6px; border-bottom: 2px solid #c9a84c; padding-bottom: 3px; }
+    h3:first-child { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.68rem; margin-bottom: 6px; }
+    thead tr { background: #0d2240; }
+    thead th { padding: 5px 8px; color: #c9bfaa; text-align: right; border-right: 1px solid #3a3028; white-space: nowrap; font-size: 0.62rem; }
+    thead th.cat { text-align: left; border-right: 2px solid #c9a84c; min-width: 150px; }
+    tbody tr { border-bottom: 1px solid #eee; }
+    tbody tr:nth-child(even) { background: #f8f9fb; }
+    tbody td { padding: 4px 8px; text-align: right; border-right: 1px solid #eee; white-space: nowrap; color: #1a3a5c; }
+    tbody td.cat { text-align: left; font-family: 'Source Serif 4', serif; font-weight: 500; color: #0d2240; border-right: 2px solid #b0bdd4; }
+    tfoot tr { background: #0d2240; border-top: 2px solid #c9a84c; }
+    tfoot td { padding: 5px 8px; text-align: right; color: #f7f3ec; font-weight: 700; border-right: 1px solid #3a3028; }
+    tfoot td.cat { text-align: left; color: #c9a84c; font-family: 'Playfair Display', serif; }
+    tfoot td.print-pos { color: #6fcf82 !important; font-weight: 700; }
+    tfoot td.print-neg { color: #f47a70 !important; font-weight: 700; }
+    .print-pos { color: #1a5c2a !important; font-weight: 600; }
+    .print-neg { color: #8b1a1a !important; font-weight: 600; }
+    .print-chunk-label { font-size: 0.58rem; color: #888; text-align: right; margin-bottom: 2px; margin-top: 8px; }
+    p { font-size: 0.62rem; color: #666; margin-top: 14px; padding-top: 8px; border-top: 1px solid #ccc; line-height: 1.6; }
+    @page { margin: 12mm 10mm; size: landscape; }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead { display: table-header-group; }
+      tr { page-break-inside: avoid; }
+      h3 { page-break-after: avoid; }
+      table { page-break-inside: auto; }
+    }
+  `;
+ 
+  const winHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Riveredge Income &amp; Expense Matrix</title>
+<style>${printCSS}</style>
+</head>
+<body>
+<div class="print-doc-header">
+  <div class="print-doc-title">Riveredge <em>Income &amp; Expense Matrix</em></div>
+  <div class="print-doc-meta">${headerMeta}</div>
+</div>
+<div class="content">${bodyHTML}</div>
+</body>
+</html>`;
+ 
+  const pw = window.open('', '_blank', 'width=1100,height=800,scrollbars=yes');
+  if(!pw) { alert('Please allow popups for this page to use Print / Save as PDF.'); return; }
+  pw.document.open();
+  pw.document.write(winHTML);
+  pw.document.close();
+  // Wait for fonts/styles to load then trigger print dialog
+  pw.onload = function() { pw.focus(); pw.print(); };
+  setTimeout(function() { pw.focus(); pw.print(); }, 800);
+}
+ 
+// Close print modal on Escape
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape' && document.getElementById('print-modal').classList.contains('open')) {
+    closePrintModal();
+  }
+});
  
 // ── BOOT ──
 initSelects('inc');
@@ -2456,5 +2782,24 @@ function scrollAllRight() {
 }
 scrollAllRight();
 </script>
+ 
+<!-- ══ PRINT / EXPORT MODAL ══ -->
+<div id="print-modal">
+  <div id="print-modal-inner">
+    <div id="print-modal-header">
+      <div>
+        <div id="print-modal-title">Riveredge Income &amp; Expense Matrix — Print Preview</div>
+        <div id="print-modal-meta" id="print-modal-meta-line"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="print-modal-btn primary" onclick="printToPDFWindow()">🖨 Print / Save as PDF</button>
+        <button class="print-modal-btn secondary" onclick="closePrintModal()">✕ Close</button>
+      </div>
+    </div>
+    <div id="print-modal-body">
+      <!-- Populated by openPrintView() -->
+    </div>
+  </div>
+</div>
 </body>
 </html>
