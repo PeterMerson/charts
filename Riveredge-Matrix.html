@@ -1470,6 +1470,13 @@ function renderNet() {
     var wrapper = document.getElementById('net-matrix-wrap');
     if(wrapper) wrapper.scrollLeft = wrapper.scrollWidth;
   }, 50);
+ 
+  // Auto-redraw active chart if one is already showing
+  if(document.getElementById('net-chart-panel').style.display !== 'none') {
+    var netTitle = document.getElementById('net-panel-cat').textContent;
+    if(netTitle.indexOf('vs') > -1) renderCompareChart(years);
+    else renderNetChart(years);
+  }
 }
  
 function renderNetChart(years, nets) {
@@ -2035,6 +2042,7 @@ function selectCapCat(cat, years) {
         callbacks:{title:items=>items[0].label,
           label:item=>{
             if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
+
             return ' '+fmtFull(item.parsed.y);
           }}
       }},
