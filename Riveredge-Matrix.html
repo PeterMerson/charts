@@ -2516,6 +2516,7 @@ function openPrintView() {
  
   function buildTableChunk(title, cats, data, specialExclude, chunkYears, isFirst, totalsAcc) {
     const tbl = document.createElement('table');
+    const isExp = title.includes('Expense');
     // THEAD
     const thead = document.createElement('thead');
     const hr = document.createElement('tr');
@@ -2528,14 +2529,17 @@ function openPrintView() {
     cats.forEach(cat => {
       if(!data[cat]) return;
       const isSA = specialExclude && cat==='SpecialAssessment';
+      const isMI = isExp && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
       const tr = document.createElement('tr');
       const td0 = document.createElement('td'); td0.className='cat';
-      td0.textContent = isSA ? 'Special Assessments (excl.)' : cat;
+      td0.textContent = isSA ? 'Special Assessments (excl.)' : isMI ? 'Mortgage Interest + Principal' : cat;
       if(isSA) td0.style.cssText = 'opacity:0.6;font-style:italic;';
+      if(isMI) td0.style.cssText = 'color:#8b6914;font-style:italic;';
       tr.appendChild(td0);
       chunkYears.forEach(y => {
         const idx = ALL_YEARS.indexOf(y);
-        const val = data[cat][idx] || 0;
+        const baseVal = data[cat][idx] || 0;
+        const val = isMI ? baseVal + (MORTGAGE_PRINCIPAL[idx]||0) : baseVal;
         if(!isSA) totalsAcc[y] = (totalsAcc[y]||0) + val;
         const td = document.createElement('td');
         td.textContent = val !== 0 ? fmt(val) : '—';
@@ -2549,7 +2553,7 @@ function openPrintView() {
     const tfoot = document.createElement('tfoot');
     const tr = document.createElement('tr');
     const td0f = document.createElement('td'); td0f.className='cat';
-    td0f.textContent = title.includes('Income') ? 'Total Income' : 'Total Expenses';
+    td0f.textContent = title.includes('Income') ? 'Total Income' : ('Total Expenses' + (isExp && SHOW_PRINCIPAL ? ' (incl. Principal)' : ''));
     tr.appendChild(td0f);
     chunkYears.forEach(y => {
       const val = totalsAcc[y]||0;
@@ -2602,7 +2606,9 @@ function openPrintView() {
     netHead.appendChild(nhr); netTbl.appendChild(netHead);
     const netBody = document.createElement('tbody');
     const ntr = document.createElement('tr');
-    const ntd0 = document.createElement('td'); ntd0.className='cat'; ntd0.textContent='Net Income (Income − Expenses)'; ntr.appendChild(ntd0);
+    const ntd0 = document.createElement('td'); ntd0.className='cat';
+    ntd0.textContent = 'Net Income (Income − Expenses' + (SHOW_PRINCIPAL ? ' incl. Principal' : '') + ')';
+    ntr.appendChild(ntd0);
     chunkYears.forEach(y => {
       const idx = ALL_YEARS.indexOf(y);
       let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
