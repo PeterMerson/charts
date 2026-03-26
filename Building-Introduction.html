@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge — Know Your Building · Know Your Investment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --ink: #0d2240;
+  --ink2: #1a3a5c;
+  --paper: #f8f9fb;
+  --paper2: #edf1f7;
+  --gold: #8b6914;
+  --gold-light: #c9a84c;
+  --gold-pale: #f0e4c0;
+  --text: #f7f3ec;
+  --muted: #9a8f7e;
+  --green: #1a5c2a;
+  --green-light: #6fcf82;
+  --red: #8b1a1a;
+  --red-light: #f47a70;
+  --rule: rgba(201,168,76,0.3);
+}
+ 
+html { scroll-behavior: smooth; }
+ 
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  background: var(--ink);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+ 
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px;
+  overflow: hidden;
+}
+ 
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 50%, rgba(201,168,76,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 80% at 85% 20%, rgba(31,78,121,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 70% 80%, rgba(26,92,42,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+ 
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+ 
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+ 
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+ 
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+ 
+.hero-title .line2 {
+  font-style: italic;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+ 
+.hero-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+ 
+.hero-lead {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.75;
+  color: rgba(247,243,236,0.85);
+  max-width: 680px;
+  margin-bottom: 56px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.8s forwards;
+}
+ 
+.hero-lead strong {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+ 
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gold-light);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1s forwards;
+}
+.hero-cta:hover { background: #e8c96a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+.hero-cta-arrow { font-size: 1rem; transition: transform 0.2s; }
+.hero-cta:hover .hero-cta-arrow { transform: translateX(4px); }
+ 
+.gold-divider {
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-light), transparent);
+  margin: 48px 0;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+ 
+/* ── STATS STRIP ── */
+.stats-strip {
+  display: flex;
+  gap: 0;
+  margin-top: 72px;
+  border-top: 1px solid var(--rule);
+  padding-top: 32px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.1s forwards;
+}
+.stat-item {
+  flex: 1;
+  padding-right: 32px;
+  border-right: 1px solid var(--rule);
+  margin-right: 32px;
+}
+.stat-item:last-child { border-right: none; margin-right: 0; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--gold-light);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  line-height: 1.5;
+}
+ 
+/* ── SECTIONS ── */
+.content-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 60px;
+}
+ 
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 0 0 40px;
+  height: 1px;
+  background: var(--gold);
+}
+ 
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+.section-title em { color: var(--gold-light); font-style: italic; }
+ 
+.section-body {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: rgba(247,243,236,0.8);
+  max-width: 640px;
+}
+ 
+/* ── FIVE SECTIONS GRID ── */
+.sections-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin: 48px 0;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.section-card {
+  background: rgba(13,34,64,0.95);
+  padding: 24px 20px;
+  transition: background 0.2s;
+}
+.section-card:hover { background: rgba(26,58,92,0.95); }
+.sc-arrow {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.sc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+.sc-body {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+ 
+/* ── TOGGLES ── */
+.toggles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+.toggle-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 6px;
+  padding: 20px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: border-color 0.2s, background 0.2s;
+}
+.toggle-card:hover {
+  border-color: rgba(201,168,76,0.5);
+  background: rgba(255,255,255,0.05);
+}
+.toggle-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.toggle-text {}
+.toggle-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.toggle-desc {
+  font-family: 'Source Serif 4', serif;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(247,243,236,0.65);
+}
+ 
+/* ── MY UNIT FEATURE ── */
+.feature-block {
+  background: linear-gradient(135deg, rgba(26,92,42,0.12) 0%, rgba(13,34,64,0.8) 100%);
+  border: 1px solid rgba(111,207,130,0.25);
+  border-radius: 8px;
+  padding: 40px 48px;
+  margin: 48px 0;
+  position: relative;
+  overflow: hidden;
+}
+.feature-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green-light), transparent);
+}
+.feature-block-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--green-light);
+  margin-bottom: 12px;
+}
+.feature-block-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+.feature-block-body {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: rgba(247,243,236,0.8);
+  max-width: 600px;
+}
+.feature-example {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 20px;
+  background: rgba(26,92,42,0.2);
+  border: 1px solid rgba(111,207,130,0.3);
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--green-light);
+}
+.feature-example strong {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+ 
+/* ── WESTCHESTER BLOCK ── */
+.benchmark-block {
+  background: rgba(88,166,255,0.05);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 8px;
+  padding: 32px 40px;
+  margin: 32px 0;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+.benchmark-badge {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--green-light);
+  white-space: nowrap;
+  line-height: 1;
+}
+.benchmark-badge span {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 400;
+}
+.benchmark-text {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: rgba(247,243,236,0.75);
+}
+.benchmark-text strong { color: var(--text); }
+ 
+/* ── QUOTE ── */
+.pull-quote {
+  border-left: 3px solid var(--gold-light);
+  padding: 24px 0 24px 32px;
+  margin: 48px 0;
+}
+.pull-quote-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(247,243,236,0.9);
+  margin-bottom: 12px;
+}
+.pull-quote-attr {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+}
+ 
+/* ── DIVIDER ── */
+.full-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), rgba(201,168,76,0.3), transparent);
+  margin: 0 60px;
+}
+ 
+/* ── FOOTER ── */
+.doc-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 60px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.footer-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: rgba(154,143,126,0.5);
+}
+ 
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+ 
+/* Scroll-reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+ 
+@media (max-width: 768px) {
+  .hero { padding: 60px 24px; }
+  .content-section { padding: 60px 24px; }
+  .sections-grid { grid-template-columns: 1fr 1fr; }
+  .toggles-grid { grid-template-columns: 1fr; }
+  .stats-strip { flex-wrap: wrap; }
+  .benchmark-block { flex-direction: column; gap: 20px; }
+  .full-divider { margin: 0 24px; }
+  .doc-footer { padding: 40px 24px; }
+}
+</style>
+</head>
+<body>
+ 
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+ 
+    <div class="hero-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+ 
+    <h1 class="hero-title">
+      Know Your Building.<br>
+      <span class="line2">Know Your Investment.</span>
+    </h1>
+ 
+    <div class="hero-subtitle">Riveredge Owners Financial Transparency Report &nbsp;·&nbsp; Interactive Edition &nbsp;·&nbsp; 35 Years</div>
+ 
+    <div class="gold-divider"></div>
+ 
+    <p class="hero-lead">
+      Every dollar in. Every dollar out. <strong>35 years of audited history</strong> — and what it means for your apartment specifically.<br><br>
+      Most co-op shareholders never see beyond the annual maintenance bill. This tool changes that. Select your apartment and instantly see what your proportional share of <strong>every building expense</strong> has been — year by year, category by category, all the way back to 1990.
+    </p>
+ 
+    <a href="Riveredge-Matrix-myunit.html" class="hero-cta">
+      Open the Dashboard <span class="hero-cta-arrow">→</span>
+    </a>
+ 
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num">35</div>
+        <div class="stat-label">Years of audited<br>financial data</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">157</div>
+        <div class="stat-label">Individual apartment<br>unit profiles</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">85,027</div>
+        <div class="stat-label">Total shares — every<br>unit precisely allocated</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Interactive matrices<br>with trend charts</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">$4.6M</div>
+        <div class="stat-label">Cumulative 35-year<br>net surplus</div>
+      </div>
+    </div>
+ 
+  </div>
+</section>
+ 
+<div class="full-divider"></div>
+ 
+<!-- ══ FIVE SECTIONS ══ -->
+<section class="content-section">
+  <div class="section-label reveal">What it contains</div>
+  <h2 class="section-title reveal">Five sections. <em>One complete picture.</em></h2>
+  <p class="section-body reveal">Each section is fully interactive — select any year range from 1990 to 2024, toggle % and $ changes visible, switch between line and bar charts, and click any row to open a detailed trend chart in the side panel.</p>
+ 
+  <div class="sections-grid reveal">
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Income</div>
+      <div class="sc-body">Where the money comes from — maintenance charges, parking, laundry, storage, interest, transfer fees, and more. Special assessments shown separately and excluded from totals.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Expenses</div>
+      <div class="sc-body">Where it goes — real estate taxes, utilities, payroll, mortgage interest, repairs & maintenance, insurance, security, management fees, water & sewer, legal & audit, and more.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Net Income</div>
+      <div class="sc-body">The surplus or deficit each year — total income minus total expenses. Includes a side-by-side Total Income vs Total Expenses comparison chart. Per-share values shown on each bar.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Capital Expenditures</div>
+      <div class="sc-body">What was invested in the physical building year by year — from major systems replacements to infrastructure improvements. Two periods tracked: 1990–2005 and 2006–2024.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Total Liquidity</div>
+      <div class="sc-body">Cash & equivalents plus reserve fund — the cooperative's financial cushion. Benchmarked against the Westchester "solid adequate" standard of $3,442–$4,917 per unit.</div>
+    </div>
+  </div>
+</section>
+ 
+<div class="full-divider"></div>
+ 
+<!-- ══ MY UNIT ══ -->
+<section class="content-section">
+  <div class="section-label reveal">The most personal feature</div>
+  <h2 class="section-title reveal">Your apartment. <em>Your numbers.</em></h2>
+ 
+  <div class="feature-block reveal">
+    <div class="feature-block-label">🏢 My Unit Calculator</div>
+    <div class="feature-block-title">Select your apartment — everything changes.</div>
+    <div class="feature-block-body">
+      Every building in a co-op carries expenses collectively, but each shareholder's share is determined by the number of shares attached to their apartment — set in the original 1981 Offering Plan and never changed. Riveredge has <strong>85,027 total shares</strong> across 157 apartments ranging from 337 to 706 shares each.<br><br>
+      Select your apartment from the dropdown and turn on <strong>My Unit View</strong>. Every single figure in every matrix instantly recalculates to show your proportional share — Income, Expenses, Net Income, Capital Expenditures, and Total Liquidity. Change the year range and it updates live.
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+      <div class="feature-example">Apt 8T — 544 shares &nbsp;·&nbsp; <strong>0.640%</strong> of building</div>
+      <div class="feature-example">2024 Expense share: <strong>$12,226</strong></div>
+      <div class="feature-example">Liquidity share: <strong>$12,647</strong> ✅ Above range</div>
+    </div>
+  </div>
+ 
+  <div class="pull-quote reveal">
+    <div class="pull-quote-text">"When someone is considering purchasing a unit, being able to show them not just the building financials but their specific unit's historical costs, maintenance trajectory, and liquidity position — that's a level of transparency most co-ops never provide."</div>
+    <div class="pull-quote-attr">Riveredge Owners Financial Transparency Report</div>
+  </div>
+ 
+  <div class="benchmark-block reveal">
+    <div class="benchmark-badge">
+      2.6×
+      <span>Above Westchester<br>High Benchmark</span>
+    </div>
+    <div class="benchmark-text">
+      The Westchester standard for a "solid adequate" cooperative reserve is <strong>$3,442–$4,917 per unit</strong> (2024 dollars, CPI-adjusted). Riveredge's 2024 Total Liquidity of <strong>$1,976,793</strong> translates to <strong>$12,511 per unit</strong> — more than 2.5 times the upper benchmark. Every single apartment is above range. This has been true every year since 2009.<br><br>
+      The <strong>Compare Apts</strong> panel shows this for all 157 units side by side — including each apartment's proportional liquidity share and its Westchester benchmark status.
+    </div>
+  </div>
+</section>
+ 
+<div class="full-divider"></div>
+ 
+<!-- ══ TOGGLES ══ -->
+<section class="content-section">
+  <div class="section-label reveal">Tools & controls</div>
+  <h2 class="section-title reveal">Everything you can <em>switch on.</em></h2>
+  <p class="section-body reveal">Every control is designed to answer a specific question. Nothing is decorative.</p>
+ 
+  <div class="toggles-grid" style="margin-top:40px;">
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Year Range</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Year Range Selector</div>
+        <div class="toggle-desc">Focus on any period from 1990 to 2024. Want to see just the last 10 years? The period before and after 2006 maintenance increases? The pandemic years? Set From and To and every table and chart updates instantly.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">My Unit View</div>
+      <div class="toggle-text">
+        <div class="toggle-name">My Unit View</div>
+        <div class="toggle-desc">Scales every figure in every matrix to your apartment's proportional share based on shares owned ÷ 85,027 total shares. Turns building-level totals into personally meaningful numbers. Works across all four sections simultaneously.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Compare Apts</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Compare Apartments</div>
+        <div class="toggle-desc">Opens a scrollable grid showing all 157 apartments sorted by share count. Each card shows 2024 expense allocation, annual and monthly maintenance, liquidity share, percentage of building, and Westchester benchmark status. Your selected unit is highlighted with a star.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">% Change</div>
+      <div class="toggle-text">
+        <div class="toggle-name">% Change Badges</div>
+        <div class="toggle-desc">Shows year-over-year percentage change as a small badge below each cell value. Green for increases, red for decreases. Instantly reveals which expense categories are accelerating or moderating over your selected range.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">$ Change</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Dollar Change Badges</div>
+        <div class="toggle-desc">Shows the raw dollar difference year-over-year. In My Unit View, these differences are also scaled to your unit's share — so you see exactly how many more or fewer dollars your apartment contributed compared to the prior year.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Mortgage Principal</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Mortgage Principal Toggle</div>
+        <div class="toggle-desc">The cooperative carries a mortgage. Principal payments are a real cash obligation but are excluded from operating expense totals by accounting convention. Toggle this on to see the full cash requirement — the true cost of running the building each year.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">CPI-U Overlay</div>
+      <div class="toggle-text">
+        <div class="toggle-name">CPI-U Inflation Overlay</div>
+        <div class="toggle-desc">Adds a dashed gold inflation line to any trend chart, indexed to the start year of your selected range. See whether an expense category has grown faster or slower than general inflation over any period. Source: Bureau of Labor Statistics All Urban Consumers index.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Chart Type</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Line / Bar Chart Toggle</div>
+        <div class="toggle-desc">Switch any trend chart between a smooth line (best for showing trajectory and momentum) and a bar chart (best for comparing individual year values). The Net Income fullscreen bar chart labels each bar with both the year and the per-share dollar amount.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Print / Export PDF</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Print &amp; Export to PDF</div>
+        <div class="toggle-desc">Opens a clean dedicated print window containing all four sections as formatted tables — respecting your current year range, My Unit View setting, and Mortgage Principal toggle. Wide year ranges are automatically split into readable page-width chunks. Use Chrome or Edge's "Save as PDF" to create a shareable document.</div>
+      </div>
+    </div>
+ 
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Expand ⤢</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Fullscreen Chart Expand</div>
+        <div class="toggle-desc">Every trend chart in the side panel has a small expand button. Click it to open the chart fullscreen with boosted line weights, larger point sizes, and — in bar mode — year labels and per-share dollar amounts printed directly on each bar. Press Escape or ✕ to close.</div>
+      </div>
+    </div>
+ 
+  </div>
+</section>
+ 
+<div class="full-divider"></div>
+ 
+<!-- ══ FOOTER ══ -->
+<footer class="doc-footer">
+  <div class="footer-left">
+    Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY<br>
+    Source: Audited Annual Financial Statements 1990–2024<br>
+    Share allocations from the Original Offering Plan, 1981 &nbsp;·&nbsp; 85,027 Total Shares &nbsp;·&nbsp; 157 Apartments
+  </div>
+  <div class="footer-right">For shareholder use &nbsp;·&nbsp; Personal use only</div>
+</footer>
+ 
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+ 
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+ 
+</body>
+</html>
