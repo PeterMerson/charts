@@ -1164,9 +1164,9 @@ function selectCat(prefix, cat, years) {
     }
   });
  
-  document.getElementById(prefix+'-panel-cat').textContent = cat;
+  document.getElementById(prefix+'-panel-cat').textContent = cat + (MYUNIT_VIEW_ON && MY_UNIT ? ' — Apt '+MY_UNIT.apt : '');
   document.getElementById(prefix+'-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
- 
+
   // Use combined P&I values if principal toggle is on for Mortgage Interest
   const isMPIcat = prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
   const vals = years.map(y => {
@@ -1311,7 +1311,7 @@ function selectTotal(prefix, years, totalsByYear) {
   const first = vals[0];
   const chgPct = first>0 ? ((latest-first)/first*100) : 0;
  
-  document.getElementById(prefix+'-panel-cat').textContent = label;
+  document.getElementById(prefix+'-panel-cat').textContent = label + (MYUNIT_VIEW_ON && MY_UNIT ? ' — Apt '+MY_UNIT.apt : '');
   document.getElementById(prefix+'-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
   document.getElementById(prefix+'-ps-peak').textContent = peakYr;
   document.getElementById(prefix+'-ps-peak-val').textContent = fmtFull(peak);
@@ -1881,7 +1881,7 @@ function renderCompareChart(years) {
   const first    = vals_inc[0];
   const chgPct   = first>0 ? ((latest-first)/first*100) : 0;
  
-  document.getElementById('net-panel-cat').textContent = 'Total Income vs Total Expenses';
+  document.getElementById('net-panel-cat').textContent = 'Total Income vs Total Expenses' + (MYUNIT_VIEW_ON && MY_UNIT ? ' — Apt '+MY_UNIT.apt : '');
   document.getElementById('net-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
   document.getElementById('net-ps-peak').textContent = peak_yr;
   document.getElementById('net-ps-peak-val').textContent = '$'+peak_inc.toLocaleString('en-US');
