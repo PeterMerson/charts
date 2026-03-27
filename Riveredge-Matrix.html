@@ -119,7 +119,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .pstat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--neutral); margin-bottom: 2px; }
 .pstat-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--ink); }
 .pstat-val.up { color: var(--up); } .pstat-val.dn { color: var(--dn); }
-.chart-panel { padding: 14px 16px 10px; }
+.chart-panel { padding: 14px 16px 10px; height: 260px; overflow: hidden; }
 .panel-empty { padding: 48px 20px; text-align: center; color: var(--neutral); font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; line-height: 1.7; }
 .panel-empty .arrow { font-size: 1.4rem; display: block; margin-bottom: 8px; color: var(--rule2); }
  
@@ -181,7 +181,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .panel-card.fullscreen .chart-panel {
   flex: 1 !important; display: block !important;
   padding: 16px 20px !important;
-  min-height: 0;
+  min-height: 0; height: auto !important; overflow: visible !important;
 }
 .panel-card.fullscreen canvas {
   width: 100% !important;
@@ -640,9 +640,12 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
         </div>
       </div>
       <div id="cap-panel-empty" class="panel-empty"><span class="arrow" style="color:#58a6ff;">←</span>Click either row<br>to graph over the<br>selected range</div>
-      <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;">
-        <canvas id="cap-trend-chart" height="180"></canvas>
+      <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;height:260px;">
+        <canvas id="cap-trend-chart" height="230" style="max-height:230px;"></canvas>
         <button class="expand-btn" id="cap-expand-btn" onclick="toggleFSCap()" title="Expand chart">⤢</button>
+        <div id="cap-bench-note" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:#7a8a9a;padding:6px 8px 2px;line-height:1.6;border-top:1px solid #e8ecf2;margin-top:4px;">
+          Dashed lines: Westchester "solid adequate" standard — <span style="color:rgba(220,60,50,0.95);">Low $3,500/unit</span> · <span style="color:rgba(185,140,20,0.95);">High $5,000/unit</span> (2025 dollars, CPI-U adjusted backward) · 158 units · Source: Westchester co-op industry benchmarks
+        </div>
       </div>
     </div>
   </div>
@@ -760,6 +763,44 @@ const barYearLabels = {
   }
 };
 Chart.register(barYearLabels);
+
+// Westchester benchmark lines plugin — draws dashed lines on Total Liquidity chart
+const westchesterLines = {
+  id: 'westchesterLines',
+  afterDraw(chart) {
+    if(!chart._westchesterYears || !chart._westchesterBench) return;
+    const xs = chart.scales.x, ys = chart.scales.y;
+    if(!xs || !ys || !chart.chartArea) return;
+    const c = chart.ctx;
+    const ca = chart.chartArea;
+    const snapYears = chart._westchesterYears;
+    const lines = [
+      {arr:W_BENCH_LOW,  stroke:'rgba(248,81,73,0.95)',  lbl:'W.Low'},
+      {arr:W_BENCH_HIGH, stroke:'rgba(201,168,76,0.95)', lbl:'W.High'}
+    ];
+    c.save();
+    c.beginPath(); c.rect(ca.left, ca.top, ca.right-ca.left, ca.bottom-ca.top); c.clip();
+    lines.forEach(function(b) {
+      c.beginPath(); c.strokeStyle=b.stroke; c.lineWidth=2.5; c.setLineDash([8,5]);
+      var first=true;
+      for(var i=0;i<snapYears.length;i++){
+        var ai=ALL_YEARS.indexOf(snapYears[i]); if(ai<0) continue;
+        var px=xs.getPixelForIndex(i), py=ys.getPixelForValue(b.arr[ai]);
+        if(first){c.moveTo(px,py);first=false;}else c.lineTo(px,py);
+      }
+      c.stroke(); c.setLineDash([]);
+    });
+    c.restore();
+    // Labels at right edge
+    lines.forEach(function(b) {
+      var ai=ALL_YEARS.indexOf(snapYears[snapYears.length-1]); if(ai<0) return;
+      var py=ys.getPixelForValue(b.arr[ai]);
+      c.font='bold 9px IBM Plex Mono,monospace'; c.fillStyle=b.stroke; c.textAlign='right';
+      c.fillText(b.lbl, ca.right-4, py-5);
+    });
+  }
+};
+Chart.register(westchesterLines);
  
 // Maintenance charge increase years and percentages
 const MAINT_INCREASES = {
@@ -775,6 +816,9 @@ const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102
 const CASH_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,393313,608614,252599,61503,30296,274066,110834,102845,214400,115582,98755,111999,83242,145852,223965,1425016,1976793];
 const RESERVE_DATA = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306484,470398,1006727,1083523,1120846,1303582,1338409,1462059,1354270,1667267,1877718,2118012,2335551,2364123,2231883,891297,0];
 const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
+// Westchester "solid adequate" benchmark: $3,500-$5,000/unit in 2025 dollars x 158 units, CPI-adjusted back to each year
+const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508];
+const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869];
  
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
  
@@ -2027,7 +2071,7 @@ function selectCapCat(cat, years) {
     tr.style.outline = tr.querySelector('td.cat-col') && tr.querySelector('td.cat-col').textContent.replace(' ▶','') === cat
       ? '2px solid #58a6ff' : '';
   });
- 
+
   const rawVals = years.map(y => CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0);
   const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
   const vals = rawVals.map(v => Math.round(v * scale));
@@ -2037,7 +2081,7 @@ function selectCapCat(cat, years) {
   const first = vals[0];
   const chgPct = first > 0 ? ((latest-first)/first*100) : 0;
   const catLabel = cat + ((MYUNIT_VIEW_ON && MY_UNIT) ? ' — Apt '+MY_UNIT.apt : '');
- 
+
   document.getElementById('cap-panel-cat').textContent = catLabel;
   document.getElementById('cap-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
   document.getElementById('cap-ps-peak').textContent = peakYr;
@@ -2054,45 +2098,78 @@ function selectCapCat(cat, years) {
   document.getElementById('cap-panel-stats-wrap').style.display = 'flex';
   document.getElementById('cap-panel-empty').style.display = 'none';
   document.getElementById('cap-chart-panel').style.display = 'block';
- 
+  const benchNote = document.getElementById('cap-bench-note');
+  if(benchNote) benchNote.style.display = cat.indexOf('Liquidity') > -1 ? 'block' : 'none';
+
   if(capState.trendChart) { capState.trendChart.destroy(); capState.trendChart = null; }
   const ctx = document.getElementById('cap-trend-chart').getContext('2d');
   const ci = CAP_CATS.indexOf(cat);
   const color = CAP_COLORS[ci];
   const isBar = CAP_CHART_TYPE === 'bar';
+  const isLiq = cat.indexOf('Liquidity') > -1;
   const grad = ctx.createLinearGradient(0,0,0,180);
   grad.addColorStop(0,color+'33'); grad.addColorStop(1,color+'05');
- 
+
+  // Build datasets — main data always first
+  const datasets = [{
+    data: vals, borderColor: color,
+    backgroundColor: isBar ? color+'cc' : grad,
+    borderWidth: isBar?1:5, borderRadius: isBar?3:0,
+    pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
+    pointBackgroundColor: color, pointBorderColor:'#fff', pointBorderWidth:2.5,
+    fill: !isBar, tension: isBar?0:0.25, label: catLabel,
+    type: isBar ? 'bar' : 'line'
+  }];
+
+  // Add benchmark lines for Liquidity — always as line type
+  if(isLiq) {
+    const wLow  = years.map(y => W_BENCH_LOW[ALL_YEARS.indexOf(y)]);
+    const wHigh = years.map(y => W_BENCH_HIGH[ALL_YEARS.indexOf(y)]);
+    datasets.push({
+      type: 'line', data: wHigh, label:'Westchester High Standard',
+      borderColor:'rgba(185,140,20,0.95)', backgroundColor:'transparent',
+      borderWidth:3, borderDash:[8,5], pointRadius:0, fill:false, tension:0.2
+    });
+    datasets.push({
+      type: 'line', data: wLow, label:'Westchester Low Standard',
+      borderColor:'rgba(220,60,50,0.95)', backgroundColor:'transparent',
+      borderWidth:3, borderDash:[8,5], pointRadius:0, fill:false, tension:0.2
+    });
+  }
+
   capState.trendChart = new Chart(ctx, {
-    type: isBar ? 'bar' : 'line',
-    data: { labels:years, datasets:[{
-      data:vals, borderColor:color,
-      backgroundColor: isBar ? color+'cc' : grad,
-      borderWidth: isBar?1:5, borderRadius: isBar?3:0,
-      pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
-      pointBackgroundColor:color, pointBorderColor:'#fff', pointBorderWidth:2.5,
-      fill:!isBar, tension:isBar?0:0.25, label:catLabel
-    }]},
+    type: 'bar',
+    data: { labels: years, datasets: datasets },
     options: { responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
-      plugins:{ legend:{display:false}, tooltip:{backgroundColor:'#1c2a3a',titleColor:'#e8c96a',bodyColor:'#e6edf3',borderColor:'#2d4a6a',borderWidth:1,padding:12,displayColors:true,boxWidth:10,boxHeight:10,
-        callbacks:{title:items=>items[0].label,
-          label:item=>{
-            if(item.dataset.label&&item.dataset.label.indexOf('CPI')>-1) return ' CPI-U Index: '+item.parsed.y.toFixed(1);
-            return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
-          }}
-      }},
+      plugins:{
+        legend:{ display: isLiq,
+          labels:{ color:'#4a6080', font:{family:'IBM Plex Mono',size:10},
+            boxWidth:20, padding:12,
+            filter: item => item.text !== catLabel
+          }
+        },
+        tooltip:{ backgroundColor:'#1c2a3a', titleColor:'#e8c96a', bodyColor:'#e6edf3',
+          borderColor:'#2d4a6a', borderWidth:1, padding:12,
+          callbacks:{
+            title: items => items[0].label,
+            label: item => {
+              if(item.dataset.label==='Westchester Low Standard')  return ' W.Low: $'+Math.round(item.parsed.y).toLocaleString()+' ($'+(Math.round(item.parsed.y/158)).toLocaleString()+'/unit)';
+              if(item.dataset.label==='Westchester High Standard') return ' W.High: $'+Math.round(item.parsed.y).toLocaleString()+' ($'+(Math.round(item.parsed.y/158)).toLocaleString()+'/unit)';
+              return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
+            }
+          }
+        },
+        westchesterLines:{ enabled: false }
+      },
       scales:{
-        x:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:90,callback:(v,i)=>years[i]},grid:{color:'#dde4ef'}},
-        y:{ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')},grid:{color:'#dde4ef'}}
+        x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:90,callback:(v,i)=>years[i]}, grid:{color:'#dde4ef'} },
+        y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} }
       }
     }
   });
-  // Store raw building-level vals for per-share labels in fullscreen bar mode
-  // Only meaningful for Total Liquidity (not Capital Expenditures)
-  if(cat.indexOf('Liquidity') > -1) {
-    capState.trendChart._netBarVals = rawVals;
-  }
+
+  if(isLiq) capState.trendChart._netBarVals = rawVals;
 }
  
 function toggleFSCap() {
@@ -2108,9 +2185,10 @@ function toggleFSCap() {
   if(panel._isFullscreen) {
     panel._isFullscreen = false;
     if(panel._origParent) panel._origParent.appendChild(panel);
+    panel.classList.remove('fullscreen');
     panel.removeAttribute('style');
-    chartPanel.style.flex=''; chartPanel.style.height='200px';
-    if(canvas){canvas.setAttribute('height','180');canvas.style.height='';}
+    chartPanel.style.flex=''; chartPanel.style.height='260px'; chartPanel.style.overflow='hidden'; chartPanel.style.maxHeight='';
+    if(canvas){canvas.setAttribute('height','230');canvas.style.height='';canvas.style.maxHeight='';}
     document.body.style.overflow='';
     if(backdrop) backdrop.style.display='none';
     if(btn) btn.textContent='⤢';
@@ -2129,14 +2207,8 @@ function toggleFSCap() {
     panel._isFullscreen=true;
     panel._origParent=panel.parentNode;
     document.body.appendChild(panel);
+    panel.classList.add('fullscreen');
     if(backdrop) backdrop.style.display='block';
-    panel.style.position='fixed';panel.style.top='30px';panel.style.left='30px';
-    panel.style.right='30px';panel.style.bottom='30px';
-    panel.style.width='auto';panel.style.height='auto';panel.style.zIndex='9999';
-    panel.style.borderRadius='8px';panel.style.display='flex';
-    panel.style.flexDirection='column';panel.style.overflow='hidden';
-    chartPanel.style.flex='1';chartPanel.style.height='auto';
-    if(canvas){canvas.removeAttribute('height');canvas.style.height='100%';}
     document.body.style.overflow='hidden';
     if(btn) btn.textContent='✕';
     setTimeout(function(){
@@ -2144,7 +2216,7 @@ function toggleFSCap() {
         chart.data.datasets.forEach(function(ds){
           if(ds._origBW===undefined) ds._origBW=ds.borderWidth;
           if(ds._origPR===undefined) ds._origPR=ds.pointRadius;
-          ds.borderWidth=(ds.borderWidth||2)*2.2;
+          if(!ds.borderDash) { ds.borderWidth=(ds.borderWidth||2)*2.2; }
           ds.pointRadius=(ds.pointRadius||3)*1.8;
         });
         if(chart.config.type==='bar') {
