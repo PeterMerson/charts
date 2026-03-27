@@ -1495,7 +1495,10 @@ function renderNet() {
   ctr.style.cursor = 'pointer';
   ctr.title = 'Click to graph Total Income vs Total Expenses';
   const ctd0 = document.createElement('td'); ctd0.className = 'cat-col';
-  ctd0.textContent = 'Total Income vs Total Expenses ▶'; ctr.appendChild(ctd0);
+  ctd0.textContent = (MYUNIT_VIEW_ON && MY_UNIT)
+    ? 'Total Income vs Total Expenses (Apt '+MY_UNIT.apt+') ▶'
+    : 'Total Income vs Total Expenses ▶';
+  ctr.appendChild(ctd0);
  
   // Just show Total Income values in each cell (for reference)
   let prevInc = null;
@@ -1535,7 +1538,7 @@ function renderNet() {
     prevInc = inc;
   });
   ctr.onclick = () => renderCompareChart(years);
-  if(!MYUNIT_VIEW_ON) body.appendChild(ctr);
+  body.appendChild(ctr);
  
   setTimeout(function() {
     var wrapper = document.getElementById('net-matrix-wrap');
