@@ -806,6 +806,15 @@ Chart.register(westchesterLines);
 const MAINT_INCREASES = {
   2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '+5%', 2023: '+9%'
 };
+// PDF memos hosted on GitHub Pages — note: 2023 tooltip uses 2024 memo
+const MAINT_PDF_URLS = {
+  2004: 'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005: 'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006: 'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008: 'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013: 'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023: 'https://petermerson.github.io/charts/maintenance_increase_2024.pdf'
+};
 // Stagger heights so closely-spaced labels don't overlap
 // Lower number = higher on chart (closer to top), higher = lower
 const MAINT_OFFSETS = {
@@ -1280,17 +1289,41 @@ function selectCat(prefix, cat, years) {
                 var actualDollar = vals[item.dataIndex];
                 return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
               },
-            afterBody: isRETax && !isBar ? function(items) {
-              var yr = parseInt(items[0].label);
-              if([1997,2009,2021].indexOf(yr) > -1) return ['','⚖ Tax Appeal/Certiorari year'];
-              return '';
-            } : undefined
+            afterBody: (function() {
+              if(isRETax && !isBar) return function(items) {
+                var yr = parseInt(items[0].label);
+                if([1997,2009,2021].indexOf(yr) > -1) return ['','⚖ Tax Appeal/Certiorari year'];
+                return '';
+              };
+              if(cat === 'Maintenance Charges' && !isBar) return function(items) {
+                var yr = parseInt(items[0].label);
+                if(MAINT_PDF_URLS[yr]) return ['', '📄 Click chart to open Board Memo →'];
+                return '';
+              };
+              return undefined;
+            })()
           }
         }
       },
       scales:scales
     }
   });
+
+  // Click handler to open maintenance increase PDF memos
+  if(cat === 'Maintenance Charges' && !isBar) {
+    var chartCanvas = document.getElementById(prefix+'-trend-chart');
+    chartCanvas._maintClickHandler && chartCanvas.removeEventListener('click', chartCanvas._maintClickHandler);
+    chartCanvas._maintClickHandler = function(evt) {
+      var chart = state[prefix].trendChart;
+      if(!chart) return;
+      var pts = chart.getElementsAtEventForMode(evt, 'index', {intersect:false}, true);
+      if(!pts.length) return;
+      var yr = parseInt(chart.data.labels[pts[0].index]);
+      if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
+    };
+    chartCanvas.addEventListener('click', chartCanvas._maintClickHandler);
+    chartCanvas.style.cursor = 'pointer';
+  }
 }
  
 // ── SELECT TOTAL ROW ──
