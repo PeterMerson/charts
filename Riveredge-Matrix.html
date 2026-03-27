@@ -2121,17 +2121,19 @@ function selectCapCat(cat, years) {
     type: isBar ? 'bar' : 'line'
   }];
 
-  // Add benchmark lines for Liquidity — always as line type
+  // Add benchmark lines for Liquidity — always as line type, scaled to unit if My Unit View on
   if(isLiq) {
-    const wLow  = years.map(y => W_BENCH_LOW[ALL_YEARS.indexOf(y)]);
-    const wHigh = years.map(y => W_BENCH_HIGH[ALL_YEARS.indexOf(y)]);
+    const wLow  = years.map(y => Math.round(W_BENCH_LOW[ALL_YEARS.indexOf(y)]  * scale));
+    const wHigh = years.map(y => Math.round(W_BENCH_HIGH[ALL_YEARS.indexOf(y)] * scale));
+    const wLowLabel  = 'Westchester Low Standard'  + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
+    const wHighLabel = 'Westchester High Standard' + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
     datasets.push({
-      type: 'line', data: wHigh, label:'Westchester High Standard',
+      type: 'line', data: wHigh, label: wHighLabel,
       borderColor:'rgba(185,140,20,0.95)', backgroundColor:'transparent',
       borderWidth:3, borderDash:[8,5], pointRadius:0, fill:false, tension:0.2
     });
     datasets.push({
-      type: 'line', data: wLow, label:'Westchester Low Standard',
+      type: 'line', data: wLow, label: wLowLabel,
       borderColor:'rgba(220,60,50,0.95)', backgroundColor:'transparent',
       borderWidth:3, borderDash:[8,5], pointRadius:0, fill:false, tension:0.2
     });
@@ -2146,7 +2148,7 @@ function selectCapCat(cat, years) {
         legend:{ display: isLiq,
           labels:{ color:'#4a6080', font:{family:'IBM Plex Mono',size:10},
             boxWidth:20, padding:12,
-            filter: item => item.text !== catLabel
+            filter: item => item.text.indexOf(catLabel) === -1
           }
         },
         tooltip:{ backgroundColor:'#1c2a3a', titleColor:'#e8c96a', bodyColor:'#e6edf3',
@@ -2154,8 +2156,8 @@ function selectCapCat(cat, years) {
           callbacks:{
             title: items => items[0].label,
             label: item => {
-              if(item.dataset.label==='Westchester Low Standard')  return ' W.Low: $'+Math.round(item.parsed.y).toLocaleString()+' ($'+(Math.round(item.parsed.y/158)).toLocaleString()+'/unit)';
-              if(item.dataset.label==='Westchester High Standard') return ' W.High: $'+Math.round(item.parsed.y).toLocaleString()+' ($'+(Math.round(item.parsed.y/158)).toLocaleString()+'/unit)';
+              if(item.dataset.label && item.dataset.label.indexOf('Westchester High')>-1) return ' W.High: $'+Math.round(item.parsed.y).toLocaleString();
+              if(item.dataset.label && item.dataset.label.indexOf('Westchester Low')>-1)  return ' W.Low: $'+Math.round(item.parsed.y).toLocaleString();
               return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
             }
           }
