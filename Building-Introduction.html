@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
 :root {
   --ink: #0d2240;
   --ink2: #1a3a5c;
@@ -24,9 +24,9 @@
   --red-light: #f47a70;
   --rule: rgba(201,168,76,0.3);
 }
- 
+
 html { scroll-behavior: smooth; }
- 
+
 body {
   font-family: 'Source Serif 4', Georgia, serif;
   background: var(--ink);
@@ -34,7 +34,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 }
- 
+
 /* ── HERO ── */
 .hero {
   position: relative;
@@ -45,7 +45,7 @@ body {
   padding: 80px 60px;
   overflow: hidden;
 }
- 
+
 .hero::before {
   content: '';
   position: absolute;
@@ -56,7 +56,7 @@ body {
     radial-gradient(ellipse 40% 40% at 70% 80%, rgba(26,92,42,0.06) 0%, transparent 60%);
   pointer-events: none;
 }
- 
+
 .hero-grid {
   position: absolute;
   inset: 0;
@@ -66,14 +66,14 @@ body {
   background-size: 60px 60px;
   pointer-events: none;
 }
- 
+
 .hero-inner {
   max-width: 1100px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
- 
+
 .hero-eyebrow {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
@@ -84,7 +84,7 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s ease 0.2s forwards;
 }
- 
+
 .hero-title {
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.8rem, 6vw, 5.5rem);
@@ -95,13 +95,13 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s ease 0.4s forwards;
 }
- 
+
 .hero-title .line2 {
   font-style: italic;
   font-weight: 700;
   color: var(--gold-light);
 }
- 
+
 .hero-subtitle {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.78rem;
@@ -112,7 +112,7 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s ease 0.6s forwards;
 }
- 
+
 .hero-lead {
   font-size: clamp(1rem, 1.8vw, 1.25rem);
   line-height: 1.75;
@@ -122,12 +122,12 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s ease 0.8s forwards;
 }
- 
+
 .hero-lead strong {
   color: var(--gold-light);
   font-weight: 600;
 }
- 
+
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -149,7 +149,7 @@ body {
 .hero-cta:hover { background: #e8c96a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
 .hero-cta-arrow { font-size: 1rem; transition: transform 0.2s; }
 .hero-cta:hover .hero-cta-arrow { transform: translateX(4px); }
- 
+
 .gold-divider {
   width: 80px;
   height: 3px;
@@ -158,7 +158,7 @@ body {
   opacity: 0;
   animation: fadeUp 0.8s ease 0.7s forwards;
 }
- 
+
 /* ── STATS STRIP ── */
 .stats-strip {
   display: flex;
@@ -192,14 +192,14 @@ body {
   color: var(--muted);
   line-height: 1.5;
 }
- 
+
 /* ── SECTIONS ── */
 .content-section {
   max-width: 1100px;
   margin: 0 auto;
   padding: 80px 60px;
 }
- 
+
 .section-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.65rem;
@@ -217,7 +217,7 @@ body {
   height: 1px;
   background: var(--gold);
 }
- 
+
 .section-title {
   font-family: 'Playfair Display', serif;
   font-size: clamp(1.8rem, 3vw, 2.8rem);
@@ -226,14 +226,14 @@ body {
   margin-bottom: 24px;
 }
 .section-title em { color: var(--gold-light); font-style: italic; }
- 
+
 .section-body {
   font-size: 1.05rem;
   line-height: 1.8;
   color: rgba(247,243,236,0.8);
   max-width: 640px;
 }
- 
+
 /* ── FIVE SECTIONS GRID ── */
 .sections-grid {
   display: grid;
@@ -269,7 +269,7 @@ body {
   line-height: 1.7;
   color: var(--muted);
 }
- 
+
 /* ── TOGGLES ── */
 .toggles-grid {
   display: grid;
@@ -319,7 +319,7 @@ body {
   line-height: 1.6;
   color: rgba(247,243,236,0.65);
 }
- 
+
 /* ── MY UNIT FEATURE ── */
 .feature-block {
   background: linear-gradient(135deg, rgba(26,92,42,0.12) 0%, rgba(13,34,64,0.8) 100%);
@@ -374,7 +374,7 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
 }
- 
+
 /* ── WESTCHESTER BLOCK ── */
 .benchmark-block {
   background: rgba(88,166,255,0.05);
@@ -410,7 +410,7 @@ body {
   color: rgba(247,243,236,0.75);
 }
 .benchmark-text strong { color: var(--text); }
- 
+
 /* ── QUOTE ── */
 .pull-quote {
   border-left: 3px solid var(--gold-light);
@@ -432,14 +432,14 @@ body {
   letter-spacing: 0.15em;
   color: var(--muted);
 }
- 
+
 /* ── DIVIDER ── */
 .full-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), rgba(201,168,76,0.3), transparent);
   margin: 0 60px;
 }
- 
+
 /* ── FOOTER ── */
 .doc-footer {
   max-width: 1100px;
@@ -464,13 +464,13 @@ body {
   font-size: 0.62rem;
   color: rgba(154,143,126,0.5);
 }
- 
+
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
- 
+
 /* Scroll-reveal */
 .reveal {
   opacity: 0;
@@ -481,7 +481,7 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
- 
+
 @media (max-width: 768px) {
   .hero { padding: 60px 24px; }
   .content-section { padding: 60px 24px; }
@@ -495,32 +495,32 @@ body {
 </style>
 </head>
 <body>
- 
+
 <!-- ══ HERO ══ -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-inner">
- 
+
     <div class="hero-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
- 
+
     <h1 class="hero-title">
       Know Your Building.<br>
       <span class="line2">Know Your Investment.</span>
     </h1>
- 
+
     <div class="hero-subtitle">Riveredge Owners Financial Transparency Report &nbsp;·&nbsp; Interactive Edition &nbsp;·&nbsp; 35 Years</div>
- 
+
     <div class="gold-divider"></div>
- 
+
     <p class="hero-lead">
       Every dollar in. Every dollar out. <strong>35 years of audited history</strong> — and what it means for your apartment specifically.<br><br>
       Most co-op shareholders never see beyond the annual maintenance bill. This tool changes that. Select your apartment and instantly see what your proportional share of <strong>every building expense</strong> has been — year by year, category by category, all the way back to 1990.
     </p>
- 
+
     <a href="https://petermerson.github.io/charts/Riveredge-Matrix.html" class="hero-cta">
       Open the Interactive Matrix <span class="hero-cta-arrow">→</span>
     </a>
- 
+
     <div class="stats-strip">
       <div class="stat-item">
         <div class="stat-num">35</div>
@@ -539,18 +539,18 @@ body {
         <div class="stat-label">Interactive matrices<br>with trend charts</div>
       </div>
     </div>
- 
+
   </div>
 </section>
- 
+
 <div class="full-divider"></div>
- 
+
 <!-- ══ FIVE SECTIONS ══ -->
 <section class="content-section">
   <div class="section-label reveal">What it contains</div>
   <h2 class="section-title reveal">Five sections. <em>One complete picture.</em></h2>
   <p class="section-body reveal">Each section is fully interactive — select any year range from 1990 to 2024, toggle % and $ changes visible, switch between line and bar charts, and click any row to open a detailed trend chart in the side panel.</p>
- 
+
   <div class="sections-grid reveal">
     <div class="section-card">
       <span class="sc-arrow">→</span>
@@ -579,14 +579,14 @@ body {
     </div>
   </div>
 </section>
- 
+
 <div class="full-divider"></div>
- 
+
 <!-- ══ MY UNIT ══ -->
 <section class="content-section">
   <div class="section-label reveal">The most personal feature</div>
   <h2 class="section-title reveal">Your apartment. <em>Your numbers.</em></h2>
- 
+
   <div class="feature-block reveal">
     <div class="feature-block-label">🏢 My Unit Calculator</div>
     <div class="feature-block-title">Select your apartment — everything changes.</div>
@@ -600,12 +600,12 @@ body {
       <div class="feature-example">Liquidity share: <strong>$12,647</strong> ✅ Above range</div>
     </div>
   </div>
- 
+
   <div class="pull-quote reveal">
     <div class="pull-quote-text">"When someone is considering purchasing a unit, being able to show them not just the building financials but their specific unit's historical costs, maintenance trajectory, and liquidity position — that's a level of transparency most co-ops never provide."</div>
     <div class="pull-quote-attr">Riveredge Owners Financial Transparency Report</div>
   </div>
- 
+
   <div class="benchmark-block reveal">
     <div class="benchmark-badge">
       2.6×
@@ -617,17 +617,17 @@ body {
     </div>
   </div>
 </section>
- 
+
 <div class="full-divider"></div>
- 
+
 <!-- ══ TOGGLES ══ -->
 <section class="content-section">
   <div class="section-label reveal">Tools & controls</div>
   <h2 class="section-title reveal">Everything you can <em>switch on.</em></h2>
   <p class="section-body reveal">Every control is designed to answer a specific question. Nothing is decorative.</p>
- 
+
   <div class="toggles-grid" style="margin-top:40px;">
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Year Range</div>
       <div class="toggle-text">
@@ -635,7 +635,7 @@ body {
         <div class="toggle-desc">Focus on any period from 1990 to 2024. Want to see just the last 10 years? The period before and after 2006 maintenance increases? The pandemic years? Set From and To and every table and chart updates instantly.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">My Unit View</div>
       <div class="toggle-text">
@@ -643,7 +643,7 @@ body {
         <div class="toggle-desc">Scales every figure in every matrix to your apartment's proportional share based on shares owned ÷ 85,027 total shares. Turns building-level totals into personally meaningful numbers. Works across all four sections simultaneously.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Compare Apts</div>
       <div class="toggle-text">
@@ -651,7 +651,7 @@ body {
         <div class="toggle-desc">Opens a scrollable grid showing all 157 apartments sorted by share count. Each card shows 2024 expense allocation, annual and monthly maintenance, liquidity share, percentage of building, and Westchester benchmark status. Your selected unit is highlighted with a star.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">% Change</div>
       <div class="toggle-text">
@@ -659,7 +659,7 @@ body {
         <div class="toggle-desc">Shows year-over-year percentage change as a small badge below each cell value. Green for increases, red for decreases. Instantly reveals which expense categories are accelerating or moderating over your selected range.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">$ Change</div>
       <div class="toggle-text">
@@ -667,7 +667,7 @@ body {
         <div class="toggle-desc">Shows the raw dollar difference year-over-year. In My Unit View, these differences are also scaled to your unit's share — so you see exactly how many more or fewer dollars your apartment contributed compared to the prior year.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Mortgage Principal</div>
       <div class="toggle-text">
@@ -675,7 +675,7 @@ body {
         <div class="toggle-desc">The cooperative carries a mortgage. Principal payments are a real cash obligation but are excluded from operating expense totals by accounting convention. Toggle this on to see the full cash requirement — the true cost of running the building each year.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">CPI-U Overlay</div>
       <div class="toggle-text">
@@ -683,7 +683,7 @@ body {
         <div class="toggle-desc">Adds a dashed gold inflation line to any trend chart, indexed to the start year of your selected range. See whether an expense category has grown faster or slower than general inflation over any period. Source: Bureau of Labor Statistics All Urban Consumers index.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Chart Type</div>
       <div class="toggle-text">
@@ -691,7 +691,7 @@ body {
         <div class="toggle-desc">Switch any trend chart between a smooth line (best for showing trajectory and momentum) and a bar chart (best for comparing individual year values). The Net Income fullscreen bar chart labels each bar with both the year and the per-share dollar amount.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Print / Export PDF</div>
       <div class="toggle-text">
@@ -699,7 +699,7 @@ body {
         <div class="toggle-desc">Opens a clean dedicated print window containing all four sections as formatted tables — respecting your current year range, My Unit View setting, and Mortgage Principal toggle. Wide year ranges are automatically split into readable page-width chunks. Use Chrome or Edge's "Save as PDF" to create a shareable document.</div>
       </div>
     </div>
- 
+
     <div class="toggle-card reveal">
       <div class="toggle-badge">Expand ⤢</div>
       <div class="toggle-text">
@@ -707,12 +707,69 @@ body {
         <div class="toggle-desc">Every trend chart in the side panel has a small expand button. Click it to open the chart fullscreen with boosted line weights, larger point sizes, and — in bar mode — year labels and per-share dollar amounts printed directly on each bar. Press Escape or ✕ to close.</div>
       </div>
     </div>
- 
+
   </div>
 </section>
- 
+
 <div class="full-divider"></div>
- 
+
+<!-- ══ ADDITIONAL RESOURCES ══ -->
+<section class="content-section">
+  <div class="section-label reveal">Additional resources</div>
+  <h2 class="section-title reveal">Companion <em>tools & documents.</em></h2>
+  <p class="section-body reveal">These two additional interactive tools complement the matrix and provide a different lens on the same audited data — breaking expenses and income into proportional slices so you can see where each dollar actually goes.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px;">
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">🥧</span>
+        <div>
+          <div class="toggle-name">Historical Income & Expense Breakdown</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">1990 – 2023 · 34 Years · Interactive</div>
+        </div>
+      </div>
+      <div class="toggle-desc">Two pie charts — Income breakdown and Expense breakdown — for every year from 1990 to 2023. Use the Prev / Next arrows to step through the years and watch the proportions shift as the building's financial profile evolved over three decades. See at a glance how Repairs & Maintenance, Utilities, and Payroll have grown relative to each other.</div>
+      <a href="https://2023-1990-Historical-Income-Expense.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">Open Historical Breakdown →</a>
+    </div>
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">📊</span>
+        <div>
+          <div class="toggle-name">2024 Financial Breakdown & Shareholder Memo</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">2024 Year-End · Detailed Analysis</div>
+        </div>
+      </div>
+      <div class="toggle-desc">A detailed 2024 year-end income and expense breakdown with full pie chart analysis. Includes a shareholder memorandum addressing the proposed $1,000,000 Special Assessment and a documented review of the 2006 maintenance increase — with 35 years of audited data as the evidentiary foundation.</div>
+      <a href="https://petermerson.github.io/charts/DashBoard-Income-Expense-2024.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">Open 2024 Breakdown →</a>
+    </div>
+
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ CONTACT ══ -->
+<section class="content-section">
+  <div class="section-label reveal">Questions & feedback</div>
+  <h2 class="section-title reveal">Get in <em>touch.</em></h2>
+  <p class="section-body reveal">If you have questions about the data, comments on the analysis, or suggestions for additional features — I'd genuinely like to hear from you. This tool was built for the Riveredge shareholder community and your input makes it better.</p>
+
+  <div style="margin-top:36px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;" class="reveal">
+    <a href="mailto:petermerson@hotmail.com" style="display:inline-flex;align-items:center;gap:12px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:16px 28px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(201,168,76,0.2)';this.style.borderColor='var(--gold-light)'" onmouseout="this.style.background='rgba(201,168,76,0.12)';this.style.borderColor='rgba(201,168,76,0.4)'">
+      <span style="font-size:1.4rem;">✉</span>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--gold-light);">Peter Merson &nbsp;·&nbsp; Apt 8T</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:rgba(247,243,236,0.7);margin-top:2px;">petermerson@hotmail.com</div>
+      </div>
+    </a>
+    <p style="font-family:'Source Serif 4',serif;font-size:0.88rem;color:rgba(247,243,236,0.55);max-width:400px;line-height:1.7;">Questions about your specific unit, data corrections, or ideas for what to add — all welcome.</p>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
 <!-- ══ FOOTER ══ -->
 <footer class="doc-footer">
   <div class="footer-left">
@@ -726,7 +783,7 @@ body {
     <div style="margin-top:4px;opacity:0.5;">For shareholder use &nbsp;·&nbsp; Personal use only</div>
   </div>
 </footer>
- 
+
 <script>
 // Scroll reveal
 const observer = new IntersectionObserver((entries) => {
@@ -737,9 +794,9 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.12 });
- 
+
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
- 
+
 </body>
 </html>
