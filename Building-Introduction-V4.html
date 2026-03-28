@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge — Know Your Building · Know Your Investment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:        #0d2240;
+  --ink2:       #1a3a5c;
+  --paper:      #f8f9fb;
+  --paper2:     #edf1f7;
+  --gold:       #8b6914;
+  --gold-light: #c9a84c;
+  --gold-pale:  #f0e4c0;
+  --text:       #f7f3ec;
+  --muted:      #9a8f7e;
+  --green:      #1a5c2a;
+  --green-light:#6fcf82;
+  --red:        #8b1a1a;
+  --red-light:  #f47a70;
+  --red-pale:   rgba(244,122,112,0.12);
+  --rule:       rgba(201,168,76,0.3);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Serif 4', Georgia, serif;
+  background: var(--ink);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 50%, rgba(201,168,76,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 80% at 85% 20%, rgba(31,78,121,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 70% 80%, rgba(26,92,42,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+.hero-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold-light); margin-bottom: 24px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 6vw, 5.5rem); font-weight: 900;
+  line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 12px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
+}
+.hero-title .line2 { font-style: italic; font-weight: 700; color: var(--gold-light); }
+.hero-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 48px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+}
+.hero-lead {
+  font-size: clamp(1rem, 1.8vw, 1.25rem); line-height: 1.75;
+  color: rgba(247,243,236,0.85); max-width: 680px; margin-bottom: 56px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.8s forwards;
+}
+.hero-lead strong { color: var(--gold-light); font-weight: 600; }
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: var(--gold-light); color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 14px 32px; border-radius: 4px; text-decoration: none;
+  transition: all 0.2s; opacity: 0; animation: fadeUp 0.8s ease 1s forwards;
+}
+.hero-cta:hover { background: #e8c96a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+.hero-cta-arrow { font-size: 1rem; transition: transform 0.2s; }
+.hero-cta:hover .hero-cta-arrow { transform: translateX(4px); }
+.gold-divider {
+  width: 80px; height: 3px;
+  background: linear-gradient(90deg, var(--gold-light), transparent);
+  margin: 48px 0; opacity: 0; animation: fadeUp 0.8s ease 0.7s forwards;
+}
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  display: flex; gap: 0; margin-top: 72px;
+  border-top: 1px solid var(--rule); padding-top: 32px;
+  opacity: 0; animation: fadeUp 0.8s ease 1.1s forwards;
+}
+.stat-item { flex: 1; padding-right: 32px; border-right: 1px solid var(--rule); margin-right: 32px; }
+.stat-item:last-child { border-right: none; margin-right: 0; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; font-weight: 900; color: var(--gold-light); line-height: 1; margin-bottom: 6px;
+}
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--muted); line-height: 1.5;
+}
+
+/* ── SECTIONS ── */
+.content-section { max-width: 1100px; margin: 0 auto; padding: 80px 60px; }
+.section-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
+}
+.section-label::after { content: ''; flex: 0 0 40px; height: 1px; background: var(--gold); }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 900;
+  line-height: 1.15; margin-bottom: 24px;
+}
+.section-title em { color: var(--gold-light); font-style: italic; }
+.section-body { font-size: 1.05rem; line-height: 1.8; color: rgba(247,243,236,0.8); max-width: 640px; }
+
+/* ── FIVE SECTIONS GRID ── */
+.sections-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 2px; margin: 48px 0;
+  background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden;
+}
+.section-card { background: rgba(13,34,64,0.95); padding: 24px 20px; transition: background 0.2s; }
+.section-card:hover { background: rgba(26,58,92,0.95); }
+.sc-arrow { font-size: 1.4rem; margin-bottom: 12px; display: block; }
+.sc-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--gold-light); margin-bottom: 8px; }
+.sc-body { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; line-height: 1.7; color: var(--muted); }
+
+/* ── TOGGLES ── */
+.toggles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 40px; }
+.toggle-card {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 6px; padding: 20px 24px;
+  display: flex; gap: 16px; align-items: flex-start;
+  transition: border-color 0.2s, background 0.2s;
+}
+.toggle-card:hover { border-color: rgba(201,168,76,0.5); background: rgba(255,255,255,0.05); }
+.toggle-badge {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 3px 8px; border-radius: 3px;
+  background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold-light); white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+}
+.toggle-name { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.toggle-desc { font-family: 'Source Serif 4', serif; font-size: 0.82rem; line-height: 1.6; color: rgba(247,243,236,0.65); }
+
+/* ── MY UNIT FEATURE ── */
+.feature-block {
+  background: linear-gradient(135deg, rgba(26,92,42,0.12) 0%, rgba(13,34,64,0.8) 100%);
+  border: 1px solid rgba(111,207,130,0.25); border-radius: 8px;
+  padding: 40px 48px; margin: 48px 0; position: relative; overflow: hidden;
+}
+.feature-block::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--green-light), transparent);
+}
+.feature-block-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--green-light); margin-bottom: 12px; }
+.feature-block-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; margin-bottom: 16px; }
+.feature-block-body { font-size: 0.95rem; line-height: 1.8; color: rgba(247,243,236,0.8); max-width: 600px; }
+.feature-example {
+  display: inline-flex; align-items: baseline; gap: 6px; margin-top: 20px;
+  background: rgba(26,92,42,0.2); border: 1px solid rgba(111,207,130,0.3);
+  border-radius: 4px; padding: 10px 18px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--green-light);
+}
+.feature-example strong { font-size: 1.1rem; font-weight: 600; }
+
+/* ── WESTCHESTER BLOCK ── */
+.benchmark-block {
+  background: rgba(88,166,255,0.05); border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 8px; padding: 32px 40px; margin: 32px 0;
+  display: flex; gap: 40px; align-items: center;
+}
+.benchmark-badge {
+  font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 900;
+  color: var(--green-light); white-space: nowrap; line-height: 1;
+}
+.benchmark-badge span {
+  display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+  margin-top: 4px; font-weight: 400;
+}
+.benchmark-text { font-size: 0.9rem; line-height: 1.75; color: rgba(247,243,236,0.75); }
+.benchmark-text strong { color: var(--text); }
+
+/* ── PULL QUOTE ── */
+.pull-quote { border-left: 3px solid var(--gold-light); padding: 24px 0 24px 32px; margin: 48px 0; }
+.pull-quote-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-style: italic;
+  line-height: 1.5; color: rgba(247,243,236,0.9); margin-bottom: 12px;
+}
+.pull-quote-attr {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted);
+}
+
+/* ── DIVIDER ── */
+.full-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), rgba(201,168,76,0.3), transparent);
+  margin: 0 60px;
+}
+
+/* ══════════════════════════════════════════
+   2006 CASE STUDY — NEW SECTION STYLES
+═══════════════════════════════════════════ */
+
+/* Dark-red tinted section background */
+.case-section {
+  position: relative;
+  background: linear-gradient(180deg, rgba(139,26,26,0.06) 0%, transparent 100%);
+  border-top: 1px solid rgba(244,122,112,0.15);
+  border-bottom: 1px solid rgba(244,122,112,0.15);
+}
+.case-section::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(244,122,112,0.5), transparent);
+}
+
+/* Three-act timeline */
+.acts-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; margin: 40px 0;
+  background: rgba(244,122,112,0.1);
+  border: 1px solid rgba(244,122,112,0.2); border-radius: 8px; overflow: hidden;
+}
+.act-card {
+  background: rgba(13,28,48,0.95); padding: 32px 28px;
+  position: relative; transition: background 0.2s;
+}
+.act-card:hover { background: rgba(20,38,64,0.98); }
+.act-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.2em;
+  margin-bottom: 10px;
+}
+.act-num.red { color: var(--red-light); }
+.act-num.amber { color: #e8a030; }
+.act-num.darkred { color: #f05050; }
+.act-year {
+  font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900;
+  line-height: 1.1; margin-bottom: 10px;
+}
+.act-year.red { color: var(--red-light); }
+.act-year.amber { color: #e8a030; }
+.act-year.darkred { color: #f05050; }
+.act-title {
+  font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700;
+  color: var(--text); margin-bottom: 10px;
+}
+.act-body {
+  font-family: 'Source Serif 4', serif; font-size: 0.82rem;
+  line-height: 1.65; color: rgba(247,243,236,0.6);
+}
+.act-body strong { color: rgba(247,243,236,0.9); font-weight: 600; }
+
+/* The confession quote */
+.confession-block {
+  position: relative;
+  background: rgba(139,26,26,0.08);
+  border: 1px solid rgba(244,122,112,0.25);
+  border-left: 4px solid var(--red-light);
+  border-radius: 0 8px 8px 0;
+  padding: 32px 40px;
+  margin: 40px 0;
+}
+.confession-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.2em;
+  color: var(--red-light); margin-bottom: 16px;
+}
+.confession-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.1rem, 2vw, 1.45rem); font-style: italic;
+  line-height: 1.55; color: rgba(247,243,236,0.92); margin-bottom: 12px;
+}
+.confession-source {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+}
+.confession-implication {
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid rgba(244,122,112,0.2);
+  font-size: 0.88rem; line-height: 1.75; color: rgba(247,243,236,0.7);
+}
+.confession-implication strong { color: var(--red-light); }
+
+/* The swap comparison */
+.swap-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3px; margin: 40px 0; border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(244,122,112,0.2);
+}
+.swap-card {
+  padding: 32px 36px;
+}
+.swap-card.gone {
+  background: rgba(26,92,42,0.1);
+  border-right: 2px solid rgba(244,122,112,0.15);
+}
+.swap-card.came {
+  background: rgba(139,26,26,0.1);
+}
+.swap-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 12px;
+}
+.swap-tag.green { color: var(--green-light); }
+.swap-tag.red { color: var(--red-light); }
+.swap-desc {
+  font-family: 'Source Serif 4', serif; font-size: 0.85rem;
+  color: rgba(247,243,236,0.6); margin-bottom: 14px; line-height: 1.5;
+}
+.swap-num {
+  font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; line-height: 1;
+}
+.swap-num.green { color: var(--green-light); }
+.swap-num.red { color: var(--red-light); }
+.swap-unit {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.1em;
+}
+.swap-footer {
+  background: rgba(139,26,26,0.15); border-top: 1px solid rgba(244,122,112,0.2);
+  padding: 20px 36px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  color: rgba(247,243,236,0.7); line-height: 1.6;
+  grid-column: 1 / -1;
+}
+.swap-footer strong { color: var(--red-light); }
+
+/* Impact stat row */
+.impact-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 2px; margin: 40px 0;
+  background: rgba(244,122,112,0.1);
+  border: 1px solid rgba(244,122,112,0.2); border-radius: 8px; overflow: hidden;
+}
+.impact-stat {
+  background: rgba(13,28,48,0.9); padding: 28px 24px; text-align: center;
+}
+.impact-stat-num {
+  font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900;
+  color: var(--red-light); line-height: 1; margin-bottom: 8px;
+}
+.impact-stat-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--muted); line-height: 1.5;
+}
+
+/* Per apt table */
+.apt-table {
+  width: 100%; border-collapse: collapse;
+  margin: 32px 0; font-family: 'IBM Plex Mono', monospace;
+}
+.apt-table th {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--gold-light); padding: 10px 16px; text-align: left;
+  background: rgba(201,168,76,0.08); border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.apt-table th:not(:first-child) { text-align: right; }
+.apt-table td {
+  font-size: 0.75rem; padding: 11px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: rgba(247,243,236,0.7);
+}
+.apt-table td:not(:first-child) { text-align: right; }
+.apt-table tr:hover td { background: rgba(255,255,255,0.03); color: rgba(247,243,236,0.9); }
+.apt-table .col-gone { color: var(--green-light); font-weight: 600; }
+.apt-table .col-came { color: var(--red-light); font-weight: 600; }
+.apt-table .col-cum  { color: #f0a050; font-weight: 600; }
+
+/* Surplus proof block */
+.surplus-block {
+  background: linear-gradient(135deg, rgba(26,92,42,0.1) 0%, rgba(13,28,48,0.8) 100%);
+  border: 1px solid rgba(111,207,130,0.2); border-radius: 8px;
+  padding: 36px 44px; margin: 40px 0; position: relative; overflow: hidden;
+  display: flex; gap: 48px; align-items: center;
+}
+.surplus-block::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--green-light), transparent);
+}
+.surplus-big {
+  font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 900;
+  color: var(--green-light); white-space: nowrap; line-height: 1; flex-shrink: 0;
+}
+.surplus-big span {
+  display: block; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--muted); font-weight: 400; margin-top: 6px;
+}
+.surplus-text { font-size: 0.9rem; line-height: 1.8; color: rgba(247,243,236,0.75); }
+.surplus-text strong { color: var(--green-light); }
+
+/* Shared accountability block */
+.accountability-block {
+  background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.2);
+  border-left: 4px solid var(--gold-light); border-radius: 0 8px 8px 0;
+  padding: 32px 40px; margin: 40px 0;
+}
+.accountability-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold-light); margin-bottom: 14px;
+}
+.accountability-text {
+  font-size: 0.95rem; line-height: 1.8; color: rgba(247,243,236,0.8);
+}
+.accountability-text strong { color: var(--gold-light); }
+
+/* Bylaw callout */
+.bylaw-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(244,122,112,0.08); border: 1px solid rgba(244,122,112,0.3);
+  border-radius: 4px; padding: 12px 20px; margin: 24px 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  color: var(--red-light); line-height: 1.5;
+}
+
+/* Questions */
+.questions-list {
+  list-style: none; margin: 32px 0;
+}
+.questions-list li {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.9rem; line-height: 1.65; color: rgba(247,243,236,0.75);
+}
+.questions-list li:last-child { border-bottom: none; }
+.q-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  color: var(--red-light); padding-top: 3px; flex-shrink: 0; font-weight: 600;
+}
+
+/* ── FOOTER ── */
+.doc-footer {
+  max-width: 1100px; margin: 0 auto; padding: 40px 60px 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); line-height: 1.8; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.footer-right {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+  color: rgba(154,143,126,0.5); text-align: right; line-height: 1.8;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+  .hero { padding: 60px 24px; }
+  .content-section { padding: 60px 24px; }
+  .sections-grid { grid-template-columns: 1fr 1fr; }
+  .toggles-grid { grid-template-columns: 1fr; }
+  .acts-grid { grid-template-columns: 1fr; }
+  .swap-grid { grid-template-columns: 1fr; }
+  .impact-strip { grid-template-columns: repeat(2, 1fr); }
+  .surplus-block { flex-direction: column; gap: 20px; }
+  .benchmark-block { flex-direction: column; gap: 20px; }
+  .stats-strip { flex-wrap: wrap; }
+  .full-divider { margin: 0 24px; }
+  .doc-footer { padding: 40px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+
+    <div class="hero-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+
+    <h1 class="hero-title">
+      Know Your Building.<br>
+      <span class="line2">Know Your Investment.</span>
+    </h1>
+
+    <div class="hero-subtitle">Riveredge Owners Financial Transparency Report &nbsp;·&nbsp; Interactive Edition &nbsp;·&nbsp; 35 Years</div>
+
+    <div class="gold-divider"></div>
+
+    <p class="hero-lead">
+      Every dollar in. Every dollar out. <strong>35 years of audited history</strong> — and what it means for your apartment specifically.<br><br>
+      Most co-op shareholders never see beyond the annual maintenance bill. This tool changes that. It also shows why independent verification matters: in 2006, a record 17% maintenance increase was justified with claims the audited reports do not support. <strong>The numbers have been here all along.</strong>
+    </p>
+
+    <a href="https://petermerson.github.io/charts/Riveredge-Matrix.html" class="hero-cta">
+      Open the Interactive Matrix <span class="hero-cta-arrow">→</span>
+    </a>
+
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num">35</div>
+        <div class="stat-label">Years of audited<br>financial data</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">158</div>
+        <div class="stat-label">Individual apartment<br>unit profiles</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">85,027</div>
+        <div class="stat-label">Total shares — every<br>unit precisely allocated</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Interactive matrices<br>with trend charts</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ FIVE SECTIONS ══ -->
+<section class="content-section">
+  <div class="section-label reveal">What it contains</div>
+  <h2 class="section-title reveal">Five sections. <em>One complete picture.</em></h2>
+  <p class="section-body reveal">Each section is fully interactive — select any year range from 1990 to 2024, toggle % and $ changes visible, switch between line and bar charts, and click any row to open a detailed trend chart in the side panel.</p>
+
+  <div class="sections-grid reveal">
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Income</div>
+      <div class="sc-body">Where the money comes from — maintenance charges, parking, laundry, storage, interest, transfer fees, and more. Special assessments shown separately and excluded from totals.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Expenses</div>
+      <div class="sc-body">Where it goes — real estate taxes, utilities, payroll, mortgage interest, repairs & maintenance, insurance, security, management fees, water & sewer, legal & audit, and more.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Net Income</div>
+      <div class="sc-body">The surplus or deficit each year — total income minus total expenses. Includes a side-by-side Total Income vs Total Expenses comparison chart. Per-share values shown on each bar.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Capital Expenditures</div>
+      <div class="sc-body">What was invested in the physical building year by year — from major systems replacements to infrastructure improvements. Two periods tracked: 1990–2005 and 2006–2024.</div>
+    </div>
+    <div class="section-card">
+      <span class="sc-arrow">→</span>
+      <div class="sc-title">Total Liquidity</div>
+      <div class="sc-body">Cash & equivalents plus reserve fund — the cooperative's financial cushion. Benchmarked against the Westchester "solid adequate" standard of $3,442–$4,917 per unit.</div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ MY UNIT ══ -->
+<section class="content-section">
+  <div class="section-label reveal">The most personal feature</div>
+  <h2 class="section-title reveal">Your apartment. <em>Your numbers.</em></h2>
+
+  <div class="feature-block reveal">
+    <div class="feature-block-label">🏢 My Unit Calculator</div>
+    <div class="feature-block-title">Select your apartment — everything changes.</div>
+    <div class="feature-block-body">
+      Every building in a co-op carries expenses collectively, but each shareholder's share is determined by the number of shares attached to their apartment — set in the original 1981 Offering Plan and never changed. Riveredge has <strong>85,027 total shares</strong> across 158 apartments ranging from 337 to 706 shares each.<br><br>
+      Select your apartment from the dropdown and turn on <strong>My Unit View</strong>. Every single figure in every matrix instantly recalculates to show your proportional share — Income, Expenses, Net Income, Capital Expenditures, and Total Liquidity. Change the year range and it updates live.
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+      <div class="feature-example">Apt 8T — 544 shares &nbsp;·&nbsp; <strong>0.640%</strong> of building</div>
+      <div class="feature-example">2024 Expense share: <strong>$12,226</strong></div>
+      <div class="feature-example">Liquidity share: <strong>$12,647</strong> ✅ Above range</div>
+    </div>
+  </div>
+
+  <div class="pull-quote reveal">
+    <div class="pull-quote-text">"When someone is considering purchasing a unit, being able to show them not just the building financials but their specific unit's historical costs, maintenance trajectory, and liquidity position — that's a level of transparency most co-ops never provide."</div>
+    <div class="pull-quote-attr">Riveredge Owners Financial Transparency Report</div>
+  </div>
+
+  <div class="benchmark-block reveal">
+    <div class="benchmark-badge">
+      2.6×
+      <span>Above Westchester<br>High Benchmark</span>
+    </div>
+    <div class="benchmark-text">
+      The Westchester standard for a "solid adequate" cooperative reserve is <strong>$3,442–$4,917 per unit</strong> (2024 dollars, CPI-adjusted). Riveredge's 2024 Total Liquidity of <strong>$1,976,793</strong> translates to <strong>$12,511 per unit</strong> — more than 2.5 times the upper benchmark. Every single apartment is above range. This has been true every year since 2009.<br><br>
+      The <strong>Compare Apts</strong> panel shows this for all 158 units side by side — including each apartment's proportional liquidity share and its Westchester benchmark status.
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ TOGGLES ══ -->
+<section class="content-section">
+  <div class="section-label reveal">Tools & controls</div>
+  <h2 class="section-title reveal">Everything you can <em>switch on.</em></h2>
+  <p class="section-body reveal">Every control is designed to answer a specific question. Nothing is decorative.</p>
+
+  <div class="toggles-grid" style="margin-top:40px;">
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Year Range</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Year Range Selector</div>
+        <div class="toggle-desc">Focus on any period from 1990 to 2024. Want to see just the last 10 years? The period before and after 2006 maintenance increases? The pandemic years? Set From and To and every table and chart updates instantly.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">My Unit View</div>
+      <div class="toggle-text">
+        <div class="toggle-name">My Unit View</div>
+        <div class="toggle-desc">Scales every figure in every matrix to your apartment's proportional share based on shares owned ÷ 85,027 total shares. Turns building-level totals into personally meaningful numbers. Works across all four sections simultaneously.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Compare Apts</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Compare Apartments</div>
+        <div class="toggle-desc">Opens a scrollable grid showing all 158 apartments sorted by share count. Each card shows 2024 expense allocation, annual and monthly maintenance, liquidity share, percentage of building, and Westchester benchmark status. Your selected unit is highlighted with a star.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">% Change</div>
+      <div class="toggle-text">
+        <div class="toggle-name">% Change Badges</div>
+        <div class="toggle-desc">Shows year-over-year percentage change as a small badge below each cell value. Green for increases, red for decreases. Instantly reveals which expense categories are accelerating or moderating over your selected range.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">$ Change</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Dollar Change Badges</div>
+        <div class="toggle-desc">Shows the raw dollar difference year-over-year. In My Unit View, these differences are also scaled to your unit's share — so you see exactly how many more or fewer dollars your apartment contributed compared to the prior year.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Mortgage Principal</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Mortgage Principal Toggle</div>
+        <div class="toggle-desc">The cooperative carries a mortgage. Principal payments are a real cash obligation but are excluded from operating expense totals by accounting convention. Toggle this on to see the full cash requirement — the true cost of running the building each year.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">CPI-U Overlay</div>
+      <div class="toggle-text">
+        <div class="toggle-name">CPI-U Inflation Overlay</div>
+        <div class="toggle-desc">Adds a dashed gold inflation line to any trend chart, indexed to the start year of your selected range. See whether an expense category has grown faster or slower than general inflation over any period. Source: Bureau of Labor Statistics All Urban Consumers index.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Chart Type</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Line / Bar Chart Toggle</div>
+        <div class="toggle-desc">Switch any trend chart between a smooth line (best for showing trajectory and momentum) and a bar chart (best for comparing individual year values). The Net Income fullscreen bar chart labels each bar with both the year and the per-share dollar amount.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Print / Export PDF</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Print &amp; Export to PDF</div>
+        <div class="toggle-desc">Opens a clean dedicated print window containing all four sections as formatted tables — respecting your current year range, My Unit View setting, and Mortgage Principal toggle. Wide year ranges are automatically split into readable page-width chunks.</div>
+      </div>
+    </div>
+    <div class="toggle-card reveal">
+      <div class="toggle-badge">Expand ⤢</div>
+      <div class="toggle-text">
+        <div class="toggle-name">Fullscreen Chart Expand</div>
+        <div class="toggle-desc">Every trend chart in the side panel has a small expand button. Click it to open the chart fullscreen with boosted line weights, larger point sizes, and — in bar mode — year labels and per-share dollar amounts printed directly on each bar.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══════════════════════════════════════════════════
+     2006 CASE STUDY — NEW SECTION
+═══════════════════════════════════════════════════ -->
+<section class="case-section">
+<div class="content-section">
+
+  <div class="section-label reveal" style="color:var(--red-light);">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;">Why this tool exists · Two documented examples</span>
+  </div>
+  <h2 class="section-title reveal">
+    When the numbers tell<br><em style="color:var(--red-light);">a different story.</em>
+  </h2>
+  <p class="section-body reveal" style="max-width:700px;">
+    On two separate occasions — 2006 and 2023 — Riveredge shareholders received memos announcing maintenance increases justified by cost projections that the audited annual financial statements do not support. Both cases are documented here using only the building's own numbers. Neither is offered to assign blame. Both are offered as the reason independent verification matters.
+  </p>
+
+  <div class="pull-quote reveal" style="border-color:var(--red-light);margin-top:40px;">
+    <div class="pull-quote-text" style="color:rgba(247,243,236,0.85);font-size:clamp(1rem,1.8vw,1.3rem);">
+      Board members are volunteers who serve with good intentions. This is offered not to assign blame, but to make one point: <strong style="color:var(--gold-light);font-style:normal;">the audited reports exist so that any shareholder can verify any claim, at any time.</strong> These are two examples of why that matters.
+    </div>
+    <div class="pull-quote-attr">— Peter Merson, Apt 8T · Former board member who voted no on the 2006 increase</div>
+  </div>
+
+  <!-- EXAMPLE 1 DIVIDER -->
+  <div style="display:flex;align-items:center;gap:20px;margin:56px 0 0;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--red-light);white-space:nowrap;">Example 1 of 2</div>
+    <div style="flex:1;height:1px;background:rgba(244,122,112,0.25);"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--red-light);white-space:nowrap;">April 2006 &nbsp;·&nbsp; The Record 17% Increase</div>
+    <div style="flex:1;height:1px;background:rgba(244,122,112,0.25);"></div>
+    <a href="https://petermerson.github.io/charts/maintenance_increase_2006.pdf" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:5px 12px;border-radius:4px;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.background='rgba(201,168,76,0.12)'" onmouseout="this.style.background='transparent'">Read Original Memo →</a>
+  </div>
+
+  <!-- THREE-ACT TIMELINE -->
+  <div style="margin-top:56px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:16px;">What the audited reports show · 2002 – 2006</div>
+    <div class="acts-grid">
+      <div class="act-card">
+        <div class="act-num red">Act I</div>
+        <div class="act-year red">2002</div>
+        <div class="act-title">A legitimate capital need</div>
+        <div class="act-body">A roof and facade required major work. A <strong>$350,000 shareholder loan</strong> was taken, due October 2006. A <strong>$2.25/share/year special assessment</strong> was levied to fund the project and retire the loan. A sound and reasonable plan.</div>
+      </div>
+      <div class="act-card">
+        <div class="act-num amber">Act II</div>
+        <div class="act-year amber">2002 – 2005</div>
+        <div class="act-title">A slow, visible failure</div>
+        <div class="act-body">Assessment funds were used for <strong>operating expenses</strong> — the exact thing the board's own memo would later admit the money was "not meant" for. The audited reports showed deteriorating cash balances each year. The bylaw obligation to share annual cash needs with shareholders was not met. <strong>No one raised the alarm</strong> — including the author of this document.</div>
+      </div>
+      <div class="act-card">
+        <div class="act-num darkred">Act III</div>
+        <div class="act-year darkred">April 2006</div>
+        <div class="act-title">A memo that didn't match</div>
+        <div class="act-body">Six months before the loan came due, shareholders received a memo blaming <strong>steep energy, insurance, and tax increases</strong> for the shortfall. The audited financials show utilities fell in 2006, insurance rose less than 1.4%, and payroll declined. The four-year diversion of assessment funds went unmentioned.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE CONFESSION QUOTE -->
+  <div class="confession-block reveal">
+    <div class="confession-label">The one true statement in the memo — and the most revealing</div>
+    <div class="confession-quote">
+      "The current assessment was put in place to pay for the facade repair and new roof. It was not meant to be used for ongoing operating expenses."
+    </div>
+    <div class="confession-source">— Riveredge Board of Directors · April 8, 2006</div>
+    <div class="confession-implication">
+      This is the only factually accurate statement in the memo — and it is also a quiet confession. The board correctly describes what the assessment was <em>supposed</em> to do, without mentioning that <strong>the board itself used the money for operating expenses instead</strong>. They described the problem, attributed it to external cost pressures, and imposed a record increase — without disclosing the actual cause.
+    </div>
+  </div>
+
+  <!-- CLAIMS vs AUDITS -->
+  <div style="margin-top:56px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:20px;">Memo claims vs. audited annual financial statements</div>
+    <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;">
+      <thead>
+        <tr>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);padding:10px 16px;text-align:left;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Memo claimed</th>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--red-light);padding:10px 16px;text-align:left;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">What it said</th>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-light);padding:10px 16px;text-align:left;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Audited report shows</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Utilities / energy</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);">"Steep increases in energy costs"</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;">Utilities fell in 2006: $232K → $211K (−8.8%)</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Insurance</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);">"Increased dramatically"</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;">Rose &lt;1.4%: $63,743 → $64,626</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Real estate taxes</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);">Cited as spiraling out of control</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;">+6.7% — consistent with prior-year trend</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Payroll</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);">"Costs spiraling out of control"</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;">Payroll fell in 2006: $188K → $185K</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Cash position end-2005</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);">Implied: no choice but large increase</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;">Ending cash $313,914 — loan due was $350,000</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;font-size:0.75rem;color:rgba(247,243,236,0.8);font-weight:600;">Maintenance income 2006</td>
+          <td style="padding:11px 16px;font-size:0.75rem;color:var(--red-light);">Increase needed to cover costs</td>
+          <td style="padding:11px 16px;font-size:0.75rem;color:var(--green-light);font-weight:600;">Jumped +$263,075 (+20.1%) in 2006</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- THE SWAP -->
+  <div style="margin-top:56px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:20px;">The essential financial fact</div>
+    <div class="swap-grid">
+      <div class="swap-card gone">
+        <div class="swap-tag green">The "burden" the memo said would end</div>
+        <div class="swap-desc">$2.25/share/year special assessment · scheduled to end August 2006</div>
+        <div class="swap-num green">$1,224<span style="font-size:1.4rem;">/yr</span></div>
+        <div class="swap-unit">544-share apartment · ($102/month)</div>
+      </div>
+      <div class="swap-card came">
+        <div class="swap-tag red">The permanent charge that replaced it</div>
+        <div class="swap-desc">$2.69/share/year maintenance increase · no end date, retroactive to Jan 1, 2006</div>
+        <div class="swap-num red">$1,462<span style="font-size:1.4rem;">/yr</span></div>
+        <div class="swap-unit">544-share apartment · ($122/month) · forever</div>
+      </div>
+      <div class="swap-footer">
+        The "burden" that ended: <strong>$1,224/year</strong>. &nbsp; The permanent annual charge that replaced it: <strong>$1,462/year</strong>. &nbsp; Unlike the assessment, this charge had no end date — and it has been in place for <strong>19 years</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPACT NUMBERS -->
+  <div style="margin-top:48px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:16px;">Cumulative financial impact · 2006 – 2024 · 85,027 total shares · 158 apartments</div>
+    <div class="impact-strip">
+      <div class="impact-stat">
+        <div class="impact-stat-num">19</div>
+        <div class="impact-stat-label">Years of the<br>"temporary" burden</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">~$27,800</div>
+        <div class="impact-stat-label">Excess paid by one<br>544-share apartment</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">~$4.34M</div>
+        <div class="impact-stat-label">Excess collected from<br>all shareholders</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">17 of 18</div>
+        <div class="impact-stat-label">Post-2006 years the<br>building ran a surplus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PER APT TYPE TABLE -->
+  <div style="margin-top:48px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:16px;">Annual impact by apartment type · all rates per share per year</div>
+    <table class="apt-table">
+      <thead>
+        <tr>
+          <th>Apartment type</th>
+          <th>Shares</th>
+          <th>Assessment "ended" (annual)</th>
+          <th>Permanent increase (annual)</th>
+          <th>19-yr cumulative extra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Studio &nbsp;<span style="color:var(--muted);">K, L lines</span></td>
+          <td>383</td>
+          <td class="col-gone">$861/yr &nbsp;($72/mo)</td>
+          <td class="col-came">$1,030/yr &nbsp;($86/mo)</td>
+          <td class="col-cum">~$19,600</td>
+        </tr>
+        <tr>
+          <td>One-bedroom &nbsp;<span style="color:var(--muted);">G, J, M, O lines, avg</span></td>
+          <td>571</td>
+          <td class="col-gone">$1,285/yr &nbsp;($107/mo)</td>
+          <td class="col-came">$1,535/yr &nbsp;($128/mo)</td>
+          <td class="col-cum">~$29,200</td>
+        </tr>
+        <tr>
+          <td>Jr. two-bedroom &nbsp;<span style="color:var(--muted);">H, N lines, avg</span></td>
+          <td>581</td>
+          <td class="col-gone">$1,307/yr &nbsp;($109/mo)</td>
+          <td class="col-came">$1,562/yr &nbsp;($130/mo)</td>
+          <td class="col-cum">~$29,700</td>
+        </tr>
+        <tr>
+          <td>Two-bedroom &nbsp;<span style="color:var(--muted);">E, P lines</span></td>
+          <td>706</td>
+          <td class="col-gone">$1,589/yr &nbsp;($132/mo)</td>
+          <td class="col-came">$1,898/yr &nbsp;($158/mo)</td>
+          <td class="col-cum">~$36,100</td>
+        </tr>
+        <tr>
+          <td>Three-bedroom &nbsp;<span style="color:var(--muted);">F, Q lines</span></td>
+          <td>706</td>
+          <td class="col-gone">$1,589/yr &nbsp;($132/mo)</td>
+          <td class="col-came">$1,898/yr &nbsp;($158/mo)</td>
+          <td class="col-cum">~$36,100</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:8px;line-height:1.6;">Share counts from the original 1981 Offering Plan. Pre-increase rate $15.81/share/year implied by 17% increase. 19-yr cumulative = annual excess × 19 years (2006–2024). Superintendent's apartment allocated 0 shares.</div>
+  </div>
+
+  <!-- SURPLUS PROOF -->
+  <div class="surplus-block reveal">
+    <div class="surplus-big">
+      17 / 18
+      <span>Post-2006 surplus years</span>
+    </div>
+    <div class="surplus-text">
+      The building ran an operating <strong>surplus in 17 of the 18 years</strong> from 2007 to 2024, totaling over <strong>$5.5 million in cumulative net income</strong>. This is the opposite of a building under financial distress.<br><br>
+      Had the board retired the $350,000 loan with a short-term surcharge and returned maintenance to its prior rate, the building would still have run consistent surpluses — and shareholders would not have paid $1,462/year extra (per 544-share apartment) for 19 years.
+    </div>
+  </div>
+
+  <!-- BYLAW CALLOUT -->
+  <div class="reveal">
+    <div class="bylaw-pill">
+      ⚖ &nbsp; Riveredge's co-op by-laws require the Board of Directors to provide shareholders with the co-op's annual cash needs. This requirement was not met during 2002–2006, nor has it been consistently met since. Had it been honored, the deteriorating cash position would have been visible and addressable years before it became a crisis.
+    </div>
+  </div>
+
+
+  <!-- SHARED ACCOUNTABILITY -->
+  <div class="accountability-block reveal">
+    <div class="accountability-label">A note on shared responsibility</div>
+    <div class="accountability-text">
+      The board culture at the time discouraged questioning the treasurer's financial decisions. That was a mistake — and one I participated in. The audited reports showing the building's deteriorating cash position were available every year from 2002 onward. Any board member, including myself, could have reviewed them and raised questions earlier.<br><br>
+      <strong>Good governance is not about distrust. It is about verification.</strong> The purpose of this entire suite of tools is to make that verification effortless for every Riveredge shareholder, permanently.
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div style="margin-top:48px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:16px;">Questions shareholders are entitled to ask</div>
+    <ul class="questions-list">
+      <li><span class="q-num">01</span>If energy costs drove the 2006 shortfall, why do the audited reports show utilities fell that year?</li>
+      <li><span class="q-num">02</span>Where did the special assessment funds collected 2002–2006 go, and why wasn't the $350,000 loan reserved?</li>
+      <li><span class="q-num">03</span>Why was a permanent $2.69/share/year increase imposed rather than a temporary surcharge to retire the $350,000 loan?</li>
+      <li><span class="q-num">04</span>Why was the shortfall only identified in April 2006 when the audited reports show deficits dating to 2002?</li>
+      <li><span class="q-num">05</span>Has the board met its bylaw obligation to provide shareholders with the co-op's annual cash needs — and if not, when will it?</li>
+      <li><span class="q-num">06</span>Can the board provide a reconciliation of the memo's stated cost drivers against the audited line items for 2005 and 2006?</li>
+    </ul>
+  </div>
+  <!-- EXAMPLE 2 DIVIDER -->
+  <div style="display:flex;align-items:center;gap:20px;margin:64px 0 0;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--red-light);white-space:nowrap;">Example 2 of 2</div>
+    <div style="flex:1;height:1px;background:rgba(244,122,112,0.25);"></div>
+    <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--red-light);white-space:nowrap;">November 2023 &nbsp;·&nbsp; The 9% Increase</div>
+    <div style="flex:1;height:1px;background:rgba(244,122,112,0.25);"></div>
+    <a href="https://petermerson.github.io/charts/maintenance_increase_2023.pdf" target="_blank" style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:5px 12px;border-radius:4px;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.background='rgba(201,168,76,0.12)'" onmouseout="this.style.background='transparent'">Read Original Memo →</a>
+  </div>
+
+  <p class="section-body reveal" style="max-width:700px;margin-top:32px;">
+    History repeated itself in November 2023. The board issued a letter projecting dramatic cost increases to justify a 9% maintenance increase effective January 1, 2024. The 2024 audited annual results — once a one-time fire and water damage event is properly excluded — tell a different story.
+  </p>
+
+  <!-- 2023 MEMO CLAIM -->
+  <div class="confession-block reveal" style="margin-top:36px;">
+    <div class="confession-label">Board letter · November 27, 2023</div>
+    <div class="confession-quote" style="font-size:clamp(0.95rem,1.6vw,1.2rem);">
+      "The Board projects dramatic increases in the cost of operating the Riveredge building and property in 2024."
+    </div>
+    <div class="confession-source">— Westchester Property Management Group Inc. on behalf of Riveredge Board · Nov. 27, 2023</div>
+    <div class="confession-implication">
+      The letter cited four specific projected increases totalling <strong>$218,800</strong>: fuel oil +$110,000 · insurance +$23,000 · real estate taxes +$8,500 · other expenses +$77,300. A 9% maintenance increase — <strong>$1.58/share/year</strong> — was imposed on this basis, generating approximately $134,342 in additional annual income.
+    </div>
+  </div>
+
+  <!-- 2023 CLAIMS vs ACTUAL -->
+  <div style="margin-top:40px;" class="reveal">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);margin-bottom:20px;">Projected increases vs. 2024 audited actual results · includes mortgage principal</div>
+    <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;">
+      <thead>
+        <tr>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);padding:10px 16px;text-align:left;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Category</th>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--red-light);padding:10px 16px;text-align:right;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Board projected increase</th>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-light);padding:10px 16px;text-align:right;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Actual 2024 increase</th>
+          <th style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:10px 16px;text-align:right;background:rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.2);">Overestimate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.9);font-weight:600;">Fuel Oil / Utilities</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);text-align:right;">+$110,000</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;text-align:right;">+$37,866</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--muted);text-align:right;">$72,134 — came in at ⅓ of projection</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.9);font-weight:600;">Insurance</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);text-align:right;">+$23,000</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;text-align:right;">+$12,507</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--muted);text-align:right;">$10,493</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.9);font-weight:600;">Real Estate Taxes</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);text-align:right;">+$8,500</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);font-weight:600;text-align:right;">+$14,940</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);text-align:right;">Underestimated by $6,440</td>
+        </tr>
+        <tr>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:rgba(247,243,236,0.9);font-weight:600;">Other Expenses</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--red-light);text-align:right;">+$77,300</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--green-light);font-weight:600;text-align:right;">+$38,496</td>
+          <td style="padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:var(--muted);text-align:right;">$38,804</td>
+        </tr>
+        <tr style="background:rgba(244,122,112,0.06);">
+          <td style="padding:11px 16px;font-size:0.75rem;color:rgba(247,243,236,0.9);font-weight:700;">Total projected increase</td>
+          <td style="padding:11px 16px;font-size:0.75rem;color:var(--red-light);font-weight:700;text-align:right;">+$218,800</td>
+          <td style="padding:11px 16px;font-size:0.75rem;color:var(--green-light);font-weight:700;text-align:right;">+$103,809</td>
+          <td style="padding:11px 16px;font-size:0.75rem;color:#f0a050;font-weight:700;text-align:right;">$114,991 overstated (110%)</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:8px;line-height:1.6;">All figures include mortgage principal. 2024 Repairs &amp; Maintenance excludes $228,074 one-time fire &amp; water damage (gross 2024 total: $1,981,010). Actual increase = $1,752,936 − $1,649,127.</div>
+  </div>
+
+  <!-- 2023 IMPACT STRIP -->
+  <div style="margin-top:36px;" class="reveal">
+    <div class="impact-strip" style="grid-template-columns:repeat(4,1fr);">
+      <div class="impact-stat">
+        <div class="impact-stat-num">9%</div>
+        <div class="impact-stat-label">Maintenance increase<br>Jan 1, 2024</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">+$218,800</div>
+        <div class="impact-stat-label">Board's projected<br>cost increase</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">+$103,809</div>
+        <div class="impact-stat-label">Actual adjusted<br>cost increase</div>
+      </div>
+      <div class="impact-stat">
+        <div class="impact-stat-num">110%</div>
+        <div class="impact-stat-label">Board overstated<br>by this amount</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN STATEMENT -->
+  <div class="surplus-block reveal" style="margin-top:36px;background:linear-gradient(135deg,rgba(139,26,26,0.1) 0%,rgba(13,28,48,0.8) 100%);border-color:rgba(244,122,112,0.2);">
+    <div class="surplus-big" style="color:var(--red-light);font-size:2.8rem;">
+      2 / 2
+      <span style="color:var(--muted);">Times verified against audits</span>
+    </div>
+    <div class="surplus-text">
+      In both 2006 and 2023, the cost projections used to justify maintenance increases were <strong style="color:var(--red-light);">not supported by the audited annual results</strong>. In 2006, cited cost drivers were flat or falling. In 2023, the board overstated projected increases by 110% — with the single largest item, fuel oil, coming in at one-third of what was projected.<br><br>
+      This is not offered as proof of intent. It is offered as proof that <strong style="color:var(--gold-light);">independent verification of board financial claims — using the building's own audited statements — is both possible and necessary.</strong> The matrix makes that verification available to every shareholder, permanently.
+    </div>
+  </div>
+
+  <!-- NO RESPONSE CALLOUT -->
+  <div style="margin-top:40px;" class="reveal">
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-left:4px solid var(--gold-light);border-radius:0 8px 8px 0;padding:32px 40px;">
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold-light);margin-bottom:18px;">A matter of record</div>
+
+      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.4;">These questions were submitted in writing. No response was received.</div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
+
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:16px 20px;display:flex;gap:20px;align-items:flex-start;">
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold-light);line-height:1;">2006</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:3px;">Analysis</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:0.88rem;color:rgba(247,243,236,0.8);line-height:1.7;">A formal written request was submitted to <strong style="color:var(--text);">Westchester Property Management Group</strong> on behalf of the Board of Directors, seeking reconciliation of the April 2006 memo's stated cost drivers against the audited annual financial statements for that year.</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--red-light);margin-top:8px;text-transform:uppercase;letter-spacing:0.1em;">No response received.</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:16px 20px;display:flex;gap:20px;align-items:flex-start;">
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold-light);line-height:1;">2025</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:3px;">Dec 4</div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:0.88rem;color:rgba(247,243,236,0.8);line-height:1.7;">A formal written request was submitted to <strong style="color:var(--text);">Westchester Property Management Group</strong> on behalf of the Board of Directors, requesting reconsideration of the 9% maintenance increase in light of the significant discrepancy between the November 2023 projected cost increases ($218,800) and the actual 2024 operating results ($103,809 adjusted).</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:var(--red-light);margin-top:8px;text-transform:uppercase;letter-spacing:0.1em;">No response received.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="border-top:1px solid rgba(201,168,76,0.2);padding-top:20px;font-size:0.88rem;line-height:1.8;color:rgba(247,243,236,0.7);">
+        This project is not a first resort. It is a second one. The proper channel — a written request to management and the board — was used twice, on two separate and documented discrepancies. The questions remain unanswered. <strong style="color:var(--gold-light);">The Riveredge Income &amp; Expense Matrix, and everything in this introduction, exists because shareholders are entitled to answers — and because the audited records provide them when the board does not.</strong>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+        <a href="https://petermerson.github.io/charts/maintenance_increase_2006.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);text-decoration:none;border:1px solid rgba(255,255,255,0.1);padding:7px 14px;border-radius:4px;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--muted)'">2006 Board Memo →</a>
+        <a href="https://petermerson.github.io/charts/maintenance_increase_2023.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);text-decoration:none;border:1px solid rgba(255,255,255,0.1);padding:7px 14px;border-radius:4px;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--muted)'">2023 Board Memo →</a>
+        <a href="https://petermerson.github.io/charts/actual_vs_projection_2024.html" target="_blank" style="display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);text-decoration:none;border:1px solid rgba(255,255,255,0.1);padding:7px 14px;border-radius:4px;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.4)';this.style.color='var(--gold-light)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--muted)'">2023 vs 2024 Reconciliation →</a>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /content-section -->
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ ADDITIONAL RESOURCES ══ -->
+<section class="content-section">
+  <div class="section-label reveal">Additional resources</div>
+  <h2 class="section-title reveal">Companion <em>tools & documents.</em></h2>
+  <p class="section-body reveal">These additional interactive tools complement the matrix and provide a different lens on the same audited data — breaking expenses and income into proportional slices so you can see where each dollar actually goes.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:40px;">
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">🥧</span>
+        <div>
+          <div class="toggle-name">Historical Income & Expense Breakdown</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">1990 – 2023 · 34 Years · Interactive</div>
+        </div>
+      </div>
+      <div class="toggle-desc">Two pie charts — Income and Expense breakdown — for every year from 1990 to 2023. Step through the years and watch the proportions shift as the building's financial profile evolved over three decades.</div>
+      <a href="https://petermerson.github.io/charts/2023-1990-Historical-Income-Expense.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">Open Historical Breakdown →</a>
+    </div>
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">📊</span>
+        <div>
+          <div class="toggle-name">2024 Financial Breakdown & Shareholder Memo</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">2024 Year-End · Detailed Analysis</div>
+        </div>
+      </div>
+      <div class="toggle-desc">A detailed 2024 year-end income and expense breakdown with full pie chart analysis. Includes a shareholder memorandum addressing the proposed $1,000,000 Special Assessment and a documented review of the 2006 maintenance increase.</div>
+      <a href="https://petermerson.github.io/charts/DashBoard-Income-Expense-2024.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">Open 2024 Breakdown →</a>
+    </div>
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">📄</span>
+        <div>
+          <div class="toggle-name">Memo vs. Audited Record</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">April 2006 · Full Analysis Document</div>
+        </div>
+      </div>
+      <div class="toggle-desc">The complete side-by-side comparison document — every claim in the April 8, 2006 board memo set against the audited annual reports. Includes the three-act timeline, the swap analysis, per-apartment cost impact, and the bylaw obligations not met.</div>
+      <a href="#" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">Download Analysis Document →</a>
+    </div>
+
+    <div class="toggle-card reveal" style="flex-direction:column;gap:12px;padding:28px 28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:1.6rem;">✉</span>
+        <div>
+          <div class="toggle-name">Shareholder Letters to Management</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);margin-top:2px;">2006 Analysis &amp; 2025 Request · No Response Received</div>
+        </div>
+      </div>
+      <div class="toggle-desc">Two formal written requests submitted to Westchester Property Management Group on behalf of the Board of Directors — one seeking reconciliation of the 2006 memo's cost claims against the audited record, one requesting reconsideration of the 2024 maintenance increase in light of the projection discrepancy. Neither received a response.</div>
+      <a href="https://petermerson.github.io/charts/maintenance_increase_discussion.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-light);text-decoration:none;border:1px solid rgba(201,168,76,0.4);padding:8px 16px;border-radius:4px;transition:all 0.15s;width:fit-content;" onmouseover="this.style.borderColor='var(--gold-light)';this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.4)';this.style.background='transparent'">View Shareholder Letters →</a>
+    </div>
+
+  </div>
+</section>
+<section class="content-section">
+  <div class="section-label reveal">Questions & feedback</div>
+  <h2 class="section-title reveal">Get in <em>touch.</em></h2>
+  <p class="section-body reveal">If you have questions about the data, comments on the analysis, or suggestions for additional features — I'd genuinely like to hear from you. This tool was built for the Riveredge shareholder community and your input makes it better.</p>
+
+  <div style="margin-top:36px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;" class="reveal">
+    <a href="mailto:peter@riveredge.example.com" style="display:inline-flex;align-items:center;gap:12px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:6px;padding:16px 28px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(201,168,76,0.2)';this.style.borderColor='var(--gold-light)'" onmouseout="this.style.background='rgba(201,168,76,0.12)';this.style.borderColor='rgba(201,168,76,0.4)'">
+      <span style="font-size:1.4rem;">✉</span>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--gold-light);">Peter Merson &nbsp;·&nbsp; Apt 8T</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:rgba(247,243,236,0.7);margin-top:2px;">Questions, corrections, or ideas welcome</div>
+      </div>
+    </a>
+    <p style="font-family:'Source Serif 4',serif;font-size:0.88rem;color:rgba(247,243,236,0.55);max-width:400px;line-height:1.7;">Questions about your specific unit, data corrections, or ideas for what to add — all welcome.</p>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- ══ FOOTER ══ -->
+<footer class="doc-footer">
+  <div class="footer-left">
+    Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY<br>
+    Source: Audited Annual Financial Statements 1990–2024<br>
+    Share allocations from the Original Offering Plan, 1981 &nbsp;·&nbsp; 85,027 Total Shares &nbsp;·&nbsp; 158 Apartments
+  </div>
+  <div class="footer-right">
+    <div style="color:var(--gold-light);font-weight:600;letter-spacing:0.06em;">Produced by Peter Merson &nbsp;·&nbsp; Apt 8T</div>
+    <div>In conjunction with Claude AI (Anthropic) &nbsp;·&nbsp; claude.ai</div>
+    <div style="margin-top:4px;opacity:0.5;">For shareholder use &nbsp;·&nbsp; Personal use only</div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
