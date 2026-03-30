@@ -774,8 +774,8 @@ const westchesterLines = {
     const ca = chart.chartArea;
     const snapYears = chart._westchesterYears;
     const lines = [
-      {arr:W_BENCH_LOW,  stroke:'rgba(248,81,73,0.95)',  lbl:'W.Low'},
-      {arr:W_BENCH_HIGH, stroke:'rgba(201,168,76,0.95)', lbl:'W.High'}
+      {arr:W_BENCH_LOW,  stroke:'rgba(248,81,73,0.95)',  lbl:'W.Low $3,500/unit'},
+      {arr:W_BENCH_HIGH, stroke:'rgba(201,168,76,0.95)', lbl:'W.High $5,000/unit'}
     ];
     c.save();
     c.beginPath(); c.rect(ca.left, ca.top, ca.right-ca.left, ca.bottom-ca.top); c.clip();
@@ -2160,8 +2160,8 @@ function selectCapCat(cat, years) {
   if(isLiq) {
     const wLow  = years.map(y => Math.round(W_BENCH_LOW[ALL_YEARS.indexOf(y)]  * scale));
     const wHigh = years.map(y => Math.round(W_BENCH_HIGH[ALL_YEARS.indexOf(y)] * scale));
-    const wLowLabel  = 'Westchester Low Standard'  + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
-    const wHighLabel = 'Westchester High Standard' + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
+    const wLowLabel  = 'Westchester Low Standard $3,500 per Unit'  + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
+    const wHighLabel = 'Westchester High Standard $5,000 per Unit' + (MYUNIT_VIEW_ON && MY_UNIT ? ' (Apt '+MY_UNIT.apt+')' : '');
     datasets.push({
       type: 'line', data: wHigh, label: wHighLabel,
       borderColor:'rgba(185,140,20,0.95)', backgroundColor:'transparent',
@@ -2191,8 +2191,8 @@ function selectCapCat(cat, years) {
           callbacks:{
             title: items => items[0].label,
             label: item => {
-              if(item.dataset.label && item.dataset.label.indexOf('Westchester High')>-1) return ' W.High: $'+Math.round(item.parsed.y).toLocaleString();
-              if(item.dataset.label && item.dataset.label.indexOf('Westchester Low')>-1)  return ' W.Low: $'+Math.round(item.parsed.y).toLocaleString();
+              if(item.dataset.label && item.dataset.label.indexOf('Westchester High')>-1) return ' W.High $5,000/unit: $'+Math.round(item.parsed.y).toLocaleString();
+              if(item.dataset.label && item.dataset.label.indexOf('Westchester Low')>-1)  return ' W.Low $3,500/unit: $'+Math.round(item.parsed.y).toLocaleString();
               return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
             }
           }
