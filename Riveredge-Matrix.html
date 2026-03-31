@@ -224,7 +224,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .myunit-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--gold-light); white-space:nowrap; }
 .myunit-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .myunit-label { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:#9a8f7e; white-space:nowrap; }
-.myunit-select { font-family:'IBM Plex Mono',monospace; font-size:0.78rem; background:#0d2240; border:1px solid var(--gold); color:var(--gold-light); padding:6px 28px 6px 10px; border-radius:4px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c9a84c'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; min-width:120px; }
+.myunit-select { font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; background:#ffffff; border:2px solid var(--gold-light); color:#0d2240; padding:6px 28px 6px 10px; border-radius:4px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230d2240'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; min-width:120px; }
 .myunit-select:focus { outline:2px solid var(--gold-light); }
 .myunit-info { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
 .myunit-stat { text-align:center; padding:4px 12px; border-left:1px solid rgba(201,168,76,0.3); }
@@ -362,9 +362,9 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     <div style="display:flex;align-items:center;gap:8px;">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#9a8f7e;">Year Range</span>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:#9a8f7e;">From</span>
-      <select id="global-sel-from" onchange="setGlobalRange()" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;background:#0d2240;border:1px solid var(--gold);color:var(--gold-light);padding:5px 22px 5px 8px;border-radius:3px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c9a84c'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center;"></select>
+      <select id="global-sel-from" onchange="setGlobalRange()" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;font-weight:600;background:#ffffff;border:2px solid var(--gold-light);color:#0d2240;padding:5px 22px 5px 8px;border-radius:3px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230d2240'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center;"></select>
       <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:#9a8f7e;">To</span>
-      <select id="global-sel-to" onchange="setGlobalRange()" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;background:#0d2240;border:1px solid var(--gold);color:var(--gold-light);padding:5px 22px 5px 8px;border-radius:3px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c9a84c'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center;"></select>
+      <select id="global-sel-to" onchange="setGlobalRange()" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;font-weight:600;background:#ffffff;border:2px solid var(--gold-light);color:#0d2240;padding:5px 22px 5px 8px;border-radius:3px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230d2240'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 6px center;"></select>
     </div>
     <div style="width:1px;height:20px;background:#3a3028;"></div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -2812,6 +2812,7 @@ function printToPDFWindow() {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <title>Riveredge Income &amp; Expense Matrix</title>
 <style>${printCSS}</style>
 </head>
