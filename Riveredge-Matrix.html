@@ -71,9 +71,9 @@ body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); 
 select { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; background: var(--paper2); border: 1px solid var(--rule2); color: var(--ink); padding: 5px 8px; border-radius: 3px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5040'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; padding-right: 22px; }
 select:focus { outline: 2px solid var(--gold-light); outline-offset: 1px; }
 .ctrl-divider { width: 1px; height: 22px; background: var(--rule); margin: 0 4px; }
-.mode-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--rule2); background: var(--paper2); color: var(--neutral); cursor: pointer; transition: all 0.15s; }
-.mode-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.mode-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+.mode-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 3px; border: 2px solid var(--gold-light); background: #ffffff; color: var(--ink); cursor: pointer; transition: all 0.15s; }
+.mode-btn.active { background: var(--ink); color: var(--gold-light); border-color: var(--gold-light); font-weight: 700; }
+.mode-btn:hover:not(.active) { border-color: var(--gold-light); color: var(--ink); background: #f0e4c0; }
  
 /* ── MAIN LAYOUT ── */
 .main-layout { max-width: 1400px; margin: 0 auto; padding: 0 32px 20px; display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
@@ -230,9 +230,9 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .myunit-stat { text-align:center; padding:4px 12px; border-left:1px solid rgba(201,168,76,0.3); }
 .myunit-stat-label { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.1em; color:#9a8f7e; margin-bottom:2px; }
 .myunit-stat-val { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--gold-light); }
-.myunit-toggle { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; padding:6px 14px; border-radius:4px; border:1px solid var(--gold); background:transparent; color:var(--gold-light); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
-.myunit-toggle.active { background:var(--gold); color:#0d2240; font-weight:700; }
-.myunit-toggle:hover:not(.active) { background:rgba(201,168,76,0.15); }
+.myunit-toggle { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; padding:6px 14px; border-radius:4px; border:2px solid var(--gold-light); background:#ffffff; color:var(--ink); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+.myunit-toggle.active { background:var(--ink); color:var(--gold-light); border-color:var(--gold-light); font-weight:700; }
+.myunit-toggle:hover:not(.active) { background:#f0e4c0; color:var(--ink); }
 .myunit-compare { display:none; flex-direction:column; gap:0; margin-top:12px; max-width:1400px; margin-left:auto; margin-right:auto; padding:0 32px; }
 .myunit-compare.visible { display:flex; }
 .compare-card { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:14px 20px; box-shadow:var(--shadow); }
@@ -384,7 +384,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     </div>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#9a8f7e;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
     <div style="width:1px;height:20px;background:#3a3028;"></div>
-    <button class="mode-btn" id="btn-print" onclick="openPrintView()" title="Open a clean printable snapshot of all matrices" style="border-color:#c9a84c;color:#c9a84c;background:transparent;">🖨 Print / Export PDF</button>
+    <button class="mode-btn" id="btn-print" onclick="openPrintView()" title="Open a clean printable snapshot of all matrices" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;">🖨 Print / Export PDF</button>
   </div>
 </div>
 <div class="info-note"><span>ⓘ Special Assessments are shown as a separate row (italic) but are <strong>excluded from Total Income</strong> — they are one-time, non-recurring charges. &nbsp;Two assessments were levied: <strong>1993</strong> ($170,050) and <strong>2002–2006</strong> ($763,620 total). &nbsp;Total collected 1990–2024: <strong>$933,670</strong>. &nbsp;Hover over the row label for details.</span></div>
@@ -2587,6 +2587,7 @@ function openPrintView() {
  
   // Determine year range from income selectors (use inc range as master)
   const fromYr = parseInt(document.getElementById('global-sel-from').value);
+
   const toYr   = parseInt(document.getElementById('global-sel-to').value);
   const f = Math.min(fromYr, toYr), t = Math.max(fromYr, toYr);
   const years  = ALL_YEARS.filter(y => y >= f && y <= t);
@@ -2812,7 +2813,6 @@ function printToPDFWindow() {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
 <title>Riveredge Income &amp; Expense Matrix</title>
 <style>${printCSS}</style>
 </head>
