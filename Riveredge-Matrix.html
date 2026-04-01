@@ -1419,10 +1419,12 @@ function cpiRangeChange(years) {
 // ── CHART TYPE TOGGLE ──
 function setChartType(type) {
   CHART_TYPE = type;
+  NET_CHART_TYPE = type;
+  CAP_CHART_TYPE = type;
   document.getElementById('btn-charttype-line').classList.toggle('active', type==='line');
   document.getElementById('btn-charttype-bar').classList.toggle('active', type==='bar');
-  // Sync inc/exp local buttons
-  ['inc','exp'].forEach(function(p) {
+  // Sync inc/exp/net/cap local buttons
+  ['inc','exp','net','cap'].forEach(function(p) {
     var lb = document.getElementById(p+'-btn-line');
     var bb = document.getElementById(p+'-btn-bar');
     if(lb) lb.classList.toggle('active', type==='line');
@@ -1437,10 +1439,15 @@ function setChartType(type) {
       selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
     }
   });
+  // Redraw net chart if visible
   if(window._netYears && document.getElementById('net-chart-panel').style.display !== 'none') {
     var netTitle = document.getElementById('net-panel-cat').textContent;
     if(netTitle.indexOf('vs') > -1) renderCompareChart(window._netYears);
     else renderNetChart(window._netYears);
+  }
+  // Redraw cap chart if visible
+  if(capState.selectedCat && document.getElementById('cap-chart-panel').style.display !== 'none') {
+    selectCapCat(capState.selectedCat, getCapYears());
   }
 }
  
@@ -1681,16 +1688,21 @@ function toggleCPI() {
   const btn = document.getElementById('btn-cpi');
   btn.textContent = SHOW_CPI ? 'On' : 'Off';
   btn.classList.toggle('active', SHOW_CPI);
-  // Redraw active charts
+  // Redraw active charts — inc and exp
   ['inc','exp'].forEach(prefix => {
     const years = getYears(prefix);
     if(state[prefix].totalSelected && window['_'+prefix+'TotalsByYear']) {
-      // Total row is selected — redraw using stored totals
       selectTotal(prefix, years, window['_'+prefix+'TotalsByYear']);
     } else if(state[prefix].selectedCat) {
       selectCat(prefix, state[prefix].selectedCat, years);
     }
   });
+  // Also redraw net income chart if visible
+  if(window._netYears && document.getElementById('net-chart-panel').style.display !== 'none') {
+    var netTitle = document.getElementById('net-panel-cat').textContent;
+    if(netTitle.indexOf('vs') > -1) renderCompareChart(window._netYears);
+    else renderNetChart(window._netYears);
+  }
 }
  
 // ── TOGGLE MORTGAGE PRINCIPAL ──
@@ -2587,7 +2599,6 @@ function openPrintView() {
  
   // Determine year range from income selectors (use inc range as master)
   const fromYr = parseInt(document.getElementById('global-sel-from').value);
-
   const toYr   = parseInt(document.getElementById('global-sel-to').value);
   const f = Math.min(fromYr, toYr), t = Math.max(fromYr, toYr);
   const years  = ALL_YEARS.filter(y => y >= f && y <= t);
