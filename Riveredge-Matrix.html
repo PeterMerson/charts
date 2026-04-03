@@ -1175,7 +1175,10 @@ function selectCat(prefix, cat, years) {
     }
   });
  
-  document.getElementById(prefix+'-panel-cat').textContent = cat + (MYUNIT_VIEW_ON && MY_UNIT ? ' — Apt '+MY_UNIT.apt : '');
+  const displayCat = (prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL)
+    ? 'Mortgage Interest & Principal'
+    : cat;
+  document.getElementById(prefix+'-panel-cat').textContent = displayCat + (MYUNIT_VIEW_ON && MY_UNIT ? ' — Apt '+MY_UNIT.apt : '');
   document.getElementById(prefix+'-panel-range').textContent = years[0]+' – '+years[years.length-1]+'  ·  '+years.length+' years';
 
   // Use combined P&I values if principal toggle is on for Mortgage Interest
