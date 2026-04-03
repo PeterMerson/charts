@@ -987,6 +987,7 @@ function render(prefix) {
  
   cats.forEach((cat) => {
     const isSA = (prefix==='inc' && cat==='SpecialAssessment');
+    const isMI = (prefix==='exp' && cat==='Mortgage Interest');
     const tr = document.createElement('tr');
     if(selectedCat === cat) tr.classList.add('selected');
     // Special Assessment row: muted italic style
@@ -996,12 +997,13 @@ function render(prefix) {
  
     // When principal is toggled on, combine it with Mortgage Interest row
     const isMPI = prefix==='exp' && cat==='Mortgage Interest' && SHOW_PRINCIPAL;
-    const rowLabel = isMPI ? 'Mortgage Interest + Principal' : isSA ? 'Special Assessments ⓘ' : cat;
+    const rowLabel = isMPI ? 'Mortgage Interest + Principal' : isSA ? 'Special Assessments ⓘ' : isMI ? 'Mortgage Interest ⓘ' : cat;
  
     tr.onclick = () => selectCat(prefix, cat, years);
     const td0 = document.createElement('td');
     td0.className = 'cat-col';
     if(isSA) td0.title = '1993: $170,050  |  2002-2006: $763,620  |  Total collected: $933,670  |  Excluded from Income totals';
+    if(isMI) td0.title = '2013 — Mortgage Refinancing\nThe cooperative\'s existing 7.35% mortgage was refinanced with a $2,800,000 · 5.17% · 30-year fully amortizable mortgage. The principal balance due in 2043 (30 years later) is $0. The co-op has Les Lew, the then Treasurer, to thank for this. Annual savings: $184,764 · $2.17/share/year.';
     td0.textContent = rowLabel;
     if(isMPI) { td0.style.color = 'var(--gold)'; td0.style.fontStyle = 'italic'; }
     tr.appendChild(td0);
@@ -1275,6 +1277,7 @@ function selectCat(prefix, cat, years) {
  
   const showLegend = SHOW_CPI;
  
+  if(cat !== 'Mortgage Interest') {
   state[prefix].trendChart = new Chart(ctx, {
     type: CHART_TYPE,
     data:{ labels:years, datasets:datasets },
@@ -1300,6 +1303,12 @@ function selectCat(prefix, cat, years) {
                 if(MAINT_PDF_URLS[yr]) return ['', '📄 Click chart to open Board Memo →'];
                 return '';
               };
+              if(cat === 'Mortgage Interest') return function(items) {
+                var yr = parseInt(items[0].label);
+                if(yr === 1998) return ['','🏦 1998 Refinancing','11% Interest Only → 7.35% · 15-yr amortizable','$4,000,000 mortgage · Balance due 2013: ~$2,600,000','Thanks to Howard Katz, Treasurer'];
+                if(yr === 2013) return ['','🏦 2013 Refinancing','7.35% → 5.17% · 30-yr fully amortizable','$2,800,000 mortgage · Balance due 2043: $0','Saved $184,764/yr · $2.17/share · Thanks to Les Lew, Treasurer'];
+                return '';
+              };
               return undefined;
             })()
           }
@@ -1308,6 +1317,7 @@ function selectCat(prefix, cat, years) {
       scales:scales
     }
   });
+  } // end if not Mortgage Interest
 
   // Click handler to open maintenance increase PDF memos
   if(cat === 'Maintenance Charges' && !isBar) {
@@ -1323,6 +1333,113 @@ function selectCat(prefix, cat, years) {
     };
     chartCanvas.addEventListener('click', chartCanvas._maintClickHandler);
     chartCanvas.style.cursor = 'pointer';
+  }
+
+  // Draw vertical refi marker lines on Mortgage Interest chart
+  if(cat === 'Mortgage Interest') {
+    const REFI_MARKERS = {
+      1998: { label: '1998 Refi', sub: '11%→7.35%', lineColor: '#c9a84c', boxColor: '#c9a84c' },
+      2013: { label: '2013 Refi', sub: '7.35%→5.17%', lineColor: '#3fb950', boxColor: '#3fb950' }
+    };
+    const refiPlugin = {
+      id: 'refiLines_' + Date.now(),
+      beforeDraw(chart) {
+        const { ctx, scales: { x, y }, chartArea } = chart;
+        if(!x || !y || !chartArea) return;
+        ctx.save();
+        chart.data.labels.forEach((yr, i) => {
+          const info = REFI_MARKERS[parseInt(yr)];
+          if(!info) return;
+          const xPos = x.getPixelForValue(i);
+
+          // Full-height solid line
+          ctx.beginPath();
+          ctx.setLineDash([]);
+          ctx.strokeStyle = info.lineColor;
+          ctx.lineWidth = 4;
+          ctx.globalAlpha = 1;
+          ctx.moveTo(xPos, chartArea.top);
+          ctx.lineTo(xPos, chartArea.bottom);
+          ctx.stroke();
+
+          // Label box
+          const pad = 5;
+          const boxW = 88;
+          const boxH = 32;
+          const boxX = xPos - boxW / 2;
+          const boxY = chartArea.top + 6;
+
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = info.boxColor;
+          ctx.beginPath();
+          ctx.rect(boxX, boxY, boxW, boxH);
+          ctx.fill();
+
+          ctx.fillStyle = '#0d2240';
+          ctx.font = 'bold 11px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(info.label, xPos, boxY + 4);
+          ctx.font = '9px monospace';
+          ctx.fillText(info.sub, xPos, boxY + 18);
+        });
+        ctx.restore();
+      },
+      afterDraw(chart) {
+        const { ctx, scales: { x, y }, chartArea } = chart;
+        if(!x || !y || !chartArea) return;
+        ctx.save();
+        chart.data.labels.forEach((yr, i) => {
+          const info = REFI_MARKERS[parseInt(yr)];
+          if(!info) return;
+          const xPos = x.getPixelForValue(i);
+          const dataVal = chart.data.datasets[0].data[i];
+          const dataY = y.getPixelForValue(dataVal);
+          // Big dot on top of line
+          ctx.beginPath();
+          ctx.arc(xPos, dataY, 10, 0, Math.PI * 2);
+          ctx.fillStyle = info.lineColor;
+          ctx.globalAlpha = 1;
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        });
+        ctx.restore();
+      }
+    };
+    // Destroy and recreate chart with plugin registered
+    if(state[prefix].trendChart) { state[prefix].trendChart.destroy(); state[prefix].trendChart = null; }
+    const ctx2 = document.getElementById(prefix+'-trend-chart').getContext('2d');
+    const refiChartOptions = {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display: showLegend, labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#4a6080', boxWidth:20 } },
+        tooltip: { backgroundColor:'#0d2240', titleColor:'#c9a84c', bodyColor:'#f0f4fa', borderColor:'#2a4a6a', borderWidth:1, padding:10,
+          callbacks:{
+            title: items => items[0].label,
+            label: item => {
+              var actualDollar = vals[item.dataIndex];
+              return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
+            },
+            afterBody: function(items) {
+              var yr = parseInt(items[0].label);
+              if(yr === 1998) return ['','🏦 1998 Refinancing','11% Interest Only → 7.35% · 15-yr','$4,000,000 · Balance due 2013: ~$2,600,000','Thanks to Howard Katz, Treasurer'];
+              if(yr === 2013) return ['','🏦 2013 Refinancing','7.35% → 5.17% · 30-yr fully amortizable','$2,800,000 · Balance due 2043: $0','Saved $184,764/yr · $2.17/share','Thanks to Les Lew, Treasurer'];
+              return '';
+            }
+          }
+        }
+      },
+      scales: scales
+    };
+    state[prefix].trendChart = new Chart(ctx2, {
+      type: CHART_TYPE,
+      data: { labels: years, datasets: datasets },
+      options: refiChartOptions,
+      plugins: [refiPlugin]
+    });
   }
 }
  
