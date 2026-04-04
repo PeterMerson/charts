@@ -240,7 +240,7 @@ let expActive = null;
 const container = document.getElementById('year-btn-container');
 ALL_HIST_YEARS.forEach(yr => {
   const btn = document.createElement('button');
-  btn.className = 'year-btn' + (yr === 2022 ? ' active' : '');
+  btn.className = 'year-btn' + (yr === 2023 ? ' active' : '');
   btn.textContent = yr;
   btn.id = 'ybtn-' + yr;
   btn.onclick = () => setYear(yr);
@@ -507,7 +507,7 @@ document.addEventListener('mousemove', e => {
   if(t.classList.contains('visible')) { t.style.left=(e.clientX+14)+'px'; t.style.top=(e.clientY-10)+'px'; }
 });
  
-setYear(2022);
+setYear(2023);
 </script>
 </body>
 </html>
