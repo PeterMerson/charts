@@ -26,10 +26,11 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
  
   body {
+    overflow-x: hidden;
     background: var(--paper);
     color: var(--ink);
     font-family: 'Source Serif 4', serif;
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     min-height: 100vh;
   }
  
@@ -40,7 +41,7 @@
     border-bottom: 3px solid var(--gold);
   }
   .header-inner {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -93,7 +94,7 @@
     padding: 16px 24px;
   }
   .summary-inner {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     gap: 40px;
@@ -105,7 +106,7 @@
     color: #2a1e10;
     line-height: 1.6;
     flex: 1;
-    min-width: 300px;
+    min-width: 180px;
   }
   .summary-text strong { color: var(--ink); }
   .summary-stats {
@@ -117,7 +118,7 @@
     text-align: center;
     padding: 10px 16px;
     border-radius: 6px;
-    min-width: 110px;
+    min-width: 80px;
   }
   .sstat.cpi { background: #fff8e6; border: 1px solid #e8c96a; }
   .sstat.actual { background: var(--green-bg); border: 1px solid var(--green-mid); }
@@ -141,7 +142,7 @@
  
   /* ── SECTION RULE ── */
   .section-rule {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 24px auto 0;
     padding: 0 24px;
     display: flex;
@@ -160,17 +161,18 @@
  
   /* ── TABLE WRAPPER ── */
   .table-wrap {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 12px auto 0;
     padding: 0 24px 40px;
-    overflow-x: auto;
+    overflow-x: hidden;
   }
  
   table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
  
   thead tr {
@@ -249,13 +251,13 @@
   .verdict.above { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-mid); }
  
   /* Savings bar */
-  .bar-cell { min-width: 140px; }
+  .bar-cell { min-width: 90px; }
   .bar-wrap { display: flex; align-items: center; gap: 6px; }
-  .bar-track { flex: 1; height: 8px; background: var(--paper3); border-radius: 4px; overflow: hidden; min-width: 60px; }
+  .bar-track { flex: 1; height: 8px; background: var(--paper3); border-radius: 4px; overflow: hidden; min-width: 40px; }
   .bar-fill { height: 100%; border-radius: 4px; }
   .bar-fill.pos { background: var(--green-mid); }
   .bar-fill.neg { background: var(--red-mid); }
-  .bar-val { font-size: 0.65rem; font-weight: 600; white-space: nowrap; min-width: 80px; text-align: right; }
+  .bar-val { font-size: 0.65rem; font-weight: 600; white-space: nowrap; min-width: 40px; text-align: right; }
   .bar-val.pos { color: var(--green); }
   .bar-val.neg { color: var(--red); }
  
@@ -294,7 +296,7 @@
  
   /* Footer */
   .footer {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 24px 32px;
     display: flex;
@@ -389,15 +391,15 @@
       <th class="th-group">Verdict</th>
     </tr>
     <tr>
-      <th style="text-align:left; min-width:180px;">Expense Category</th>
-      <th>1990 Actual</th>
-      <th>2024 Actual</th>
-      <th>Actual %</th>
-      <th>vs. CPI</th>
-      <th>2024 if CPI</th>
-      <th>$ Saved / (Excess)</th>
-      <th style="min-width:150px;">Impact Bar</th>
-      <th>Result</th>
+      <th style="text-align:left; width:18%;">Expense Category</th>
+      <th style="width:10%;">1990 Actual</th>
+      <th style="width:10%;">2024 Actual</th>
+      <th style="width:8%;">Actual %</th>
+      <th style="width:8%;">vs. CPI</th>
+      <th style="width:10%;">2024 if CPI</th>
+      <th style="width:11%;">$ Saved / (Excess)</th>
+      <th style="width:15%;">Impact Bar</th>
+      <th style="width:10%;">Result</th>
     </tr>
   </thead>
   <tbody>
@@ -437,6 +439,13 @@
         </div>
       </td>
       <td><span class="verdict below">✓ Below CPI</span></td>
+    </tr>
+    <!-- RE Tax clarifying note -->
+    <tr>
+      <td colspan="9" style="padding:4px 12px 10px 12px;font-size:0.78rem;color:rgba(201,168,76,0.75);font-style:italic;border-bottom:1px solid rgba(255,255,255,0.06);">
+        ⓘ &nbsp;The $255,173 above reflects the <strong style="color:rgba(201,168,76,0.9);">single-year 2024 savings</strong> vs. the CPI-adjusted baseline. The <strong style="color:rgba(201,168,76,0.9);">cumulative 35-year savings</strong> from three successful tax appeal campaigns (1997, 2009, 2021) totals approximately <strong style="color:rgba(201,168,76,0.9);">~$3.6 million</strong> — documented in the
+        <a href="https://petermerson.github.io/charts/RE-Tax-vs-CPI.html" target="_blank" style="color:rgba(201,168,76,0.9);text-decoration:underline;">Real Estate Taxes vs. CPI Analysis →</a>
+      </td>
     </tr>
  
     <!-- Security -->
