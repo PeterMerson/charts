@@ -1301,13 +1301,14 @@ function selectCat(prefix, cat, years) {
                 if([1997,2009,2021].indexOf(yr) > -1) return ['','⚖ Tax Appeal/Certiorari year'];
                 return '';
               };
-              if(cat === 'Maintenance Charges' && !isBar) return function(items) {
+              if(cat === 'Maintenance Charges') return function(items) {
                 var yr = parseInt(items[0].label);
                 if(MAINT_PDF_URLS[yr]) return ['', '📄 Click chart to open Board Memo →'];
                 return '';
               };
               if(cat === 'Mortgage Interest') return function(items) {
                 var yr = parseInt(items[0].label);
+
                 if(yr === 1998) return ['','🏦 1998 Refinancing','11% Interest Only → 7.35% · 15-yr amortizable','$4,000,000 mortgage · Balance due 2013: ~$2,600,000','Thanks to Howard Katz, Treasurer'];
                 if(yr === 2013) return ['','🏦 2013 Refinancing','7.35% → 5.17% · 30-yr fully amortizable','$2,800,000 mortgage · Balance due 2043: $0','Saved $184,764/yr · $2.17/share · Thanks to Les Lew, Treasurer'];
                 return '';
@@ -1323,7 +1324,7 @@ function selectCat(prefix, cat, years) {
   } // end if not Mortgage Interest
 
   // Click handler to open maintenance increase PDF memos
-  if(cat === 'Maintenance Charges' && !isBar) {
+  if(cat === 'Maintenance Charges') {
     var chartCanvas = document.getElementById(prefix+'-trend-chart');
     chartCanvas._maintClickHandler && chartCanvas.removeEventListener('click', chartCanvas._maintClickHandler);
     chartCanvas._maintClickHandler = function(evt) {
