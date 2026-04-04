@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Interest Income & Fed Rate — 1990–2024</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Georgia', serif;
+  background: #f5f2ed;
+  color: #1a2a3a;
+  padding: 32px 24px 48px;
+}
+.wrapper { max-width: 960px; margin: 0 auto; }
+
+.page-title {
+  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  font-weight: bold; color: #1F4E79;
+  text-align: center; margin-bottom: 6px;
+}
+.page-sub {
+  font-size: 12px; color: #8a9aaa;
+  text-align: center; margin-bottom: 24px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* Era selector */
+.era-bar {
+  display: flex; justify-content: center;
+  gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.era-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 6px 14px; border-radius: 4px;
+  border: 1.5px solid #1F4E79;
+  background: transparent; color: #1F4E79;
+  cursor: pointer; transition: all 0.15s;
+}
+.era-btn:hover, .era-btn.active {
+  background: #1F4E79; color: #fff;
+}
+
+.chart-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 20px 24px 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+canvas { width: 100% !important; }
+
+/* Stats strip */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 20px;
+}
+.stat-card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 14px 16px; text-align: center;
+}
+.stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 1px; color: #8a9aaa;
+  margin-bottom: 5px;
+}
+.stat-val { font-size: 20px; font-weight: bold; color: #1F4E79; }
+.stat-val.orange { color: #c9722a; }
+.stat-val.red { color: #c0392b; }
+.stat-val.green { color: #1a6b2a; }
+.stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; font-family: 'Courier New', monospace; }
+
+/* Era narrative boxes */
+.era-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+.era-card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 16px 18px;
+  border-top: 3px solid;
+}
+.era-card.high  { border-color: #1a6b2a; }
+.era-card.med   { border-color: #c9a84c; }
+.era-card.low   { border-color: #c0392b; }
+.era-card.rising { border-color: #1F4E79; }
+.era-title {
+  font-family: 'Courier New', monospace;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 6px;
+  font-weight: 700;
+}
+.era-card.high  .era-title { color: #1a6b2a; }
+.era-card.med   .era-title { color: #c9722a; }
+.era-card.low   .era-title { color: #c0392b; }
+.era-card.rising .era-title { color: #1F4E79; }
+.era-years { font-size: 13px; font-weight: bold; color: #1a2a3a; margin-bottom: 6px; }
+.era-desc { font-size: 12px; color: #5a6a7a; line-height: 1.6; }
+.era-stat { font-size: 13px; font-weight: bold; margin-top: 8px; }
+.era-card.high  .era-stat { color: #1a6b2a; }
+.era-card.med   .era-stat { color: #c9722a; }
+.era-card.low   .era-stat { color: #c0392b; }
+.era-card.rising .era-stat { color: #1F4E79; }
+
+/* Table */
+.table-card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  overflow: hidden; margin-bottom: 20px;
+}
+.table-title {
+  background: #0d2240; color: #c9a84c;
+  font-family: 'Courier New', monospace;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.1em; padding: 10px 16px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  background: #f0ede8;
+  font-family: 'Courier New', monospace;
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: #5a6a7a;
+  padding: 8px 12px; text-align: right;
+}
+thead th:first-child { text-align: left; }
+tbody tr { border-bottom: 1px solid #f5f2ed; }
+tbody tr:hover { background: #faf7f2; }
+td {
+  padding: 7px 12px; text-align: right;
+  font-family: 'Courier New', monospace;
+  color: #2a3a4a;
+}
+td:first-child { text-align: left; font-weight: bold; color: #1F4E79; }
+.yield-high { color: #1a6b2a; font-weight: 700; }
+.yield-med  { color: #c9722a; font-weight: 600; }
+.yield-low  { color: #c0392b; }
+.fed-high { color: #1a6b2a; }
+.fed-med  { color: #c9722a; }
+.fed-low  { color: #c0392b; }
+.highlight-row td { background: rgba(201,168,76,0.08); }
+.total-row td { background: #0d2240; color: #c9a84c; font-weight: 700; border-top: 2px solid #c9a84c; }
+.total-row td:first-child { color: #f0e8d0; }
+
+.note {
+  font-family: 'Courier New', monospace;
+  font-size: 11px; color: #8a9aaa;
+  text-align: center; line-height: 1.7;
+}
+
+/* COVID callout */
+.covid-callout {
+  background: #fff8e7; border-left: 4px solid #e6a817;
+  border-radius: 0 8px 8px 0; padding: 14px 18px;
+  margin-bottom: 20px; font-size: 13px;
+  color: #5a4000; line-height: 1.7;
+}
+.covid-callout strong { color: #3a2800; }
+
+@media (max-width: 640px) {
+  .stats-strip { grid-template-columns: repeat(2,1fr); }
+  .era-cards   { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <h1 class="page-title">Interest Income, Total Liquidity & the Federal Reserve</h1>
+  <div class="page-sub">Riveredge Owners, Inc. &nbsp;·&nbsp; 1990–2024 &nbsp;·&nbsp; 35 Years &nbsp;·&nbsp; Audited Annual Financial Statements</div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-label">Peak Yield Year</div>
+      <div class="stat-val green">8.45%</div>
+      <div class="stat-sub">1990 · Fed Rate ~8%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Trough Yield Year</div>
+      <div class="stat-val red">0.22%</div>
+      <div class="stat-sub">2021 · COVID · Fed 0–0.25%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Interest Earned</div>
+      <div class="stat-val">$622,953</div>
+      <div class="stat-sub">35-Year Cumulative</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">35-Year Avg Yield</div>
+      <div class="stat-val orange">2.37%</div>
+      <div class="stat-sub">On year-end liquidity</div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-card">
+    <div class="era-bar">
+      <button class="era-btn active" onclick="setRange(0,34,this)">All 35 Years</button>
+      <button class="era-btn" onclick="setRange(0,11,this)">1990–2001 · High Rates</button>
+      <button class="era-btn" onclick="setRange(12,23,this)">2002–2013 · Rate Collapse</button>
+      <button class="era-btn" onclick="setRange(24,30,this)">2014–2020 · Near Zero</button>
+      <button class="era-btn" onclick="setRange(31,34,this)">2021–2024 · COVID & Recovery</button>
+    </div>
+    <div style="position:relative;height:280px;">
+    <canvas id="chart"></canvas>
+    </div>
+  </div>
+
+  <!-- COVID callout -->
+  <div class="covid-callout">
+    ⚠ &nbsp; <strong>2021 — The Striking Anomaly:</strong> Riveredge held <strong>$2,509,975</strong> in total liquidity — its highest ever — yet earned only <strong>$5,624</strong> in interest (0.22%). The Federal Reserve had cut rates to <strong>0–0.25%</strong> in March 2020 in response to COVID-19 and held them there throughout all of 2021. Standard bank accounts paid as little as 0.01%. This was not a bookkeeping error — it was the direct impact of Federal Reserve policy on every institution in America holding cash. By contrast, the same balance in 1990 would have earned approximately <strong>$212,000</strong>.
+  </div>
+
+  <!-- Era narrative cards -->
+  <div class="era-cards">
+    <div class="era-card high">
+      <div class="era-title">Era 1 · High Rate Period</div>
+      <div class="era-years">1990–2001</div>
+      <div class="era-desc">The Fed kept rates elevated to combat inflation. Riveredge earned strong yields of 3–8% on its cash balances. Interest income was a meaningful contributor to the building's income in these years.</div>
+      <div class="era-stat">Avg yield: 4.44% · Total earned: $229,121</div>
+    </div>
+    <div class="era-card low">
+      <div class="era-title">Era 2 · Rate Collapse</div>
+      <div class="era-years">2002–2013</div>
+      <div class="era-desc">The dot-com crash (2001), the 2008 financial crisis, and subsequent quantitative easing drove rates to historic lows. Yields collapsed from 4% to below 1% even as the building's cash balance grew substantially.</div>
+      <div class="era-stat">Avg yield: 1.09% · Total earned: $94,068</div>
+    </div>
+    <div class="era-card med">
+      <div class="era-title">Era 3 · Near-Zero & COVID</div>
+      <div class="era-years">2014–2022</div>
+      <div class="era-desc">Rates crept up briefly in 2018–2019 then were slashed again for COVID in 2020. The building accumulated its largest ever liquidity position — over $2.5M — while earning virtually nothing on it. 2021 produced only $5,624 on $2.5M.</div>
+      <div class="era-stat">Avg yield: 0.83% · Total earned: $179,318</div>
+    </div>
+    <div class="era-card rising">
+      <div class="era-title">Era 4 · Rising Rates</div>
+      <div class="era-years">2023–2024</div>
+      <div class="era-desc">The Fed raised rates aggressively from 2022 to combat post-COVID inflation. Interest income surged — $76,136 in 2023 and $53,776 in 2024. The building is finally being compensated for its substantial cash position.</div>
+      <div class="era-stat">Avg yield: 3.00% · Total earned: $129,912</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-title">Year-by-Year Detail — 1990 through 2024</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Cash & Equiv.</th>
+          <th>Reserve Fund</th>
+          <th>Total Liquidity</th>
+          <th>Interest Income</th>
+          <th>Yield %</th>
+          <th>Fed Rate (yr-end)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1990</td><td>$383,527</td><td>—</td><td>$383,527</td><td>$32,403</td><td class="yield-high">8.45%</td><td class="fed-high">8.00%</td></tr>
+        <tr><td>1991</td><td>$300,047</td><td>—</td><td>$300,047</td><td>$17,121</td><td class="yield-high">5.71%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>1992</td><td>$180,787</td><td>—</td><td>$180,787</td><td>$7,906</td><td class="yield-med">4.37%</td><td class="fed-med">3.00%</td></tr>
+        <tr><td>1993</td><td>$177,502</td><td>—</td><td>$177,502</td><td>$6,225</td><td class="yield-med">3.51%</td><td class="fed-med">3.00%</td></tr>
+        <tr><td>1994</td><td>$209,161</td><td>—</td><td>$209,161</td><td>$7,200</td><td class="yield-med">3.44%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>1995</td><td>$288,525</td><td>—</td><td>$288,525</td><td>$7,029</td><td class="yield-med">2.44%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>1996</td><td>$307,762</td><td>—</td><td>$307,762</td><td>$14,977</td><td class="yield-med">4.87%</td><td class="fed-high">5.25%</td></tr>
+        <tr><td>1997</td><td>$337,957</td><td>—</td><td>$337,957</td><td>$14,038</td><td class="yield-med">4.15%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>1998</td><td>$566,633</td><td>—</td><td>$566,633</td><td>$24,687</td><td class="yield-med">4.36%</td><td class="fed-high">4.75%</td></tr>
+        <tr><td>1999</td><td>$631,864</td><td>—</td><td>$631,864</td><td>$26,646</td><td class="yield-med">4.22%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>2000</td><td>$656,294</td><td>—</td><td>$656,294</td><td>$36,306</td><td class="yield-high">5.53%</td><td class="fed-high">6.50%</td></tr>
+        <tr><td>2001</td><td>$672,010</td><td>—</td><td>$672,010</td><td>$25,123</td><td class="yield-med">3.74%</td><td class="fed-med">1.75%</td></tr>
+        <tr><td>2002</td><td>$721,199</td><td>—</td><td>$721,199</td><td>$6,885</td><td class="yield-low">0.95%</td><td class="fed-low">1.25%</td></tr>
+        <tr><td>2003</td><td>$523,256</td><td>—</td><td>$523,256</td><td>$4,451</td><td class="yield-low">0.85%</td><td class="fed-low">1.00%</td></tr>
+        <tr><td>2004</td><td>$370,624</td><td>—</td><td>$370,624</td><td>$2,478</td><td class="yield-low">0.67%</td><td class="fed-med">2.25%</td></tr>
+        <tr><td>2005</td><td>$313,914</td><td>—</td><td>$313,914</td><td>$5,104</td><td class="yield-low">1.63%</td><td class="fed-high">4.25%</td></tr>
+        <tr><td>2006</td><td>$271,218</td><td>—</td><td>$271,218</td><td>$7,688</td><td class="yield-med">2.83%</td><td class="fed-high">5.25%</td></tr>
+        <tr><td>2007</td><td>$513,300</td><td>—</td><td>$513,300</td><td>$10,178</td><td class="yield-low">1.98%</td><td class="fed-med">4.25%</td></tr>
+        <tr><td>2008</td><td>$393,313</td><td>$306,484</td><td>$699,797</td><td>$12,746</td><td class="yield-low">1.82%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2009</td><td>$608,614</td><td>$470,398</td><td>$1,079,012</td><td>$8,410</td><td class="yield-low">0.78%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2010</td><td>$252,599</td><td>$1,006,727</td><td>$1,259,326</td><td>$5,139</td><td class="yield-low">0.41%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2011</td><td>$61,503</td><td>$1,083,523</td><td>$1,145,026</td><td>$9,512</td><td class="yield-low">0.83%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2012</td><td>$30,296</td><td>$1,120,846</td><td>$1,151,142</td><td>$7,863</td><td class="yield-low">0.68%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2013</td><td>$274,066</td><td>$1,303,582</td><td>$1,577,648</td><td>$6,840</td><td class="yield-low">0.43%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2014</td><td>$110,834</td><td>$1,338,409</td><td>$1,449,243</td><td>$6,626</td><td class="yield-low">0.46%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2015</td><td>$102,845</td><td>$1,462,059</td><td>$1,564,904</td><td>$11,355</td><td class="yield-low">0.73%</td><td class="fed-low">0.50%</td></tr>
+        <tr><td>2016</td><td>$214,400</td><td>$1,354,270</td><td>$1,568,670</td><td>$10,461</td><td class="yield-low">0.67%</td><td class="fed-low">0.75%</td></tr>
+        <tr><td>2017</td><td>$115,582</td><td>$1,667,267</td><td>$1,782,849</td><td>$12,997</td><td class="yield-low">0.73%</td><td class="fed-low">1.50%</td></tr>
+        <tr><td>2018</td><td>$98,755</td><td>$1,877,718</td><td>$1,976,473</td><td>$27,950</td><td class="yield-low">1.41%</td><td class="fed-med">2.50%</td></tr>
+        <tr><td>2019</td><td>$111,999</td><td>$2,118,012</td><td>$2,230,011</td><td>$40,294</td><td class="yield-low">1.81%</td><td class="fed-low">1.75%</td></tr>
+        <tr><td>2020</td><td>$83,242</td><td>$2,335,551</td><td>$2,418,793</td><td>$27,550</td><td class="yield-low">1.14%</td><td class="fed-low">0.25%</td></tr>
+        <tr class="highlight-row"><td>2021 ⚠</td><td>$145,852</td><td>$2,364,123</td><td>$2,509,975</td><td>$5,624</td><td class="yield-low">0.22%</td><td class="fed-low">0.25%</td></tr>
+        <tr><td>2022</td><td>$223,965</td><td>$2,231,883</td><td>$2,455,848</td><td>$13,889</td><td class="yield-low">0.57%</td><td class="fed-high">4.50%</td></tr>
+        <tr><td>2023</td><td>$1,425,016</td><td>$891,297</td><td>$2,316,313</td><td>$76,136</td><td class="yield-med">3.29%</td><td class="fed-high">5.50%</td></tr>
+        <tr><td>2024</td><td>$1,976,793</td><td>—</td><td>$1,976,793</td><td>$53,776</td><td class="yield-med">2.72%</td><td class="fed-med">4.50%</td></tr>
+        <tr class="total-row">
+          <td>35-Year Total</td><td>—</td><td>—</td><td>—</td>
+          <td>$622,953</td><td>Avg: 2.37%</td><td>Avg: 2.97%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    Reserve Fund established 2008 · Total Liquidity = Cash &amp; Equivalents + Reserve Fund<br>
+    Yield = Interest Income ÷ Total Liquidity at year-end · Fed Rate = Federal Funds Rate (year-end target)<br>
+    ⚠ 2021: $2,509,975 in liquidity earned only $5,624 — the direct result of COVID-era zero interest rate policy<br>
+    Source: Riveredge Audited Annual Financial Statements 1990–2024 · Federal Reserve Historical Data
+  </p>
+</div>
+
+<script>
+const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const liquidity = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
+const interest = [32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776];
+const fedRate = [8.00,5.50,3.00,3.00,5.50,5.50,5.25,5.50,4.75,5.50,6.50,1.75,1.25,1.00,2.25,4.25,5.25,4.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.50,0.75,1.50,2.50,1.75,0.25,0.25,4.50,5.50,4.50];
+const yieldPct = liquidity.map((l,i) => parseFloat((interest[i]/l*100).toFixed(2)));
+
+// Era background shading plugin
+const eraPlugin = {
+  id: 'eraShading',
+  beforeDraw(chart) {
+    const {ctx, chartArea, scales:{x}} = chart;
+    if(!x||!chartArea) return;
+    const eras = [
+      {start:0,  end:11, color:'rgba(26,107,42,0.06)'},
+      {start:12, end:23, color:'rgba(192,57,43,0.06)'},
+      {start:24, end:30, color:'rgba(192,57,43,0.04)'},
+      {start:31, end:34, color:'rgba(31,78,121,0.06)'},
+    ];
+    ctx.save();
+    eras.forEach(e => {
+      const x1 = x.getPixelForValue(e.start);
+      const x2 = x.getPixelForValue(e.end);
+      ctx.fillStyle = e.color;
+      ctx.fillRect(x1, chartArea.top, x2-x1, chartArea.height);
+    });
+    ctx.restore();
+  }
+};
+Chart.register(eraPlugin);
+
+let chart;
+function buildChart(startIdx, endIdx) {
+  const yrs = years.slice(startIdx, endIdx+1);
+  const liq = liquidity.slice(startIdx, endIdx+1);
+  const yld = yieldPct.slice(startIdx, endIdx+1);
+  const fed = fedRate.slice(startIdx, endIdx+1);
+  const int = interest.slice(startIdx, endIdx+1);
+
+  if(chart) chart.destroy();
+  const ctx = document.getElementById('chart').getContext('2d');
+
+  chart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: yrs,
+      datasets:[
+        {
+          label: 'Total Liquidity (Cash + Reserve)',
+          data: liq,
+          borderColor: '#1F4E79',
+          backgroundColor: 'rgba(31,78,121,0.08)',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#1F4E79',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          fill: true,
+          tension: 0.3,
+          yAxisID: 'y1',
+          order: 3
+        },
+        {
+          label: 'Riveredge Yield on Liquidity (%)',
+          data: yld,
+          borderColor: '#c9a84c',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: yrs.map(y => y===2021?10:4),
+          pointBackgroundColor: yrs.map(y => y===2021?'#e03040':'#c9a84c'),
+          pointBorderColor: '#fff',
+          pointBorderWidth: yrs.map(y => y===2021?2.5:1.5),
+          fill: false,
+          tension: 0.3,
+          yAxisID: 'y2',
+          order: 1
+        },
+        {
+          label: 'Federal Funds Rate (%)',
+          data: fed,
+          borderColor: '#1a6b2a',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5,3],
+          pointRadius: 3,
+          pointBackgroundColor: '#1a6b2a',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          fill: false,
+          tension: 0.3,
+          yAxisID: 'y2',
+          order: 2
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{
+          display:true,
+          labels:{
+            font:{family:'Courier New', size:11},
+            color:'#4a6080', boxWidth:24, padding:16
+          }
+        },
+        tooltip:{
+          backgroundColor:'#0d2240',
+          titleColor:'#c9a84c',
+          bodyColor:'#f0f4fa',
+          borderColor:'#2a4a6a',
+          borderWidth:1, padding:12,
+          callbacks:{
+            title: items => String(years[startIdx + items[0].dataIndex]),
+            label: item => {
+              if(item.datasetIndex===0) return ` Total Liquidity: $${Math.round(item.parsed.y).toLocaleString()}`;
+              if(item.datasetIndex===1) return ` Riveredge Yield: ${item.parsed.y.toFixed(2)}%  ($${int[item.dataIndex].toLocaleString()} earned)`;
+              if(item.datasetIndex===2) return ` Fed Funds Rate: ${item.parsed.y.toFixed(2)}%`;
+              return '';
+            },
+            afterBody: items => {
+              const yr = years[startIdx + items[0].dataIndex];
+              if(yr===2021) return ['','⚠ COVID zero-rate year','$2.5M balance · only $5,624 earned'];
+              if(yr===2008) return ['','⚠ Financial Crisis · Fed cuts to 0.25%'];
+              if(yr===2020) return ['','⚠ COVID · Fed cuts to 0.25%'];
+              if(yr===2023) return ['','↑ Rate recovery · Best year since 2000'];
+              return '';
+            }
+          }
+        },
+        eraShading:{}
+      },
+      scales:{
+        x:{
+          ticks:{font:{family:'Courier New',size:10}, color:'#4a6080', maxRotation:45,
+            callback:(v,i) => {
+              const yr = yrs[i];
+              return yrs.length>15 ? (yr%5===0?yr:'') : yr;
+            }
+          },
+          grid:{color:'#e8e4dc'}
+        },
+        y1:{
+          type:'linear', position:'left',
+          title:{display:true, text:'Total Liquidity ($)', font:{family:'Courier New',size:10}, color:'#1F4E79'},
+          ticks:{
+            font:{family:'Courier New',size:10}, color:'#1F4E79',
+            callback:v => '$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')
+          },
+          grid:{color:'#e8e4dc'}
+        },
+        y2:{
+          type:'linear', position:'right',
+          title:{display:true, text:'Rate (%)', font:{family:'Courier New',size:10}, color:'#4a6080'},
+          ticks:{font:{family:'Courier New',size:10}, color:'#4a6080', callback:v=>v.toFixed(1)+'%'},
+          grid:{drawOnChartArea:false},
+          min:0, max:10
+        }
+      }
+    }
+  });
+}
+
+function setRange(start, end, btn) {
+  document.querySelectorAll('.era-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildChart(start, end);
+}
+
+buildChart(0, 34);
+</script>
+</body>
+</html>
