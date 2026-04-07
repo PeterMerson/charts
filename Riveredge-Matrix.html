@@ -803,7 +803,7 @@ Chart.register(westchesterLines);
  
 // Maintenance charge increase years and percentages
 const MAINT_INCREASES = {
-  2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '-6%', 2023: '+9%', 2024: '+1.4%'
+  2004: '+9.8%', 2005: '+13.5%', 2006: '+17%', 2008: '+3%', 2013: '-6%', 2023: '+9%', 2024: '+1.5%', 2025: '+4%'
 };
 // PDF memos hosted on GitHub Pages
 const MAINT_PDF_URLS = {
@@ -813,12 +813,13 @@ const MAINT_PDF_URLS = {
   2008: 'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
   2013: 'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
   2023: 'https://petermerson.github.io/charts/maintenance_increase_2024.pdf',
-  2024: 'https://petermerson.github.io/charts/Maint-12-04-2024.pdf'
+  2024: 'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025: 'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
 };
 // Stagger heights so closely-spaced labels don't overlap
 // Lower number = higher on chart (closer to top), higher = lower
 const MAINT_OFFSETS = {
-  2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2023: 32, 2024: 4
+  2004: 60, 2005: 32, 2006: 4, 2008: 4, 2013: 4, 2023: 32, 2024: 4, 2025: 32
 };
  
 const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
@@ -1308,7 +1309,6 @@ function selectCat(prefix, cat, years) {
               };
               if(cat === 'Mortgage Interest') return function(items) {
                 var yr = parseInt(items[0].label);
-
                 if(yr === 1998) return ['','🏦 1998 Refinancing','11% Interest Only → 7.35% · 15-yr amortizable','$4,000,000 mortgage · Balance due 2013: ~$2,600,000','Thanks to Howard Katz, Treasurer'];
                 if(yr === 2013) return ['','🏦 2013 Refinancing','7.35% → 5.17% · 30-yr fully amortizable','$2,800,000 mortgage · Balance due 2043: $0','Saved $184,764/yr · $2.17/share · Thanks to Les Lew, Treasurer'];
                 return '';
