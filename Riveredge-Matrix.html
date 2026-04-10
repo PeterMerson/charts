@@ -1254,7 +1254,7 @@ function selectCat(prefix, cat, years) {
         ? years.map(y => TAX_CERT_YEARS.indexOf(y) > -1 ? 2.5 : 2)
         : 2.5,
       fill: !isBar, tension: isBar ? 0 : 0.25,
-      label: isRETax && !isBar ? 'RE Taxes (indexed to '+years[0]+')' : cat,
+      label: isRETax && !isBar ? 'RE Taxes (indexed to '+years[0]+')' : displayCat,
       yAxisID:'y' }
   ];
   const scales = {
@@ -1294,7 +1294,7 @@ function selectCat(prefix, cat, years) {
               label: item => {
                 if(item.dataset.label && item.dataset.label.indexOf('CPI') > -1) return ' CPI-U Index: ' + item.parsed.y.toFixed(1);
                 var actualDollar = vals[item.dataIndex];
-                return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
+                return ' ' + displayCat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
               },
             afterBody: (function() {
               if(isRETax && !isBar) return function(items) {
@@ -1425,7 +1425,7 @@ function selectCat(prefix, cat, years) {
             title: items => items[0].label,
             label: item => {
               var actualDollar = vals[item.dataIndex];
-              return ' ' + cat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
+              return ' ' + displayCat + ': ' + item.parsed.y.toFixed(1) + '  (' + fmtFull(actualDollar) + ')';
             },
             afterBody: function(items) {
               var yr = parseInt(items[0].label);
