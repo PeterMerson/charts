@@ -1781,7 +1781,18 @@ function renderNetChart(years, nets) {
       interaction:{ mode:'index', intersect:false },
       plugins:{ legend:{display:false},
         tooltip:{ backgroundColor:'#0d2240', titleColor:'#c9a84c', bodyColor:'#f0f4fa', borderColor:'#2a4a6a', borderWidth:1, padding:10,
-          callbacks:{ title:i=>i[0].label, label:i=>i.dataset.label&&i.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+i.parsed.y.toFixed(1):(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US') }
+          callbacks:{
+            title:i=>i[0].label,
+            label:i=>i.dataset.label&&i.dataset.label.indexOf('CPI')>-1?' CPI-U (indexed): '+i.parsed.y.toFixed(1):(i.parsed.y>=0?' Surplus: +$':' Deficit: -$')+Math.abs(i.parsed.y).toLocaleString('en-US'),
+            afterBody: function(items) {
+              var yr = parseInt(items[0].label);
+              if(MAINT_PDF_URLS[yr]) {
+                var pct = MAINT_INCREASES[yr] || '';
+                return ['', '📄 Maintenance ' + pct + ' — click to open Board Memo →'];
+              }
+              return '';
+            }
+          }
         },
         annotation:{ annotations:{ zeroLine:{ type:'line', yMin:0, yMax:0, borderColor:'rgba(139,148,158,0.5)', borderWidth:1 } } }
       },
@@ -1790,6 +1801,28 @@ function renderNetChart(years, nets) {
   });
   // Store raw building-level vals on chart so barYearLabels plugin shows per-share amounts
   window._netChart._netBarVals = rawNets;
+
+  // Click handler to open maintenance memo PDFs
+  var netCanvas = document.getElementById('net-trend-chart');
+  netCanvas._netMaintClickHandler && netCanvas.removeEventListener('click', netCanvas._netMaintClickHandler);
+  netCanvas._netMaintClickHandler = function(evt) {
+    var chart = window._netChart;
+    if(!chart) return;
+    var pts = chart.getElementsAtEventForMode(evt, 'index', {intersect:false}, true);
+    if(!pts.length) return;
+    var yr = parseInt(chart.data.labels[pts[0].index]);
+    if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
+  };
+  netCanvas.addEventListener('click', netCanvas._netMaintClickHandler);
+  netCanvas.style.cursor = 'default';
+  netCanvas.addEventListener('mousemove', function(evt) {
+    var chart = window._netChart;
+    if(!chart) return;
+    var pts = chart.getElementsAtEventForMode(evt, 'index', {intersect:false}, true);
+    if(!pts.length) { netCanvas.style.cursor = 'default'; return; }
+    var yr = parseInt(chart.data.labels[pts[0].index]);
+    netCanvas.style.cursor = MAINT_PDF_URLS[yr] ? 'pointer' : 'default';
+  });
 }
  
 function setNetMode(m) {
