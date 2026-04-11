@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge — Fuel Oil Cost vs. WTI Spot Price 1990–2024</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink: #1a1208; --gold: #c9a84c; --gold-light: #e8c96a;
+    --paper: #f7f3ec; --paper2: #f0ebe0; --paper3: #e8e0d0;
+    --rule: #d4c9b0; --navy: #0d2240; --red: #c0392b;
+    --blue: #2471a3; --green: #1a7a3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 0.88rem; min-height: 100vh; }
+
+  .header { background: var(--navy); padding: 24px 28px 20px; border-bottom: 3px solid var(--gold); }
+  .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 900; color: var(--paper); line-height: 1.2; }
+  .header h1 em { color: var(--gold-light); font-style: italic; }
+  .header-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: #c8b890; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+  .header-kpis { display: flex; gap: 24px; flex-shrink: 0; }
+  .hkpi { text-align: right; }
+  .hkpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; color: #c0a870; text-transform: uppercase; letter-spacing: 0.08em; }
+  .hkpi-val { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--gold-light); margin-top: 2px; }
+
+  .kpi-strip { background: var(--paper2); border-bottom: 1px solid var(--rule); padding: 14px 28px; }
+  .kpi-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 32px; flex-wrap: wrap; align-items: center; }
+  .skpi { text-align: center; padding: 8px 16px; border-radius: 5px; background: var(--paper); border: 1px solid var(--rule); }
+  .skpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.06em; color: #5a4030; }
+  .skpi-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-top: 3px; }
+  .red { color: var(--red); } .blue { color: var(--blue); } .gd { color: var(--green); }
+
+  .insight { max-width: 1200px; margin: 16px auto 0; padding: 0 28px; }
+  .insight-box { background: var(--navy); border-left: 3px solid var(--gold); border-radius: 0 6px 6px 0; padding: 12px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .insight-text { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: #d0e8d0; line-height: 1.7; }
+
+  .chart-wrap { max-width: 1200px; margin: 20px auto 0; padding: 0 28px 40px; }
+  .chart-box { background: white; border: 1px solid var(--rule); border-radius: 6px; padding: 20px; position: relative; }
+  .chart-legend { display: flex; gap: 24px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 7px; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #3a2a1a; }
+  .leg-swatch { width: 28px; height: 4px; border-radius: 2px; }
+  .leg-swatch-bar { width: 14px; height: 14px; border-radius: 2px; }
+  canvas { height: 380px !important; }
+
+  .footer { max-width: 1200px; margin: 0 auto; padding: 14px 28px 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); flex-wrap: wrap; gap: 8px; }
+  .footer-note { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: #5a4030; line-height: 1.6; }
+  .claude-tag { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; color: #5a4030; }
+  .claude-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>Fuel Oil Cost vs. <em>WTI Spot Price</em></h1>
+      <div class="header-sub">Riveredge Owners, Inc. &nbsp;·&nbsp; 1990–2024 &nbsp;·&nbsp; 35 Years &nbsp;·&nbsp; Audited Annual Statements</div>
+    </div>
+    <div class="header-kpis">
+      <div class="hkpi"><div class="hkpi-label">Peak Year</div><div class="hkpi-val">2022</div></div>
+      <div class="hkpi"><div class="hkpi-label">Peak Cost</div><div class="hkpi-val">$292,115</div></div>
+      <div class="hkpi"><div class="hkpi-label">Latest (2024)</div><div class="hkpi-val">$267,710</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="kpi-strip">
+  <div class="kpi-inner">
+    <div class="skpi">
+      <div class="skpi-label">1990 Fuel Oil</div>
+      <div class="skpi-val red">$58,581</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">2024 Fuel Oil</div>
+      <div class="skpi-val red">$267,710</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">35-Yr Change</div>
+      <div class="skpi-val red">+357%</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">1990 WTI</div>
+      <div class="skpi-val blue">$24.53/bbl</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">2024 WTI</div>
+      <div class="skpi-val blue">$76.96/bbl</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">WTI 35-Yr Change</div>
+      <div class="skpi-val blue">+214%</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">2008 WTI Peak</div>
+      <div class="skpi-val blue">$99.67/bbl</div>
+    </div>
+    <div class="skpi">
+      <div class="skpi-label">2008 Fuel Oil</div>
+      <div class="skpi-val red">$234,216</div>
+    </div>
+  </div>
+</div>
+
+<div class="insight">
+  <div class="insight-box">
+    <div style="font-size:1.2rem;margin-top:2px;">🛢️</div>
+    <div class="insight-text">
+      Riveredge fuel oil costs track WTI crude closely — rising from $58,581 in 1990 to $292,115 at the 2022 peak, a 4-fold increase over 35 years. The 2008 WTI spike to $99.67/bbl pushed building costs to $234,216. Note the <strong style="color:#e8c96a;">2014 anomaly</strong> — Riveredge paid $282,575 when WTI averaged $93.17, suggesting a volume or contract factor. The 2020 COVID collapse in oil prices ($41.47 WTI) produced the lowest fuel oil cost since 2004 at $117,071.
+    </div>
+  </div>
+</div>
+
+<div class="chart-wrap">
+  <div class="chart-box">
+    <div class="chart-legend">
+      <div class="leg-item"><div class="leg-swatch-bar" style="background:rgba(192,57,43,0.75);"></div> Riveredge Fuel Oil Cost (left axis, $)</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#2471a3;height:3px;border-top:2px dashed #2471a3;"></div> WTI Crude Oil $/barrel (right axis)</div>
+    </div>
+    <canvas id="fuelChart"></canvas>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-note">
+    Fuel oil figures from Riveredge audited annual financial statements 1990–2024 · WTI annual average prices from U.S. Energy Information Administration (EIA) · Both series indexed independently
+  </div>
+  <div class="claude-tag"><div class="claude-dot"></div> Generated by Claude AI — Anthropic</div>
+</div>
+
+<script>
+const YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const FUEL  = [58581,42490,48032,42259,46581,43457,60137,50178,35895,38440,97679,73822,72694,109272,106897,157170,147144,189501,234216,132461,183679,196876,237832,218702,282575,149523,118789,145558,163392,183863,117071,178490,292115,243083,267710];
+const WTI   = [24.53,21.54,19.41,18.43,17.20,17.02,22.00,19.04,13.07,19.31,30.38,25.98,26.16,31.08,41.47,56.64,66.05,72.34,99.67,61.95,79.48,94.88,94.05,97.98,93.17,48.66,43.29,50.80,64.90,57.04,41.47,68.14,94.33,77.58,76.96];
+
+function fmt(v) { return '$' + v.toLocaleString('en-US'); }
+
+const ctx = document.getElementById('fuelChart').getContext('2d');
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      {
+        type: 'bar',
+        label: 'Fuel Oil Cost',
+        data: FUEL,
+        backgroundColor: YEARS.map((y,i) => {
+          if(y === 2008) return 'rgba(192,57,43,0.95)';
+          if(y === 2022) return 'rgba(139,0,0,0.9)';
+          if(y === 2014) return 'rgba(201,168,76,0.85)';
+          if(y === 2020) return 'rgba(26,122,58,0.75)';
+          return 'rgba(192,57,43,0.72)';
+        }),
+        borderColor: YEARS.map(y => {
+          if(y === 2022) return 'rgba(139,0,0,1)';
+          if(y === 2014) return 'rgba(201,168,76,1)';
+          if(y === 2020) return 'rgba(26,122,58,1)';
+          return 'rgba(192,57,43,0.9)';
+        }),
+        borderWidth: 1,
+        borderRadius: 3,
+        yAxisID: 'y',
+        order: 2
+      },
+      {
+        type: 'line',
+        label: 'WTI $/barrel',
+        data: WTI,
+        borderColor: '#2471a3',
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        borderDash: [5,3],
+        pointRadius: YEARS.map(y => [2008,2014,2020,2022].includes(y) ? 6 : 3),
+        pointBackgroundColor: YEARS.map(y => [2008,2022].includes(y) ? '#c0392b' : y===2014 ? '#c9a84c' : y===2020 ? '#1a7a3a' : '#2471a3'),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        pointHoverRadius: 8,
+        tension: 0.3,
+        yAxisID: 'y2',
+        order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0d2240',
+        titleColor: '#c9a84c',
+        bodyColor: '#f0f4fa',
+        borderColor: '#2a4a6a',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          title: items => items[0].label,
+          label: item => {
+            if(item.datasetIndex === 0) return ' Fuel Oil: ' + fmt(item.parsed.y);
+            return ' WTI Crude: $' + item.parsed.y.toFixed(2) + '/bbl';
+          },
+          afterBody: items => {
+            const yr = parseInt(items[0].label);
+            const notes = {
+              2008: ['','⚠ WTI peaks at $99.67/bbl — global oil crisis'],
+              2014: ['','⚠ Highest fuel oil cost when WTI at $93/bbl — possible volume factor'],
+              2020: ['','✓ COVID collapse — WTI at $41.47, lowest since 2004'],
+              2022: ['','⚠ Peak fuel oil cost — $292,115'],
+              2009: ['','✓ WTI falls to $61.95 — fuel oil drops accordingly']
+            };
+            return notes[yr] || '';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { font: {family:'IBM Plex Mono', size:9}, color:'#4a6080', maxRotation:45 },
+        grid: { color:'#dde4ef' }
+      },
+      y: {
+        position: 'left',
+        title: { display:true, text:'Fuel Oil Cost ($)', font:{family:'IBM Plex Mono',size:9}, color:'#c0392b' },
+        ticks: {
+          font: {family:'IBM Plex Mono', size:9}, color:'#c0392b',
+          callback: v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'K' : v)
+        },
+        grid: { color:'#dde4ef' }
+      },
+      y2: {
+        position: 'right',
+        title: { display:true, text:'WTI $/barrel', font:{family:'IBM Plex Mono',size:9}, color:'#2471a3' },
+        ticks: {
+          font: {family:'IBM Plex Mono', size:9}, color:'#2471a3',
+          callback: v => '$' + v.toFixed(0)
+        },
+        grid: { drawOnChartArea: false }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
