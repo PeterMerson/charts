@@ -2371,13 +2371,43 @@ function selectCapCat(cat, years) {
     });
   }
 
+  // Add cumulative CapEx lines for the two periods (bar mode only, CapEx category only)
+  const isCapEx = cat === 'Capital Expenditures';
+  if(isCapEx && isBar) {
+    const P1_END = 2005; const P2_START = 2006;
+    let cum1 = 0, cum2 = 0;
+    const cumP1 = [], cumP2 = [];
+    years.forEach(y => {
+      const raw = CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0;
+      const v = Math.round(raw * scale);
+      if(y <= P1_END) { cum1 += v; cumP1.push(cum1); cumP2.push(null); }
+      else            { cum2 += v; cumP1.push(null);  cumP2.push(cum2); }
+    });
+    datasets.push({
+      type:'line', label:'Cumulative 1990\u20132005', data:cumP1, yAxisID:'y2',
+      borderColor:'#58a6ff', backgroundColor:'transparent',
+      borderWidth:2.5, borderDash:[6,3],
+      pointRadius:years.map(y=>y===P1_END?7:2),
+      pointBackgroundColor:'#58a6ff', pointBorderColor:'#fff',
+      pointBorderWidth:1.5, pointHoverRadius:7, tension:0.3, spanGaps:false
+    });
+    datasets.push({
+      type:'line', label:'Cumulative 2006\u20132024', data:cumP2, yAxisID:'y2',
+      borderColor:'#e8a020', backgroundColor:'transparent',
+      borderWidth:2.5, borderDash:[6,3],
+      pointRadius:years.map(y=>y===2024?7:2),
+      pointBackgroundColor:'#e8a020', pointBorderColor:'#fff',
+      pointBorderWidth:1.5, pointHoverRadius:7, tension:0.3, spanGaps:false
+    });
+  }
+
   capState.trendChart = new Chart(ctx, {
     type: 'bar',
     data: { labels: years, datasets: datasets },
     options: { responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
       plugins:{
-        legend:{ display: isLiq,
+        legend:{ display: isLiq || (isCapEx && isBar),
           labels:{ color:'#4a6080', font:{family:'IBM Plex Mono',size:10},
             boxWidth:20, padding:12,
             filter: item => item.text.indexOf(catLabel) === -1
@@ -2390,6 +2420,7 @@ function selectCapCat(cat, years) {
             label: item => {
               if(item.dataset.label && item.dataset.label.indexOf('Westchester High')>-1) return ' W.High $5,000/unit: $'+Math.round(item.parsed.y).toLocaleString();
               if(item.dataset.label && item.dataset.label.indexOf('Westchester Low')>-1)  return ' W.Low $3,500/unit: $'+Math.round(item.parsed.y).toLocaleString();
+              if(item.dataset.label && item.dataset.label.indexOf('Cumulative')>-1) return ' '+item.dataset.label+': $'+Math.round(item.parsed.y).toLocaleString();
               return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
             }
           }
@@ -2398,7 +2429,13 @@ function selectCapCat(cat, years) {
       },
       scales:{
         x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:90,callback:(v,i)=>years[i]}, grid:{color:'#dde4ef'} },
-        y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} }
+        y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} },
+        y2:{ display: isCapEx && isBar, position:'right',
+          title:{ display:true, text:'Cumulative CapEx', font:{family:'IBM Plex Mono',size:9}, color:'#888' },
+          ticks:{font:{family:'IBM Plex Mono',size:9},color:'#888',
+            callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},
+          grid:{drawOnChartArea:false}
+        }
       }
     }
   });
@@ -2638,6 +2675,7 @@ function initMyUnitDropdown() {
   const groups = {'Studio':[], '1BR':[], 'Jr 2BR':[], '2BR':[], '3BR':[]};
   APARTMENTS.forEach(a => { if(groups[a.type]) groups[a.type].push(a); });
   Object.entries(groups).forEach(([type, apts]) => {
+
     const og = document.createElement('optgroup');
     og.label = type + ' (' + apts.length + ' apts)';
     apts.forEach(a => {
