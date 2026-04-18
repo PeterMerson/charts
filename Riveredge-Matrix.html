@@ -2421,7 +2421,17 @@ function selectCapCat(cat, years) {
               if(item.dataset.label && item.dataset.label.indexOf('Westchester High')>-1) return ' W.High $5,000/unit: $'+Math.round(item.parsed.y).toLocaleString();
               if(item.dataset.label && item.dataset.label.indexOf('Westchester Low')>-1)  return ' W.Low $3,500/unit: $'+Math.round(item.parsed.y).toLocaleString();
               if(item.dataset.label && item.dataset.label.indexOf('Cumulative')>-1) return ' '+item.dataset.label+': $'+Math.round(item.parsed.y).toLocaleString();
-              return ' $'+Math.abs(item.parsed.y).toLocaleString('en-US');
+              return [' $'+Math.abs(item.parsed.y).toLocaleString('en-US'), ''];
+            },
+            afterBody: items => {
+              if(!isLiq) return [];
+              const mainItem = items.find(i => i.dataset.label && i.dataset.label.indexOf('Westchester')===-1 && i.dataset.label.indexOf('Cumulative')===-1);
+              if(!mainItem) return [];
+              const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
+              const base2005 = Math.round(313914 * scale);
+              const change = Math.round(mainItem.parsed.y) - base2005;
+              const sign = change >= 0 ? '+' : '-';
+              return ['', ' Change from 2005: ' + sign + '$' + Math.abs(change).toLocaleString('en-US')];
             }
           }
         },
