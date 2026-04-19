@@ -2032,8 +2032,9 @@ function toggleFS(prefix) {
           if(ds._origPointRadius === undefined) ds._origPointRadius = ds.pointRadius;
           if(ds._origPointHoverRadius === undefined) ds._origPointHoverRadius = ds.pointHoverRadius;
           ds.borderWidth = (ds.borderWidth || 2) * 2.2;
-          ds.pointRadius = (ds.pointRadius || 3) * 1.8;
-          ds.pointHoverRadius = (ds.pointHoverRadius || 8) * 1.5;
+          // Only boost scalar pointRadius — array-based ones are handled separately below
+          if(!Array.isArray(ds.pointRadius)) ds.pointRadius = (ds.pointRadius || 3) * 1.8;
+          if(!Array.isArray(ds.pointHoverRadius)) ds.pointHoverRadius = (ds.pointHoverRadius || 8) * 1.5;
         });
         // Add year labels on top of bars in fullscreen bar mode
         if(chart.config.type === 'bar') {
@@ -2069,6 +2070,23 @@ function toggleFS(prefix) {
           if(chart.data.datasets[1]) {
             chart.data.datasets[1].borderWidth = 3;
           }
+        }
+
+        // Net compare chart: restore diamond points for memo years in fullscreen
+        var isNetExpand = (prefix === 'net' && chart.config.type !== 'bar');
+        if(isNetExpand && chart.data.datasets[0]) {
+          chart.data.datasets[0].pointRadius = chart.data.labels.map(function(y) {
+            return MAINT_PDF_URLS[parseInt(y)] ? 14 : 7;
+          });
+          chart.data.datasets[0].pointHoverRadius = chart.data.labels.map(function(y) {
+            return MAINT_PDF_URLS[parseInt(y)] ? 18 : 12;
+          });
+          chart.data.datasets[0].pointStyle = chart.data.labels.map(function(y) {
+            return MAINT_PDF_URLS[parseInt(y)] ? 'rectRot' : 'circle';
+          });
+          chart.data.datasets[0].pointBackgroundColor = chart.data.labels.map(function(y) {
+            return MAINT_PDF_URLS[parseInt(y)] ? '#c9a84c' : '#3fb950';
+          });
         }
         chart.resize();
         chart.update('none');
@@ -2133,14 +2151,25 @@ function renderCompareChart(years) {
   const gradExp = ctx.createLinearGradient(0,0,0,180);
   gradExp.addColorStop(0,'rgba(248,81,73,0.12)'); gradExp.addColorStop(1,'rgba(248,81,73,0.01)');
  
+  // Build per-point styles for memo years
+  const baseRadius = isBar ? 0 : (years.length>15 ? 4 : 6);
+  const pointStyles_inc = years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle');
+  const pointRadii_inc  = years.map(y => MAINT_PDF_URLS[y] ? 10 : baseRadius);
+  const pointHover_inc  = years.map(y => MAINT_PDF_URLS[y] ? 14 : 10);
+  const pointColors_inc = years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950');
+  const pointBorderW_inc= years.map(y => MAINT_PDF_URLS[y] ? 2 : 2.5);
+
     window._netChart = new Chart(ctx, {
     type: isBar ? 'bar' : 'line',
     data:{ labels:years, datasets:[
       { label:'Total Income', data:vals_inc,
         borderColor:'#3fb950', backgroundColor: isBar ? '#3fb950cc' : gradInc,
         borderWidth: isBar?1:5, borderRadius: isBar?3:0,
-        pointRadius: isBar?0:(years.length>15?4:6), pointHoverRadius:10,
-        pointBackgroundColor:'#3fb950', pointBorderColor:'#fff', pointBorderWidth:2.5,
+        pointRadius: isBar?0:pointRadii_inc,
+        pointHoverRadius: isBar?0:pointHover_inc,
+        pointStyle: isBar?'circle':pointStyles_inc,
+        pointBackgroundColor: isBar?'#3fb950':pointColors_inc,
+        pointBorderColor:'#fff', pointBorderWidth: isBar?0:pointBorderW_inc,
         fill: !isBar, tension: isBar?0:0.25 },
       { label:'Total Expenses', data:vals_exp,
         borderColor:'#f85149', backgroundColor: isBar ? '#f85149cc' : gradExp,
