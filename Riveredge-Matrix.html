@@ -2160,7 +2160,10 @@ function renderCompareChart(years) {
             afterBody:function(items) {
               if(items.length<2) return '';
               var net = items[0].parsed.y - items[1].parsed.y;
-              return ['', (net>=0?' Surplus: +$':' Deficit: -$')+Math.abs(net).toLocaleString('en-US')];
+              var lines = ['', (net>=0?' Surplus: +$':' Deficit: -$')+Math.abs(net).toLocaleString('en-US')];
+              var yr = parseInt(items[0].label);
+              if(MAINT_PDF_URLS[yr]) lines.push('', '📄 Click chart to open Board Memo →');
+              return lines;
             }
           }
         }
@@ -2171,6 +2174,20 @@ function renderCompareChart(years) {
       }
     }
   });
+
+  // Click handler to open maintenance memo PDFs on compare chart
+  var compareCanvas = document.getElementById('net-trend-chart');
+  compareCanvas._compareClickHandler && compareCanvas.removeEventListener('click', compareCanvas._compareClickHandler);
+  compareCanvas._compareClickHandler = function(evt) {
+    var chart = window._netChart;
+    if(!chart) return;
+    var pts = chart.getElementsAtEventForMode(evt, 'index', {intersect:false}, true);
+    if(!pts.length) return;
+    var yr = parseInt(chart.data.labels[pts[0].index]);
+    if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
+  };
+  compareCanvas.addEventListener('click', compareCanvas._compareClickHandler);
+  compareCanvas.style.cursor = 'pointer';
 }
  
 // ── CAPITAL EXPENDITURES & LIQUIDITY SECTION ──
