@@ -1800,8 +1800,8 @@ function renderNetChart(years, nets) {
       label:'Net Income'
     };
   var netScales = {
-    x:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#4a6080', maxRotation:90, callback:(v,i)=>years[i] } },
-    y:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#4a6080', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
+    x:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:10, weight:'bold'}, color:'#1a3a5c', maxRotation:90, callback:(v,i)=>years[i] } },
+    y:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:10, weight:'bold'}, color:'#1a3a5c', callback:v=>(v<0?'-$':'$')+Math.abs(v>=1000000?v/1000000:v/1000).toFixed(0)+(v>=1000000?'M':'K') } }
   };
   // Store for fullscreen
     window._netChart = new Chart(ctx, {
@@ -2181,7 +2181,7 @@ function renderCompareChart(years) {
     options:{ responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
       plugins:{
-        legend:{ display:true, labels:{ font:{family:'IBM Plex Mono',size:10}, color:'#4a6080', boxWidth:20 } },
+        legend:{ display:true, labels:{ font:{family:'IBM Plex Mono',size:11, weight:'bold'}, color:'#1a3a5c', boxWidth:20 } },
         tooltip:{ backgroundColor:'#0d2240', titleColor:'#c9a84c', bodyColor:'#f0f4fa', borderColor:'#2a4a6a', borderWidth:1, padding:10,
           callbacks:{
             title:i=>i[0].label,
@@ -2198,8 +2198,8 @@ function renderCompareChart(years) {
         }
       },
       scales:{
-        x:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#4a6080', maxRotation:90, callback:(v,i)=>years[i] } },
-        y:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:9}, color:'#4a6080', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K') } }
+        x:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:10, weight:'bold'}, color:'#1a3a5c', maxRotation:90, callback:(v,i)=>years[i] } },
+        y:{ grid:{color:'#dde4ef'}, ticks:{ font:{family:'IBM Plex Mono',size:10, weight:'bold'}, color:'#1a3a5c', callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K') } }
       }
     }
   });
@@ -2454,7 +2454,7 @@ function selectCapCat(cat, years) {
       interaction:{ mode:'index', intersect:false },
       plugins:{
         legend:{ display: isLiq || (isCapEx && isBar),
-          labels:{ color:'#4a6080', font:{family:'IBM Plex Mono',size:10},
+          labels:{ color:'#1a3a5c', font:{family:'IBM Plex Mono',size:11, weight:'bold'},
             boxWidth:20, padding:12,
             filter: item => item.text.indexOf(catLabel) === -1
           }
@@ -2484,8 +2484,8 @@ function selectCapCat(cat, years) {
         westchesterLines:{ enabled: false }
       },
       scales:{
-        x:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',maxRotation:90,callback:(v,i)=>years[i]}, grid:{color:'#dde4ef'} },
-        y:{ ticks:{font:{family:'IBM Plex Mono',size:9},color:'#4a6080',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} },
+        x:{ ticks:{font:{family:'IBM Plex Mono',size:10, weight:'bold'},color:'#1a3a5c',maxRotation:90,callback:(v,i)=>years[i]}, grid:{color:'#dde4ef'} },
+        y:{ ticks:{font:{family:'IBM Plex Mono',size:10, weight:'bold'},color:'#1a3a5c',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} },
         y2:{ display: isCapEx && isBar, position:'right',
           title:{ display:true, text:'Cumulative CapEx', font:{family:'IBM Plex Mono',size:9}, color:'#888' },
           ticks:{font:{family:'IBM Plex Mono',size:9},color:'#888',
