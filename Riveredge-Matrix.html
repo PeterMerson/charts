@@ -2474,10 +2474,10 @@ function selectCapCat(cat, years) {
               const mainItem = items.find(i => i.dataset.label && i.dataset.label.indexOf('Westchester')===-1 && i.dataset.label.indexOf('Cumulative')===-1);
               if(!mainItem) return [];
               const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
-              const base2005 = Math.round(313914 * scale);
+              const base2005 = Math.round(271218 * scale);
               const change = Math.round(mainItem.parsed.y) - base2005;
               const sign = change >= 0 ? '+' : '-';
-              return ['', ' Change from 2005: ' + sign + '$' + Math.abs(change).toLocaleString('en-US')];
+              return ['', ' Change from 2006: ' + sign + '$' + Math.abs(change).toLocaleString('en-US')];
             }
           }
         },
