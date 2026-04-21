@@ -610,8 +610,8 @@ body {
   <div class="toc-inner">
     <a href="#" class="toc-link" style="color:var(--gold-light);border-bottom-color:transparent;" onmouseover="this.style.borderBottomColor='var(--gold-light)'" onmouseout="this.style.borderBottomColor='transparent'">⌂ Home</a>
     <span style="color:rgba(201,168,76,0.25);padding:0 2px;font-size:0.7rem;">|</span>
+    <a href="#video" class="toc-link">Video</a>
     <a href="#matrix" class="toc-link">The Matrix</a>
-    <a href="#myunit" class="toc-link">My Unit</a>
     <a href="#controls" class="toc-link">Controls</a>
     <a href="#analysis" class="toc-link">Analysis Tools</a>
     <a href="#library" class="toc-link">Reference Library</a>
@@ -629,43 +629,66 @@ body {
   <div class="hero-grid"></div>
   <div class="hero-inner">
 
-    <div class="hero-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
+    <div style="display:flex;gap:60px;align-items:flex-start;flex-wrap:wrap;">
 
-    <h1 class="hero-title">
-      Know Your Building.<br>
-      <span class="line2">Know Your Investment.</span>
-    </h1>
+      <!-- LEFT: Text content -->
+      <div style="flex:1;min-width:320px;">
+        <div class="hero-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Audited Annual Statements 1990–2024</div>
 
-    <div class="hero-subtitle">Riveredge Owners Financial Transparency Report &nbsp;·&nbsp; Interactive Edition &nbsp;·&nbsp; 35 Years</div>
+        <h1 class="hero-title">
+          Know Your Building.<br>
+          <span class="line2">Know Your Investment.</span>
+        </h1>
 
-    <div class="gold-divider"></div>
+        <div class="hero-subtitle">Riveredge Owners Financial Transparency Report &nbsp;·&nbsp; Interactive Edition &nbsp;·&nbsp; 35 Years</div>
 
-    <p class="hero-lead">
-      Every dollar in. Every dollar out. <strong>35 years of audited history</strong> — and what it means for your apartment specifically.<br><br>
-      Most co-op shareholders never see beyond their monthly maintenance bill. This method changes that. It also shows why independent verification matters: in 2006, a record 17% maintenance increase was justified with claims the audited reports do not support. <strong>The numbers have been here all along.</strong>
-    </p>
+        <div class="gold-divider"></div>
 
-    <a href="https://petermerson.github.io/charts/Riveredge-Matrix.html" class="hero-cta">
-      Open the Interactive Matrix <span class="hero-cta-arrow">→</span>
-    </a>
+        <p class="hero-lead">
+          Every dollar in. Every dollar out. <strong>35 years of audited history</strong> — and what it means for your apartment specifically.<br><br>
+          Most co-op shareholders never see beyond their monthly maintenance bill. This method changes that. It also shows why independent verification matters: in 2006, a record 17% maintenance increase was justified with claims the audited reports do not support. <strong>The numbers have been here all along.</strong>
+        </p>
 
-    <div class="stats-strip">
-      <div class="stat-item">
-        <div class="stat-num">35</div>
-        <div class="stat-label">Years of audited<br>financial data</div>
+        <a href="https://petermerson.github.io/charts/Riveredge-Matrix.html" class="hero-cta">
+          Open the Interactive Matrix <span class="hero-cta-arrow">→</span>
+        </a>
+
+        <div class="stats-strip">
+          <div class="stat-item">
+            <div class="stat-num">35</div>
+            <div class="stat-label">Years of audited<br>financial data</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">158</div>
+            <div class="stat-label">Individual apartment<br>unit profiles</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">85,027</div>
+            <div class="stat-label">Total shares — every<br>unit precisely allocated</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">4</div>
+            <div class="stat-label">Interactive matrices<br>with trend charts</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">158</div>
-        <div class="stat-label">Individual apartment<br>unit profiles</div>
+
+      <!-- RIGHT: Video -->
+      <div id="video" style="flex:1;min-width:300px;max-width:560px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-light);margin-bottom:10px;">▶ &nbsp;Watch First</div>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:8px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6);border:1px solid rgba(201,168,76,0.25);">
+          <iframe
+            src="https://www.youtube.com/embed/FjllHUwt-BQ"
+            title="Riveredge Financial Transparency Project — Introduction"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            style="position:absolute;top:0;left:0;width:100%;height:100%;">
+          </iframe>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:rgba(154,143,126,0.6);margin-top:8px;line-height:1.6;">Peter Merson &nbsp;·&nbsp; Apt 8T &nbsp;·&nbsp; 35-year resident &nbsp;·&nbsp; Board member 1999–2009</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">85,027</div>
-        <div class="stat-label">Total shares — every<br>unit precisely allocated</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">4</div>
-        <div class="stat-label">Interactive matrices<br>with trend charts</div>
-      </div>
+
     </div>
 
   </div>
@@ -1201,7 +1224,6 @@ body {
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
 
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:16px 20px;display:flex;gap:20px;align-items:flex-start;">
-
           <div style="flex-shrink:0;text-align:center;">
             <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold-light);line-height:1;">2006</div>
             <div style="font-family:'IBM Plex Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:3px;">Analysis</div>
