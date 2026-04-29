@@ -384,7 +384,13 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
     </div>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;color:#9a8f7e;margin-left:auto;">CPI-U: All Urban Consumers (BLS) &nbsp;·&nbsp; Indexed to selected start year</div>
     <div style="width:1px;height:20px;background:#3a3028;"></div>
-    <button class="mode-btn" id="btn-print" onclick="openPrintView()" title="Open a clean printable snapshot of all matrices" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;">🖨 Print / Export PDF</button>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+      <button class="mode-btn" onclick="openPrintView(['income'])" title="Print Income Matrix only" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Income</button>
+      <button class="mode-btn" onclick="openPrintView(['expenses'])" title="Print Expenses Matrix only" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Expenses</button>
+      <button class="mode-btn" onclick="openPrintView(['net'])" title="Print Net Income Matrix only" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Net Income</button>
+      <button class="mode-btn" onclick="openPrintView(['capital'])" title="Print Capital & Liquidity Matrix only" style="border-color:var(--gold-light);color:var(--ink);background:#ffffff;font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Capital</button>
+      <button class="mode-btn" onclick="openPrintView('all')" title="Print all four matrices" style="border-color:var(--gold-light);color:var(--ink);background:var(--gold-light);font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Print All</button>
+    </div>
   </div>
 </div>
 <div class="info-note"><span>ⓘ Special Assessments are shown as a separate row (italic) but are <strong>excluded from Total Income</strong> — they are one-time, non-recurring charges. &nbsp;Two assessments were levied: <strong>1993</strong> ($170,050) and <strong>2002–2006</strong> ($763,620 total). &nbsp;Total collected 1990–2024: <strong>$933,670</strong>. &nbsp;Hover over the row label for details.</span></div>
@@ -2164,6 +2170,7 @@ function renderCompareChart(years) {
     data:{ labels:years, datasets:[
       { label:'Total Income', data:vals_inc,
         borderColor:'#3fb950', backgroundColor: isBar ? '#3fb950cc' : gradInc,
+
         borderWidth: isBar?1:5, borderRadius: isBar?3:0,
         pointRadius: isBar?0:pointRadii_inc,
         pointHoverRadius: isBar?0:pointHover_inc,
@@ -2871,12 +2878,14 @@ initMyUnitDropdown();
 // ══════════════════════════════════════════
 //  PRINT / EXPORT
 // ══════════════════════════════════════════
-function openPrintView() {
+function openPrintView(sections) {
+  // sections: array of 'income','expenses','net','capital' or 'all'
+  if(!sections || sections === 'all') sections = ['income','expenses','net','capital'];
+  
   const modal = document.getElementById('print-modal');
   const body  = document.getElementById('print-modal-body');
   body.innerHTML = '';
  
-  // Determine year range from income selectors (use inc range as master)
   const fromYr = parseInt(document.getElementById('global-sel-from').value);
   const toYr   = parseInt(document.getElementById('global-sel-to').value);
   const f = Math.min(fromYr, toYr), t = Math.max(fromYr, toYr);
@@ -2897,19 +2906,17 @@ function openPrintView() {
   function fmt(v) { return '$' + Math.abs(scaleVal(v)).toLocaleString('en-US'); }
   function fmtNet(v) { const sv = scaleVal(v); return (sv>=0?'+':'-')+'$'+Math.abs(sv).toLocaleString('en-US'); }
  
-  const CHUNK = 12; // max years per table chunk to fit landscape page
+  const CHUNK = 12;
  
   function buildTableChunk(title, cats, data, specialExclude, chunkYears, isFirst, totalsAcc) {
     const tbl = document.createElement('table');
     const isExp = title.includes('Expense');
-    // THEAD
     const thead = document.createElement('thead');
     const hr = document.createElement('tr');
     const thc = document.createElement('th'); thc.className='cat';
     thc.textContent = isFirst ? 'Category' : ''; hr.appendChild(thc);
     chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; hr.appendChild(th); });
     thead.appendChild(hr); tbl.appendChild(thead);
-    // TBODY
     const tbody = document.createElement('tbody');
     cats.forEach(cat => {
       if(!data[cat]) return;
@@ -2934,7 +2941,6 @@ function openPrintView() {
       tbody.appendChild(tr);
     });
     tbl.appendChild(tbody);
-    // TFOOT
     const tfoot = document.createElement('tfoot');
     const tr = document.createElement('tr');
     const td0f = document.createElement('td'); td0f.className='cat';
@@ -2953,14 +2959,11 @@ function openPrintView() {
  
   function buildTable(title, cats, data, specialExclude) {
     const h3 = document.createElement('h3'); h3.textContent = title; body.appendChild(h3);
-    // Pre-calculate totals across ALL years so chunks share the same totals object
     const totalsAcc = {};
-    // Chunk years
     for(let i=0; i<years.length; i+=CHUNK) {
       const chunkYears = years.slice(i, i+CHUNK);
       const isFirst = i===0;
       if(!isFirst) {
-        // small continuation label
         const lbl = document.createElement('div');
         lbl.className = 'print-chunk-label';
         lbl.textContent = title + ' (continued) — ' + chunkYears[0] + '–' + chunkYears[chunkYears.length-1];
@@ -2971,77 +2974,81 @@ function openPrintView() {
       body.appendChild(tbl);
     }
   }
- 
-  // Income Table
-  buildTable('Income', Object.keys(INCOME), INCOME, true);
- 
-  // Expense Table
-  buildTable('Expenses', Object.keys(EXPENSES), EXPENSES, false);
- 
-  // Net Income Table — chunked
-  const h3net = document.createElement('h3'); h3net.textContent = 'Net Income — Surplus / Deficit'; body.appendChild(h3net);
-  for(let i=0; i<years.length; i+=CHUNK) {
-    const chunkYears = years.slice(i, i+CHUNK);
-    if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Net Income (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
-    const netTbl = document.createElement('table');
-    const netHead = document.createElement('thead');
-    const nhr = document.createElement('tr');
-    const nthc = document.createElement('th'); nthc.className='cat'; nthc.textContent= i===0 ? '' : ''; nhr.appendChild(nthc);
-    chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; nhr.appendChild(th); });
-    netHead.appendChild(nhr); netTbl.appendChild(netHead);
-    const netBody = document.createElement('tbody');
-    const ntr = document.createElement('tr');
-    const ntd0 = document.createElement('td'); ntd0.className='cat';
-    ntd0.textContent = 'Net Income (Income − Expenses' + (SHOW_PRINCIPAL ? ' incl. Principal' : '') + ')';
-    ntr.appendChild(ntd0);
-    chunkYears.forEach(y => {
-      const idx = ALL_YEARS.indexOf(y);
-      let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
-      let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
-      if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
-      const net = inc - exp;
-      const td = document.createElement('td');
-      td.textContent = fmtNet(net);
-      td.classList.add(net >= 0 ? 'print-pos' : 'print-neg');
-      ntr.appendChild(td);
-    });
-    netBody.appendChild(ntr); netTbl.appendChild(netBody);
-    netTbl.style.marginBottom = '12px';
-    body.appendChild(netTbl);
+
+  // Build only the requested sections
+  if(sections.includes('income')) {
+    buildTable('Income', Object.keys(INCOME), INCOME, true);
   }
- 
-  // Capital & Liquidity Table — chunked
-  const h3cap = document.createElement('h3'); h3cap.textContent = 'Capital Expenditures & Total Liquidity'; body.appendChild(h3cap);
-  for(let i=0; i<years.length; i+=CHUNK) {
-    const chunkYears = years.slice(i, i+CHUNK);
-    if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Capital & Liquidity (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
-    const capTbl = document.createElement('table');
-    const capHead = document.createElement('thead');
-    const chr = document.createElement('tr');
-    const cthc = document.createElement('th'); cthc.className='cat'; cthc.textContent= i===0 ? 'Category' : ''; chr.appendChild(cthc);
-    chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; chr.appendChild(th); });
-    capHead.appendChild(chr); capTbl.appendChild(capHead);
-    const capBody = document.createElement('tbody');
-    [['Capital Expenditures', CAPEX_DATA],['Total Liquidity (Cash & Equiv + Reserve)', LIQUIDITY_DATA]].forEach(([label, arr]) => {
-      const tr = document.createElement('tr');
-      const td0 = document.createElement('td'); td0.className='cat';
-      td0.textContent = label + ((MYUNIT_VIEW_ON && MY_UNIT) ? ' (Apt '+MY_UNIT.apt+' share)' : '');
-      tr.appendChild(td0);
+
+  if(sections.includes('expenses')) {
+    buildTable('Expenses', Object.keys(EXPENSES), EXPENSES, false);
+  }
+
+  if(sections.includes('net')) {
+    const h3net = document.createElement('h3'); h3net.textContent = 'Net Income — Surplus / Deficit'; body.appendChild(h3net);
+    for(let i=0; i<years.length; i+=CHUNK) {
+      const chunkYears = years.slice(i, i+CHUNK);
+      if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Net Income (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
+      const netTbl = document.createElement('table');
+      const netHead = document.createElement('thead');
+      const nhr = document.createElement('tr');
+      const nthc = document.createElement('th'); nthc.className='cat'; nthc.textContent=''; nhr.appendChild(nthc);
+      chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; nhr.appendChild(th); });
+      netHead.appendChild(nhr); netTbl.appendChild(netHead);
+      const netBody = document.createElement('tbody');
+      const ntr = document.createElement('tr');
+      const ntd0 = document.createElement('td'); ntd0.className='cat';
+      ntd0.textContent = 'Net Income (Income − Expenses' + (SHOW_PRINCIPAL ? ' incl. Principal' : '') + ')';
+      ntr.appendChild(ntd0);
       chunkYears.forEach(y => {
         const idx = ALL_YEARS.indexOf(y);
-        const val = arr[idx] || 0;
+        let inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
+        let exp = Object.values(EXPENSES).reduce((s,arr)=>s+arr[idx],0);
+        if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+        const net = inc - exp;
         const td = document.createElement('td');
-        td.textContent = fmt(val);
-        tr.appendChild(td);
+        td.textContent = fmtNet(net);
+        td.classList.add(net >= 0 ? 'print-pos' : 'print-neg');
+        ntr.appendChild(td);
       });
-      capBody.appendChild(tr);
-    });
-    capTbl.appendChild(capBody);
-    capTbl.style.marginBottom = '12px';
-    body.appendChild(capTbl);
+      netBody.appendChild(ntr); netTbl.appendChild(netBody);
+      netTbl.style.marginBottom = '12px';
+      body.appendChild(netTbl);
+    }
+  }
+
+  if(sections.includes('capital')) {
+    const h3cap = document.createElement('h3'); h3cap.textContent = 'Capital Expenditures & Total Liquidity'; body.appendChild(h3cap);
+    for(let i=0; i<years.length; i+=CHUNK) {
+      const chunkYears = years.slice(i, i+CHUNK);
+      if(i>0) { const lbl=document.createElement('div'); lbl.className='print-chunk-label'; lbl.textContent='Capital & Liquidity (continued) — '+chunkYears[0]+'–'+chunkYears[chunkYears.length-1]; body.appendChild(lbl); }
+      const capTbl = document.createElement('table');
+      const capHead = document.createElement('thead');
+      const chr = document.createElement('tr');
+      const cthc = document.createElement('th'); cthc.className='cat'; cthc.textContent= i===0 ? 'Category' : ''; chr.appendChild(cthc);
+      chunkYears.forEach(y => { const th=document.createElement('th'); th.textContent=y; chr.appendChild(th); });
+      capHead.appendChild(chr); capTbl.appendChild(capHead);
+      const capBody = document.createElement('tbody');
+      [['Capital Expenditures', CAPEX_DATA],['Total Liquidity (Cash & Equiv + Reserve)', LIQUIDITY_DATA]].forEach(([label, arr]) => {
+        const tr = document.createElement('tr');
+        const td0 = document.createElement('td'); td0.className='cat';
+        td0.textContent = label + ((MYUNIT_VIEW_ON && MY_UNIT) ? ' (Apt '+MY_UNIT.apt+' share)' : '');
+        tr.appendChild(td0);
+        chunkYears.forEach(y => {
+          const idx = ALL_YEARS.indexOf(y);
+          const val = arr[idx] || 0;
+          const td = document.createElement('td');
+          td.textContent = fmt(val);
+          tr.appendChild(td);
+        });
+        capBody.appendChild(tr);
+      });
+      capTbl.appendChild(capBody);
+      capTbl.style.marginBottom = '12px';
+      body.appendChild(capTbl);
+    }
   }
  
-  // Note at bottom
   const note = document.createElement('p');
   note.style.cssText = 'font-family:IBM Plex Mono,monospace;font-size:0.65rem;color:#666;margin-top:16px;padding-top:8px;border-top:1px solid #ccc;';
   note.textContent = 'Riveredge Owners, Inc.  ·  1-3 David Lane, Yonkers NY  ·  Audited Annual Financial Statements 1990–2024  ·  Mortgage Principal ' + (SHOW_PRINCIPAL ? 'included' : 'excluded') + '  ·  Special Assessments excluded from Income totals';
