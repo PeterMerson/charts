@@ -442,6 +442,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="panel-header">
         <div class="panel-cat" id="inc-panel-cat">Select a Row</div>
         <div class="panel-range" id="inc-panel-range">Click any income category in the matrix</div>
+        <div class="masthead-meta" id="inc-fs-meta" style="display:none;margin-top:4px;"></div>
       </div>
       <div id="inc-panel-stats-wrap" class="panel-stats" style="display:none;">
         <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
@@ -519,6 +520,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="panel-header">
         <div class="panel-cat" id="exp-panel-cat">Select a Row</div>
         <div class="panel-range" id="exp-panel-range">Click any expense category in the matrix</div>
+        <div class="masthead-meta" id="exp-fs-meta" style="display:none;margin-top:4px;"></div>
       </div>
       <div id="exp-panel-stats-wrap" class="panel-stats" style="display:none;">
         <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
@@ -546,7 +548,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="section-divider-inner" style="background:#1a2e1a;border-color:#3fb950;">
     <div>
       <div class="section-title" style="color:#ffffff;">Net Income <em style="color:#6fcf82;">Surplus / Deficit</em></div>
-      <div class="masthead-meta" style="margin-top:4px;">Total Income minus Total Expenses (incl. Mortgage Principal if toggled) &nbsp;·&nbsp; 1990–2024</div>
+      <div class="masthead-meta" id="net-fs-meta" style="margin-top:4px;">Total Income minus Total Expenses (incl. Mortgage Principal if toggled) &nbsp;·&nbsp; 1990–2024</div>
     </div>
     <div class="section-kpis" id="net-kpis">
       <div class="skpi"><div class="skpi-label">2024 Net</div><div class="skpi-val dn" id="net-kpi-2024">−$64,287</div></div>
@@ -590,6 +592,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="panel-header" style="background:#1a2e1a;border-color:#3fb950;">
         <div class="panel-cat" id="net-panel-cat">Net Income</div>
         <div class="panel-range" id="net-panel-range">Click the row to graph</div>
+        <div class="masthead-meta" id="net-panel-fs-meta" style="display:none;margin-top:4px;"></div>
       </div>
       <div id="net-panel-stats-wrap" class="panel-stats" style="display:none;background:#edf7ed;">
         <div><div class="pstat-label">Best Year</div><div class="pstat-val up" id="net-ps-peak">—</div></div>
@@ -612,7 +615,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   <div class="section-divider-inner" style="background:#0d2240;border-color:#58a6ff;">
     <div>
       <div class="section-title" style="color:#ffffff;">Capital Expenditures <em style="color:#58a6ff;">&amp; Total Liquidity</em></div>
-      <div class="masthead-meta" style="margin-top:4px;">Capital Expenditures &nbsp;·&nbsp; Cash &amp; Equivalents + Reserve Fund = Total Liquidity &nbsp;·&nbsp; 1990–2024</div>
+      <div class="masthead-meta" id="cap-fs-meta" style="margin-top:4px;">Capital Expenditures &nbsp;·&nbsp; Cash &amp; Equivalents + Reserve Fund = Total Liquidity &nbsp;·&nbsp; 1990–2024</div>
     </div>
     <div class="section-kpis">
       <div class="skpi"><div class="skpi-label">2024 CapEx</div><div class="skpi-val gd">$41,304</div></div>
@@ -652,6 +655,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="panel-header" style="background:#0d2240;border-color:#58a6ff;">
         <div class="panel-cat" id="cap-panel-cat">Capital &amp; Liquidity</div>
         <div class="panel-range" id="cap-panel-range">Click a row to graph</div>
+        <div class="masthead-meta" id="cap-panel-fs-meta" style="display:none;margin-top:4px;"></div>
       </div>
       <div id="cap-panel-stats-wrap" class="panel-stats" style="display:none;background:#edf2ff;">
         <div style="display:flex; gap:24px; align-items:flex-start; flex:0 0 auto; padding-right:24px; border-right:1px solid var(--rule);">
@@ -1988,6 +1992,15 @@ function closeFSModal() {
 }
  
 
+function buildFSMeta() {
+  var fromYr = document.getElementById('global-sel-from').value;
+  var toYr = document.getElementById('global-sel-to').value;
+  var yrs = ALL_YEARS.filter(function(y){ return y >= parseInt(fromYr) && y <= parseInt(toYr); }).length;
+  var unitLabel = (MYUNIT_VIEW_ON && MY_UNIT) ? 'My Unit View: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.shares + ' shares)' : 'Building Totals';
+  var principalLabel = SHOW_PRINCIPAL ? ' \u00B7 Mortgage Principal Included' : ' \u00B7 Mortgage Principal Excluded';
+  return 'Year Range: ' + fromYr + ' \u2013 ' + toYr + ' \u00B7 ' + yrs + ' years \u00B7 ' + unitLabel + principalLabel + ' \u00B7 Source: Audited Annual Financial Statements 1990\u20132024';
+}
+
 function printChart(canvasId, title) {
   var canvas = document.getElementById(canvasId);
   if(!canvas) { alert('No chart to print. Please select a row first.'); return; }
@@ -2052,9 +2065,11 @@ function toggleFS(prefix) {
     // Remove injected print button
     var injected = panel.querySelector('.fs-print-btn');
     if(injected) injected.remove();
-    // Hide print button
+    // Hide print button and meta
     var printBtn = document.getElementById(prefix + '-print-btn');
     if(printBtn) printBtn.style.display = 'none';
+    var fsMeta = document.getElementById(prefix + '-panel-fs-meta') || document.getElementById(prefix + '-fs-meta');
+    if(fsMeta) fsMeta.style.display = 'none';
     // Restore original chart with normal line widths
     setTimeout(function() {
       if(chart) {
@@ -2094,6 +2109,9 @@ function toggleFS(prefix) {
     if(canvas) { canvas.removeAttribute('height'); canvas.style.height = '100%'; }
     document.body.style.overflow = 'hidden';
     if(btn) btn.textContent = '✕';
+    // Update meta line with current settings
+    var fsMeta = document.getElementById(prefix + '-panel-fs-meta') || document.getElementById(prefix + '-fs-meta');
+    if(fsMeta) { fsMeta.textContent = buildFSMeta(); fsMeta.style.display = 'block'; }
     // Inject print button next to close button
     var existingPrint = panel.querySelector('.fs-print-btn');
     if(existingPrint) existingPrint.remove();
@@ -2562,7 +2580,6 @@ function selectCapCat(cat, years) {
               const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
               const base2005 = Math.round(271218 * scale);
               const change = Math.round(mainItem.parsed.y) - base2005;
-
               const sign = change >= 0 ? '+' : '-';
               return ['', ' Change from 2006: ' + sign + '$' + Math.abs(change).toLocaleString('en-US')];
             }
@@ -2610,6 +2627,8 @@ function toggleFSCap() {
     if(capPrintBtn) capPrintBtn.style.display='none';
     var injectedCap = panel.querySelector('.fs-print-btn');
     if(injectedCap) injectedCap.remove();
+    var capFsMeta = document.getElementById('cap-panel-fs-meta');
+    if(capFsMeta) capFsMeta.style.display='none';
     setTimeout(function(){
       if(chart){
         chart.data.datasets.forEach(function(ds){
@@ -2629,6 +2648,8 @@ function toggleFSCap() {
     if(backdrop) backdrop.style.display='block';
     document.body.style.overflow='hidden';
     if(btn) btn.textContent='✕';
+    var capFsMeta = document.getElementById('cap-panel-fs-meta');
+    if(capFsMeta) { capFsMeta.textContent = buildFSMeta(); capFsMeta.style.display = 'block'; }
     var existingCapPrint = panel.querySelector('.fs-print-btn');
     if(existingCapPrint) existingCapPrint.remove();
     var capFsPrintBtn = document.createElement('button');
@@ -2784,7 +2805,6 @@ const APARTMENTS = [
   {apt:'7D', shares:539, type:'1BR', building:'Woodside'},
   {apt:'7E', shares:682, type:'2BR', building:'Woodside'},
   {apt:'7F', shares:701, type:'3BR', building:'Riverside'},
-
   {apt:'7G', shares:586, type:'1BR', building:'Riverside'},
   {apt:'7H', shares:596, type:'Jr 2BR', building:'Riverside'},
   {apt:'7J', shares:586, type:'1BR', building:'Riverside'},
