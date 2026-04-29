@@ -166,6 +166,22 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
   display: flex; align-items: center; justify-content: center; padding: 0;
 }
 .expand-btn:hover { opacity:1; background:var(--ink); color:var(--gold-light); border-color:var(--gold); }
+
+/* Hide print buttons in small view — show only in fullscreen */
+[id$="-print-btn"] { display: none !important; }
+.panel-card.fullscreen [id$="-print-btn"] {
+  display: flex !important;
+  position: absolute;
+  top: 10px; right: 50px; bottom: auto; left: auto;
+  width: 36px; height: 36px;
+  font-size: 16px;
+  background: var(--gold-light);
+  color: var(--ink);
+  border-color: var(--gold);
+  opacity: 1;
+  font-weight: 700;
+  z-index: 10001;
+}
  
 /* ── FULLSCREEN PANEL ── */
 .panel-card.fullscreen {
@@ -207,6 +223,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 .matrix tbody tr.compare-row td { color: #f7f3ec; border-right-color: #2a2a4a; }
 .matrix tbody tr.compare-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #58a6ff; background: #1a1a3a; }
 .matrix tbody tr.net-row:hover { background: #1e361e !important; }
+
 .matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
  
@@ -441,6 +458,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="chart-panel" id="inc-chart-panel" style="display:none;position:relative;">
         <canvas id="inc-trend-chart" height="180"></canvas>
         <button class="expand-btn" id="inc-expand-btn" onclick="toggleFS('inc')" title="Expand / Collapse chart">⤢</button>
+        <button class="expand-btn" id="inc-print-btn" onclick="printChart('inc-trend-chart', document.getElementById('inc-panel-cat').textContent)" title="Print this chart" >🖨</button>
       </div>
     </div>
   </div>
@@ -517,6 +535,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="chart-panel" id="exp-chart-panel" style="display:none;position:relative;">
         <canvas id="exp-trend-chart" height="180"></canvas>
         <button class="expand-btn" id="exp-expand-btn" onclick="toggleFS('exp')" title="Expand / Collapse chart">⤢</button>
+        <button class="expand-btn" id="exp-print-btn" onclick="printChart('exp-trend-chart', document.getElementById('exp-panel-cat').textContent)" title="Print this chart" >🖨</button>
       </div>
     </div>
   </div>
@@ -582,6 +601,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="chart-panel" id="net-chart-panel" style="display:none;position:relative;">
         <canvas id="net-trend-chart" height="180"></canvas>
         <button class="expand-btn" id="net-expand-btn" onclick="toggleFS('net')" title="Expand / Collapse chart">⤢</button>
+        <button class="expand-btn" id="net-print-btn" onclick="printChart('net-trend-chart', document.getElementById('net-panel-cat').textContent)" title="Print this chart" >🖨</button>
       </div>
     </div>
   </div>
@@ -648,6 +668,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <div class="chart-panel" id="cap-chart-panel" style="display:none;position:relative;height:260px;">
         <canvas id="cap-trend-chart" height="230" style="max-height:230px;"></canvas>
         <button class="expand-btn" id="cap-expand-btn" onclick="toggleFSCap()" title="Expand chart">⤢</button>
+        <button class="expand-btn" id="cap-print-btn" onclick="printChart('cap-trend-chart', document.getElementById('cap-panel-cat').textContent)" title="Print this chart" >🖨</button>
         <div id="cap-bench-note" style="display:none;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:#7a8a9a;padding:6px 8px 2px;line-height:1.6;border-top:1px solid #e8ecf2;margin-top:4px;">
           Dashed lines: Westchester "solid adequate" standard — <span style="color:rgba(220,60,50,0.95);">Low $3,500/unit</span> · <span style="color:rgba(185,140,20,0.95);">High $5,000/unit</span> (2025 dollars, CPI-U adjusted backward) · 158 units · Source: Westchester co-op industry benchmarks
         </div>
@@ -1966,6 +1987,44 @@ function closeFSModal() {
   }, 50);
 }
  
+
+function printChart(canvasId, title) {
+  var canvas = document.getElementById(canvasId);
+  if(!canvas) { alert('No chart to print. Please select a row first.'); return; }
+  var imgData = canvas.toDataURL('image/png');
+  var fromYr = document.getElementById('global-sel-from').value;
+  var toYr = document.getElementById('global-sel-to').value;
+  var unitLabel = (MYUNIT_VIEW_ON && MY_UNIT) ? 'My Unit View: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.shares + ' shares)' : 'Building Totals';
+  var principalLabel = SHOW_PRINCIPAL ? ' - Mortgage Principal Included' : '';
+  var meta = 'Year Range: ' + fromYr + ' to ' + toYr + '  -  ' + unitLabel + principalLabel + '  -  Source: Audited Annual Financial Statements 1990-2024';
+  var winHTML = [
+    '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + title + '</title>',
+    '<style>',
+    'body{margin:0;padding:0;background:#fff;font-family:monospace;}',
+    '.hdr{background:#0d2240;color:#f7f3ec;padding:14px 24px;border-bottom:3px solid #c9a84c;}',
+    '.hdr-title{font-family:serif;font-size:1.2rem;font-weight:900;color:#f7f3ec;}',
+    '.hdr-meta{font-size:0.62rem;color:#c9a84c;margin-top:4px;line-height:1.5;}',
+    '.chart-wrap{padding:20px 24px;}',
+    'img{width:100%;height:auto;display:block;}',
+    '.footer{font-size:0.6rem;color:#888;padding:12px 24px;border-top:1px solid #ccc;margin-top:8px;}',
+    '@page{size:landscape;margin:10mm;}',
+    '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}',
+    '</style></head><body>',
+    '<div class="hdr"><div class="hdr-title">Riveredge Income and Expense Matrix -- ' + title + '</div>',
+    '<div class="hdr-meta">' + meta + '</div></div>',
+    '<div class="chart-wrap"><img src="' + imgData + '"></div>',
+    '<div class="footer">Riveredge Owners, Inc. -- 1-3 David Lane, Yonkers NY -- Generated by Claude AI (Anthropic) -- claude.ai</div>',
+    '</body></html>'
+  ].join('');
+  var pw = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes');
+  if(!pw) { alert('Please allow popups to use Print Chart.'); return; }
+  pw.document.open();
+  pw.document.write(winHTML);
+  pw.document.close();
+  pw.onload = function() { pw.focus(); pw.print(); };
+  setTimeout(function() { pw.focus(); pw.print(); }, 800);
+}
+
 function toggleFS(prefix) {
   var panelId = prefix === 'net' ? 'net-panel-card' : prefix+'-panel-card';
   var panel = document.getElementById(panelId);
@@ -1990,6 +2049,12 @@ function toggleFS(prefix) {
     document.body.style.overflow = '';
     if(backdrop) backdrop.style.display = 'none';
     if(btn) btn.textContent = '⤢';
+    // Remove injected print button
+    var injected = panel.querySelector('.fs-print-btn');
+    if(injected) injected.remove();
+    // Hide print button
+    var printBtn = document.getElementById(prefix + '-print-btn');
+    if(printBtn) printBtn.style.display = 'none';
     // Restore original chart with normal line widths
     setTimeout(function() {
       if(chart) {
@@ -2029,6 +2094,20 @@ function toggleFS(prefix) {
     if(canvas) { canvas.removeAttribute('height'); canvas.style.height = '100%'; }
     document.body.style.overflow = 'hidden';
     if(btn) btn.textContent = '✕';
+    // Inject print button next to close button
+    var existingPrint = panel.querySelector('.fs-print-btn');
+    if(existingPrint) existingPrint.remove();
+    var fsPrintBtn = document.createElement('button');
+    fsPrintBtn.className = 'fs-print-btn';
+    fsPrintBtn.innerHTML = '\uD83D\uDDA8 Save Chart as PDF';
+    fsPrintBtn.style.cssText = 'position:absolute;top:8px;right:52px;z-index:10002;background:#c9a84c;color:#0d2240;border:none;border-radius:4px;padding:6px 14px;font-family:IBM Plex Mono,monospace;font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;';
+    var canvasId = prefix + '-trend-chart';
+    var catLabel = document.getElementById(prefix + '-panel-cat') ? document.getElementById(prefix + '-panel-cat').textContent : prefix;
+    fsPrintBtn.onclick = function() { printChart(canvasId, catLabel); };
+    panel.appendChild(fsPrintBtn);
+    // Show print button
+    var printBtn = document.getElementById(prefix + '-print-btn');
+    if(printBtn) { printBtn.style.display='flex'; printBtn.style.position='absolute'; printBtn.style.top='10px'; printBtn.style.right='50px'; printBtn.style.bottom='auto'; printBtn.style.width='36px'; printBtn.style.height='36px'; printBtn.style.fontSize='18px'; printBtn.style.background='#c9a84c'; printBtn.style.color='#0d2240'; printBtn.style.opacity='1'; printBtn.style.zIndex='10001'; }
     // Boost line widths and point sizes for fullscreen
     setTimeout(function() {
       if(chart) {
@@ -2483,6 +2562,7 @@ function selectCapCat(cat, years) {
               const scale = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT.shares / TOTAL_SHARES : 1;
               const base2005 = Math.round(271218 * scale);
               const change = Math.round(mainItem.parsed.y) - base2005;
+
               const sign = change >= 0 ? '+' : '-';
               return ['', ' Change from 2006: ' + sign + '$' + Math.abs(change).toLocaleString('en-US')];
             }
@@ -2526,6 +2606,10 @@ function toggleFSCap() {
     document.body.style.overflow='';
     if(backdrop) backdrop.style.display='none';
     if(btn) btn.textContent='⤢';
+    var capPrintBtn = document.getElementById('cap-print-btn');
+    if(capPrintBtn) capPrintBtn.style.display='none';
+    var injectedCap = panel.querySelector('.fs-print-btn');
+    if(injectedCap) injectedCap.remove();
     setTimeout(function(){
       if(chart){
         chart.data.datasets.forEach(function(ds){
@@ -2545,6 +2629,15 @@ function toggleFSCap() {
     if(backdrop) backdrop.style.display='block';
     document.body.style.overflow='hidden';
     if(btn) btn.textContent='✕';
+    var existingCapPrint = panel.querySelector('.fs-print-btn');
+    if(existingCapPrint) existingCapPrint.remove();
+    var capFsPrintBtn = document.createElement('button');
+    capFsPrintBtn.className = 'fs-print-btn';
+    capFsPrintBtn.innerHTML = '\uD83D\uDDA8 Save Chart as PDF';
+    capFsPrintBtn.style.cssText = 'position:absolute;top:8px;right:52px;z-index:10002;background:#c9a84c;color:#0d2240;border:none;border-radius:4px;padding:6px 14px;font-family:IBM Plex Mono,monospace;font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;';
+    var capCatLabel = document.getElementById('cap-panel-cat') ? document.getElementById('cap-panel-cat').textContent : 'Capital & Liquidity';
+    capFsPrintBtn.onclick = function() { printChart('cap-trend-chart', capCatLabel); };
+    panel.appendChild(capFsPrintBtn);
     setTimeout(function(){
       if(chart){
         chart.data.datasets.forEach(function(ds){
@@ -2691,6 +2784,7 @@ const APARTMENTS = [
   {apt:'7D', shares:539, type:'1BR', building:'Woodside'},
   {apt:'7E', shares:682, type:'2BR', building:'Woodside'},
   {apt:'7F', shares:701, type:'3BR', building:'Riverside'},
+
   {apt:'7G', shares:586, type:'1BR', building:'Riverside'},
   {apt:'7H', shares:596, type:'Jr 2BR', building:'Riverside'},
   {apt:'7J', shares:586, type:'1BR', building:'Riverside'},
