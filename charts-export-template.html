@@ -68,6 +68,14 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   <div><div class="ctrl-label">Source</div><div class="ctrl-val">Audited Annual Financial Statements 1990–2024</div></div>
 </div>
 
+<div style="background:#fff3cd;border:2px solid #c9a84c;border-left:8px solid #c9a84c;padding:14px 40px;display:flex;gap:14px;align-items:flex-start;">
+  <span style="font-size:1.4rem;color:#c9a84c;flex-shrink:0;">&#9432;</span>
+  <div style="font-family:IBM Plex Mono,monospace;font-size:0.72rem;color:#5a3e00;line-height:1.7;">
+    <strong>Mortgage Principal Payments are included in all expense and net income figures on these charts.</strong><br>
+    These charts reflect the full cash cost of operating the building each year — including principal repayment on the underlying mortgage. Mortgage Principal is excluded from the audited Income Statement by accounting convention, but it represents a real cash obligation paid by shareholders each year. The Riveredge Matrix allows toggling Principal on or off; these charts always show the complete cash picture.
+  </div>
+</div>
+
 <div class="charts-grid">
 
   <!-- 1. Net Income -->
@@ -167,13 +175,31 @@ const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102
 const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
 const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508];
 const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869];
-const MAINT_PDF_URLS = {2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};
+const CPI_U_DATA = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
+
+function getCPIIndexed(years) {
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const val = years[0] === y ? 100 : null; // placeholder
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return (cpi / startCPI) * 100;
+  });
+}
+
+function scaleToMatch(baseVals, years) {
+  // Scale CPI to match the first value of baseVals
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return Math.round(baseVals[0] * (cpi / startCPI));
+  });
+}2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};
 
 // ── CONFIG (injected at export time) ──
 const CONFIG = {
   fromYear: EXPORT_FROM_YEAR,
   toYear:   EXPORT_TO_YEAR,
-  showPrincipal: EXPORT_SHOW_PRINCIPAL,
+  showPrincipal: true,  // Always included for full cash picture
   myUnit: EXPORT_MY_UNIT,
   myUnitOn: EXPORT_MYUNIT_ON
 };
@@ -283,29 +309,43 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 
-// ── 3. MAINTENANCE CHARGES LINE ──
+// ── 3. MAINTENANCE CHARGES LINE + CPI ──
 (function() {
   const vals = years.map(y => sc(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(y)]));
+  const cpiVals = scaleToMatch(vals, years);
   const pointColors = years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950');
   const pointStyles = years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle');
   const pointRadii = years.map(y => MAINT_PDF_URLS[y] ? 9 : 4);
   new Chart(document.getElementById('c-maint'), {
     type: 'line',
-    data: { labels: years, datasets: [{
-      data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
-      borderWidth: 3, tension: 0.3, fill: true,
-      pointRadius: pointRadii, pointBackgroundColor: pointColors,
-      pointStyle: pointStyles, pointBorderColor: '#fff', pointBorderWidth: 2
-    }]},
+    data: { labels: years, datasets: [
+      { label: 'Maintenance Charges', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
+        borderWidth: 3, tension: 0.3, fill: true,
+        pointRadius: pointRadii, pointBackgroundColor: pointColors,
+        pointStyle: pointStyles, pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if maintenance tracked inflation)', data: cpiVals,
+        borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false, tension: 0.3 }
+    ]},
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_OPTS, callbacks: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
           title: i => i[0].label,
-          label: i => ' Maintenance: $' + i.parsed.y.toLocaleString(),
+          label: i => {
+            if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
+            return ' Maintenance: $' + i.parsed.y.toLocaleString();
+          },
           afterBody: items => {
-            const yr = parseInt(items[0].label);
+            const main = items.find(i => i.datasetIndex===0);
+            const cpi  = items.find(i => i.datasetIndex===1);
+            if(main && cpi) {
+              const diff = main.parsed.y - cpi.parsed.y;
+              const sign = diff >= 0 ? '+' : '-';
+              return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
+            }
+            const yr = parseInt(items[0]?.label);
             if(MAINT_PDF_URLS[yr]) return ['', '\u25C6 Click to open Board Memo'];
             return [];
           }
@@ -324,7 +364,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 
-// ── 4. TOTAL EXPENSES LINE ──
+// ── 4. TOTAL EXPENSES LINE + CPI ──
 (function() {
   const vals = years.map(y => {
     const idx = ALL_YEARS.indexOf(y);
@@ -332,20 +372,37 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
     return sc(exp);
   });
+  const cpiVals = scaleToMatch(vals, years);
   new Chart(document.getElementById('c-exp'), {
     type: 'line',
-    data: { labels: years, datasets: [{
-      data: vals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.08)',
-      borderWidth: 3, tension: 0.3, fill: true,
-      pointRadius: 4, pointBackgroundColor: '#f47a70', pointBorderColor: '#fff', pointBorderWidth: 2
-    }]},
+    data: { labels: years, datasets: [
+      { label: 'Total Expenses', data: vals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.08)',
+        borderWidth: 3, tension: 0.3, fill: true,
+        pointRadius: 4, pointBackgroundColor: '#f47a70', pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if expenses tracked inflation)', data: cpiVals,
+        borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false, tension: 0.3 }
+    ]},
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_OPTS, callbacks: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
           title: i => i[0].label,
-          label: i => ' Total Expenses: $' + i.parsed.y.toLocaleString()
+          label: i => {
+            if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
+            return ' Total Expenses: $' + i.parsed.y.toLocaleString();
+          },
+          afterBody: items => {
+            const main = items.find(i => i.datasetIndex===0);
+            const cpi  = items.find(i => i.datasetIndex===1);
+            if(main && cpi) {
+              const diff = main.parsed.y - cpi.parsed.y;
+              const sign = diff >= 0 ? '+' : '-';
+              return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
+            }
+            return [];
+          }
         }}
       },
       scales: {
@@ -374,6 +431,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           title: i => i[0].label,
           label: i => ' CapEx: $' + i.parsed.y.toLocaleString()
         }}
+
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
