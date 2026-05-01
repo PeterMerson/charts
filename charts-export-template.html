@@ -193,7 +193,9 @@ function scaleToMatch(baseVals, years) {
     const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
     return Math.round(baseVals[0] * (cpi / startCPI));
   });
-}2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};
+}
+
+const MAINT_PDF_URLS = {2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};;
 
 // ── CONFIG (injected at export time) ──
 const CONFIG = {
