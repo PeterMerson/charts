@@ -88,11 +88,11 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
     <div class="card-body"><div class="chart-wrap"><canvas id="c-compare"></canvas></div></div>
   </div>
 
-  <!-- 3. Maintenance Charges -->
+  <!-- 3. Total Income -->
   <div class="chart-card">
     <div class="card-header">
-      <div class="card-title">Maintenance Charges</div>
-      <div class="card-sub">Line Chart · Largest income category · Per share annotations</div>
+      <div class="card-title">Total Income</div>
+      <div class="card-sub">Line Chart · All income categories combined · CPI-U inflation baseline</div>
     </div>
     <div class="card-body"><div class="chart-wrap"><canvas id="c-maint"></canvas></div></div>
   </div>
@@ -195,7 +195,19 @@ function scaleToMatch(baseVals, years) {
   });
 }
 
-const MAINT_PDF_URLS = {2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};;
+const MAINT_INCREASES = {
+  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',2013:'-6%',2023:'+9%',2024:'+1.5%',2025:'+4%'
+};
+const MAINT_PDF_URLS = {
+  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
+  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
+};;
 
 // ── CONFIG (injected at export time) ──
 const CONFIG = {
@@ -260,12 +272,25 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         legend: { display: false },
         tooltip: { ...TOOLTIP_OPTS, callbacks: {
           title: i => i[0].label,
-          label: i => { const v=i.parsed.y; return (v>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(v).toLocaleString(); }
+          label: i => { const v=i.parsed.y; return (v>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(v).toLocaleString(); },
+          afterBody: items => {
+            const yr = parseInt(items[0].label);
+            if(MAINT_PDF_URLS[yr]) {
+              const pct = MAINT_INCREASES[yr] || '';
+              return ['', '📄 Maintenance ' + pct + ' — click chart to open Board Memo →'];
+            }
+            return [];
+          }
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation:45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => (v>=0?'+':'-')+'$'+Math.abs(v/1000).toFixed(0)+'K' }}
+      },
+      onClick: (e, els) => {
+        if(!els.length) return;
+        const yr = parseInt(years[els[0].index]);
+        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
@@ -311,21 +336,20 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 
-// ── 3. MAINTENANCE CHARGES LINE + CPI ──
+// ── 3. TOTAL INCOME LINE + CPI ──
 (function() {
-  const vals = years.map(y => sc(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(y)]));
+  const vals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    return sc(Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0));
+  });
   const cpiVals = scaleToMatch(vals, years);
-  const pointColors = years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950');
-  const pointStyles = years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle');
-  const pointRadii = years.map(y => MAINT_PDF_URLS[y] ? 9 : 4);
   new Chart(document.getElementById('c-maint'), {
     type: 'line',
     data: { labels: years, datasets: [
-      { label: 'Maintenance Charges', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
+      { label: 'Total Income', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
         borderWidth: 3, tension: 0.3, fill: true,
-        pointRadius: pointRadii, pointBackgroundColor: pointColors,
-        pointStyle: pointStyles, pointBorderColor: '#fff', pointBorderWidth: 2 },
-      { label: 'CPI-U (if maintenance tracked inflation)', data: cpiVals,
+        pointRadius: 4, pointBackgroundColor: '#3fb950', pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if income tracked inflation)', data: cpiVals,
         borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
         pointRadius: 0, fill: false, tension: 0.3 }
     ]},
@@ -337,7 +361,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           title: i => i[0].label,
           label: i => {
             if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
-            return ' Maintenance: $' + i.parsed.y.toLocaleString();
+            return ' Total Income: $' + i.parsed.y.toLocaleString();
           },
           afterBody: items => {
             const main = items.find(i => i.datasetIndex===0);
@@ -347,8 +371,6 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
               const sign = diff >= 0 ? '+' : '-';
               return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
             }
-            const yr = parseInt(items[0]?.label);
-            if(MAINT_PDF_URLS[yr]) return ['', '\u25C6 Click to open Board Memo'];
             return [];
           }
         }}
@@ -356,11 +378,6 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
-      },
-      onClick: (e, els) => {
-        if(!els.length) return;
-        const yr = parseInt(years[els[0].index]);
-        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
