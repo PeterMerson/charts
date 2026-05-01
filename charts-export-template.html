@@ -446,7 +446,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   new Chart(document.getElementById('c-capex'), {
     type: 'bar',
     data: { labels: years, datasets: [
-      { type: 'bar', data: vals,
+      { type: 'bar', label: 'Capital Expenditures', data: vals,
         backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
         borderWidth: 1, borderRadius: 3 },
       { type: 'line', label: 'Cumulative 1990–2005', data: cumP1, yAxisID: 'y2',
@@ -467,7 +467,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 16,
-          filter: item => item.text.indexOf('Cumulative') > -1 } },
+          filter: item => item.text && item.text.indexOf('Cumulative') > -1 } },
         tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
           title: i => i[0].label,
           label: i => {
