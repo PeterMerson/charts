@@ -2066,8 +2066,7 @@ function printChartsAsPDF() {
     exp += (MORTGAGE_PRINCIPAL[idx]||0); // always include
     return sc(exp);
   });
-  var maintVals = years.map(function(y){ return sc(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(y)]); });
-  var maintCPI  = scaleToMatch(maintVals, years);
+  var incCPI    = scaleToMatch(incVals, years);
   var expCPI    = scaleToMatch(expVals, years);
   var capexVals = years.map(function(y){ return sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]); });
   var liqVals   = years.map(function(y){ return sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]); });
@@ -2115,8 +2114,8 @@ function printChartsAsPDF() {
     { plugins:{ legend:{ labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#1a3a5c', boxWidth:16 } } }, scales: scaleOpts(fmtM) });
 
   var img3 = chartImgData('line', years,
-    [{ label:'Maintenance Charges', data:maintVals, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,0.08)', borderWidth:3, pointRadius:3, tension:0.3, fill:true },
-     { label:'CPI-U baseline', data:maintCPI, borderColor:'#c9a84c', borderWidth:2, borderDash:[6,4], pointRadius:0, tension:0.3, fill:false }],
+    [{ label:'Total Income', data:incVals, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,0.08)', borderWidth:3, pointRadius:3, tension:0.3, fill:true },
+     { label:'CPI-U baseline', data:incCPI, borderColor:'#c9a84c', borderWidth:2, borderDash:[6,4], pointRadius:0, tension:0.3, fill:false }],
     { plugins:{ legend:{ labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#1a3a5c', boxWidth:16 } } }, scales: scaleOpts(fmtM) });
 
   var img4 = chartImgData('line', years,
@@ -2135,7 +2134,7 @@ function printChartsAsPDF() {
   var charts = [
     { img: img1, title: 'Net Income — Surplus / Deficit', sub: 'Bar Chart · Green = Surplus · Red = Deficit' },
     { img: img2, title: 'Total Income vs Total Expenses', sub: 'Line Chart · Green = Income · Red = Expenses' },
-    { img: img3, title: 'Maintenance Charges', sub: 'Line Chart · Dashed gold line = CPI-U baseline (what maintenance would be if it tracked inflation)' },
+    { img: img3, title: 'Total Income', sub: 'Line Chart · Dashed gold line = CPI-U baseline (what income would be if it tracked inflation)' },
     { img: img4, title: 'Total Expenses', sub: 'Line Chart · Dashed gold line = CPI-U baseline (what expenses would be if they tracked inflation)' },
     { img: img5, title: 'Capital Expenditures', sub: 'Bar Chart · Major building investments by year' },
     { img: img6, title: 'Total Liquidity (Cash & Equiv + Reserve)', sub: 'Bar Chart · Building\'s total financial cushion' }
@@ -2171,12 +2170,12 @@ function printChartsAsPDF() {
     '</style></head><body>' +
     '<div class="hdr"><div class="hdr-title">' + titleStr + '</div>' +
     '<div class="hdr-meta">' + metaStr + '</div></div>' +
+    rows +
     '<div class="principal-notice">' +
     '<span class="principal-icon">&#9432;</span>' +
     '<strong>Mortgage Principal Payments are included in all expense and net income figures.</strong>' +
     '&nbsp; These charts reflect the full cash cost of operating the building each year — including principal repayment — which is excluded from the audited Income Statement by accounting convention but represents a real shareholder obligation.' +
     '</div>' +
-    rows +
     '<div class="footer">Riveredge Owners, Inc. &nbsp;&middot;&nbsp; 1-3 David Lane, Yonkers NY &nbsp;&middot;&nbsp; Produced by Peter Merson &nbsp;&middot;&nbsp; Apt 8T &nbsp;&middot;&nbsp; In conjunction with Claude AI (Anthropic) &nbsp;&middot;&nbsp; claude.ai</div>' +
     '</body></html>';
 
@@ -2445,7 +2444,6 @@ function renderCompareChart(years) {
   document.getElementById('net-panel-empty').style.display = 'none';
   document.getElementById('net-chart-panel').style.display = 'block';
  
-
   if(window._netChart){ window._netChart.destroy(); window._netChart=null; }
   const ctx = document.getElementById('net-trend-chart').getContext('2d');
  
