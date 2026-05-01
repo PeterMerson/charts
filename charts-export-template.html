@@ -432,28 +432,60 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 
-// ── 5. CAPITAL EXPENDITURES BAR ──
+// ── 5. CAPITAL EXPENDITURES BAR + CUMULATIVE LINES ──
 (function() {
+  const P1_END = 2005, P2_START = 2006;
   const vals = years.map(y => sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]));
+  let cum1 = 0, cum2 = 0;
+  const cumP1 = [], cumP2 = [];
+  years.forEach(y => {
+    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
+    if(y <= P1_END) { cum1 += v; cumP1.push(cum1); cumP2.push(null); }
+    else            { cum2 += v; cumP1.push(null);  cumP2.push(cum2); }
+  });
   new Chart(document.getElementById('c-capex'), {
     type: 'bar',
-    data: { labels: years, datasets: [{
-      data: vals,
-      backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
-      borderWidth: 1, borderRadius: 3
-    }]},
+    data: { labels: years, datasets: [
+      { type: 'bar', data: vals,
+        backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
+        borderWidth: 1, borderRadius: 3 },
+      { type: 'line', label: 'Cumulative 1990–2005', data: cumP1, yAxisID: 'y2',
+        borderColor: '#58a6ff', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === P1_END ? 7 : 2),
+        pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
+      { type: 'line', label: 'Cumulative 2006–2024', data: cumP2, yAxisID: 'y2',
+        borderColor: '#e8a020', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === 2024 ? 7 : 2),
+        pointBackgroundColor: '#e8a020', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
+    ]},
     options: {
       responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
-        tooltip: { ...TOOLTIP_OPTS, callbacks: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 16,
+          filter: item => item.text.indexOf('Cumulative') > -1 } },
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
           title: i => i[0].label,
-          label: i => ' CapEx: $' + i.parsed.y.toLocaleString()
+          label: i => {
+            if(i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString();
+            if(i.parsed.y == null) return null;
+            return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString();
+          }
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
-        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+        y2: { position: 'right',
+          title: { display: true, text: 'Cumulative CapEx', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888',
+            callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K') },
+          grid: { drawOnChartArea: false }
+        }
       }
     }
   });
