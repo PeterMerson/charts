@@ -411,6 +411,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
       <button class="mode-btn" onclick="openPrintView('all')" title="Print all four matrices" style="border-color:var(--gold-light);color:var(--ink);background:var(--gold-light);font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Print All</button>
       <button class="mode-btn" onclick="exportInteractiveCharts()" title="Export interactive charts as a standalone HTML file" style="border-color:#58a6ff;color:#fff;background:rgba(88,166,255,0.2);font-weight:700;font-size:0.6rem;padding:6px 10px;">📊 Export Charts</button>
       <button class="mode-btn" onclick="printChartsAsPDF()" title="Print all charts as PDF" style="border-color:#58a6ff;color:#fff;background:rgba(88,166,255,0.15);font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Print Charts</button>
+      <button class="mode-btn" onclick="printLargeTable()" title="Open print-optimized large-text table in a new window" style="border-color:#3fb950;color:#fff;background:rgba(63,185,80,0.25);font-weight:700;font-size:0.6rem;padding:6px 10px;">🖨 Print Table</button>
     </div>
   </div>
 </div>
@@ -1021,6 +1022,7 @@ function render(prefix) {
   const totals = {};
   years.forEach(y => totals[y] = 0);
  
+
   cats.forEach((cat) => {
     const isSA = (prefix==='inc' && cat==='SpecialAssessment');
     const isMI = (prefix==='exp' && cat==='Mortgage Interest');
@@ -3455,6 +3457,262 @@ function printToPDFWindow() {
   setTimeout(function() { pw.focus(); pw.print(); }, 800);
 }
  
+function printLargeTable() {
+  const fromYr = parseInt(document.getElementById('global-sel-from').value);
+  const toYr   = parseInt(document.getElementById('global-sel-to').value);
+  const f = Math.min(fromYr, toYr), t = Math.max(fromYr, toYr);
+  const years = ALL_YEARS.filter(y => y >= f && y <= t);
+
+  const myUnit = (MYUNIT_VIEW_ON && MY_UNIT) ? MY_UNIT : null;
+  const unitLabel = myUnit
+    ? 'My Unit View: Apt ' + myUnit.apt + ' (' + myUnit.type + ', ' + myUnit.shares + ' shares, ' + (myUnit.shares/TOTAL_SHARES*100).toFixed(3) + '% of building)'
+    : 'Building Totals';
+  const principalLabel = SHOW_PRINCIPAL ? ' \u00b7 Mortgage Principal Included' : ' \u00b7 Mortgage Principal Excluded';
+  const aptTitle = myUnit
+    ? 'Riveredge Income & Expense Matrix \u2014 Apt ' + myUnit.apt + ' (' + myUnit.type + ', ' + myUnit.shares + ' shares)'
+    : 'Riveredge Income & Expense Matrix \u2014 Building Totals';
+  const metaLine = 'Year Range: ' + f + '\u2013' + t + ' \u00b7 ' + years.length + ' years \u00b7 ' + unitLabel + principalLabel + ' \u00b7 Source: Audited Annual Financial Statements 1990\u20132024';
+
+  function sv(v) { return myUnit ? Math.round(v * myUnit.shares / TOTAL_SHARES) : v; }
+  function fmt(v)    { return '$' + Math.abs(sv(v)).toLocaleString('en-US'); }
+  function fmtNet(v) { const s=sv(v); return (s>=0?'+':'-')+'$'+Math.abs(s).toLocaleString('en-US'); }
+
+  const CHUNK = 10;
+  const chunks = [];
+  for(let i = 0; i < years.length; i += CHUNK) chunks.push(years.slice(i, i + CHUNK));
+
+  // Build one mini-table per chunk — plain rows, no thead/tfoot
+  function buildChunkTable(sectionTitle, rows, chunkYears, chunkIdx, isFirstOfDoc) {
+    const isCont = chunkIdx > 0;
+    const yr0 = chunkYears[0], yr1 = chunkYears[chunkYears.length-1];
+
+    let h = '<table class="chunk">';
+    // col group enforces fixed cat width
+    const catPct = Math.max(18, Math.min(28, Math.round(22)));
+    h += '<colgroup><col style="width:22%">';
+    chunkYears.forEach(() => { h += '<col style="width:auto">'; });
+    h += '</colgroup>';
+
+    // Row 1: section title spanning all columns
+    const contTxt = isCont ? ' <span class="cont">(' + yr0 + '\u2013' + yr1 + ', continued)</span>' : '';
+    h += '<tr class="sec-row"><td class="sec-cell" colspan="' + (chunkYears.length+1) + '">' + sectionTitle + contTxt + '</td></tr>';
+
+    // Row 2: year column headers
+    h += '<tr class="yr-row"><td class="cat-hdr">Category</td>';
+    chunkYears.forEach(y => { h += '<th>' + y + '</th>'; });
+    h += '</tr>';
+
+    // Data rows
+    const totRow = rows.find(r => r.isTotal);
+    rows.forEach(r => {
+      if(r.isTotal) return;
+      const cls = r.isItalic ? ' class="r-it"' : r.isGold ? ' class="r-go"' : '';
+      h += '<tr' + cls + '><td class="cat">' + r.label + '</td>';
+      chunkYears.forEach(y => {
+        const v = r.values[years.indexOf(y)];
+        h += '<td>' + (v !== 0 ? (r.useFmtNet ? fmtNet(v) : fmt(v)) : '\u2014') + '</td>';
+      });
+      h += '</tr>';
+    });
+
+    // Totals row
+    if(totRow) {
+      h += '<tr class="tot"><td class="cat">' + totRow.label + '</td>';
+      chunkYears.forEach(y => {
+        const v = totRow.values[years.indexOf(y)];
+        const cls = totRow.colorFn ? totRow.colorFn(v) : '';
+        h += '<td class="' + cls + '">' + (totRow.useFmtNet ? fmtNet(v) : fmt(v)) + '</td>';
+      });
+      h += '</tr>';
+    }
+
+    h += '</table>';
+    return h;
+  }
+
+  function buildSection(sectionTitle, rows) {
+    return chunks.map((chunkYears, ci) =>
+      buildChunkTable(sectionTitle, rows, chunkYears, ci)
+    ).join('');
+  }
+
+  let body = '';
+
+  // ── INCOME ──
+  {
+    const rows = [];
+    Object.keys(INCOME).forEach(cat => {
+      if(!INCOME[cat]) return;
+      const isSA = cat === 'SpecialAssessment';
+      rows.push({ label: isSA ? 'Special Assessments (excl.)' : cat,
+        values: years.map(y => INCOME[cat][ALL_YEARS.indexOf(y)] || 0), isItalic: isSA });
+    });
+    const totals = years.map(y => Object.keys(INCOME).reduce((s,cat) =>
+      cat==='SpecialAssessment'?s:s+(INCOME[cat][ALL_YEARS.indexOf(y)]||0), 0));
+    rows.push({ label:'Total Income', values:totals, isTotal:true, colorFn: v=>sv(v)>=0?'pos':'neg' });
+    body += buildSection('Income', rows);
+  }
+
+  // ── EXPENSES ──
+  {
+    const rows = [];
+    Object.keys(EXPENSES).forEach(cat => {
+      if(!EXPENSES[cat]) return;
+      const isMI = cat==='Mortgage Interest' && SHOW_PRINCIPAL;
+      rows.push({ label: isMI ? 'Mortgage Interest + Principal' : cat,
+        values: years.map(y => {
+          const idx = ALL_YEARS.indexOf(y);
+          return (EXPENSES[cat][idx]||0) + (isMI?(MORTGAGE_PRINCIPAL[idx]||0):0);
+        }), isGold: isMI });
+    });
+    const totals = years.map(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      let e = Object.values(EXPENSES).reduce((s,arr)=>s+(arr[idx]||0),0);
+      if(SHOW_PRINCIPAL) e += (MORTGAGE_PRINCIPAL[idx]||0);
+      return e;
+    });
+    rows.push({ label:'Total Expenses'+(SHOW_PRINCIPAL?' (incl. Principal)':''), values:totals, isTotal:true, colorFn:()=>'' });
+    body += buildSection('Expenses', rows);
+  }
+
+  // ── NET INCOME ──
+  {
+    const netVals = years.map(y => {
+      const idx = ALL_YEARS.indexOf(y);
+      const inc = Object.keys(INCOME).reduce((s,cat)=>cat==='SpecialAssessment'?s:s+(INCOME[cat][idx]||0),0);
+      let exp = Object.values(EXPENSES).reduce((s,arr)=>s+(arr[idx]||0),0);
+      if(SHOW_PRINCIPAL) exp += (MORTGAGE_PRINCIPAL[idx]||0);
+      return inc - exp;
+    });
+    body += buildSection('Net Income \u2014 Surplus / Deficit', [{
+      label:'Net Income (Income \u2212 Expenses'+(SHOW_PRINCIPAL?', incl. Principal':'')+')' ,
+      values:netVals, isTotal:true, colorFn:v=>sv(v)>=0?'pos':'neg', useFmtNet:true }]);
+  }
+
+  // ── CAPITAL & LIQUIDITY ──
+  body += buildSection('Capital Expenditures & Total Liquidity', [
+    { label:'Capital Expenditures'+(myUnit?' (Apt '+myUnit.apt+' share)':''),
+      values: years.map(y=>CAPEX_DATA[ALL_YEARS.indexOf(y)]||0) },
+    { label:'Total Liquidity \u2014 Cash & Equiv + Reserve'+(myUnit?' (Apt '+myUnit.apt+' share)':''),
+      values: years.map(y=>LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]||0) }
+  ]);
+
+  const footerNote = 'Riveredge Owners, Inc. \u00b7 1-3 David Lane, Yonkers NY \u00b7 Audited Annual Financial Statements 1990\u20132024 \u00b7 Mortgage Principal ' + (SHOW_PRINCIPAL?'Included':'Excluded') + ' \u00b7 Special Assessments excluded from Income totals \u00b7 Produced by Peter Merson, Apt 8T';
+
+  const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: #fff; color: #0d2240;
+      padding: 10mm;
+    }
+    .doc-hdr {
+      background: #0d2240; color: #f7f3ec;
+      padding: 8pt 12pt 7pt; border-bottom: 3pt solid #c9a84c;
+      margin-bottom: 14pt;
+    }
+    .doc-title { font-family: 'Playfair Display', serif; font-size: 13pt; font-weight: 900; }
+    .doc-meta  { font-size: 6.5pt; color: #c9bfaa; margin-top: 3pt; letter-spacing: 0.04em; }
+
+    table.chunk {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10pt;
+      page-break-inside: auto;
+      font-size: 9pt;
+      table-layout: fixed;
+    }
+    tr { page-break-inside: avoid; }
+
+    /* Section title row */
+    tr.sec-row td.sec-cell {
+      background: #1a3a5c; color: #c9a84c;
+      font-family: 'Playfair Display', serif; font-size: 10.5pt; font-weight: 900;
+      padding: 4pt 8pt; border-top: 3pt solid #c9a84c;
+      text-align: left !important;
+    }
+    .cont { font-family: 'IBM Plex Mono', monospace; font-size: 7pt;
+            font-weight: 400; color: #8ab0cc; margin-left: 6pt; }
+
+    /* Year header row */
+    tr.yr-row { background: #c9a84c; }
+    tr.tr.yr-row th {
+      padding: 3.5pt 5pt; color: #0d2240 !important; text-align: right;
+      border-right: 0.5pt solid #a07820; white-space: nowrap;
+      font-size: 8.5pt; font-weight: 800; letter-spacing: 0.05em;
+    }
+    tr.yr-row td.cat-hdr {
+      padding: 3.5pt 5pt; font-size: 8.5pt; font-weight: 800;
+      text-align: left !important; border-right: 2pt solid #0d2240;
+      color: #0d2240 !important; overflow: hidden; white-space: nowrap;
+    }
+
+    /* Data rows */
+    tr:not(.sec-row):not(.yr-row):not(.tot) { border-bottom: 0.5pt solid #dde4ef; }
+    tr:nth-child(even):not(.sec-row):not(.yr-row):not(.tot) { background: #f4f6fb; }
+    td {
+      padding: 3.5pt 5pt; text-align: right;
+      border-right: 0.5pt solid #dde4ef;
+      white-space: nowrap; color: #1a3a5c; font-size: 9pt; font-weight: 700;
+    }
+    td.cat {
+      text-align: left !important; font-weight: 700; color: #0d2240;
+      border-right: 2pt solid #b0bdd4; padding-left: 7pt;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    tr.r-it td { opacity: 0.65; font-style: italic; }
+    tr.r-it td.cat { color: #666; }
+    tr.r-go td.cat { color: #7a5a10; font-style: italic; }
+
+    /* Totals row */
+    tr.tot td {
+      background: #0d2240 !important; border-top: 2pt solid #c9a84c;
+      padding: 4pt 5pt; text-align: right;
+      color: #ffffff !important; font-weight: 700;
+      border-right: 0.5pt solid #3a3028; font-size: 9.5pt;
+    }
+    tr.tot td.cat {
+      text-align: left !important; color: #c9a84c;
+      font-family: 'Playfair Display', serif; font-size: 10pt;
+      border-right: 2pt solid #c9a84c; padding-left: 7pt;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .pos { color: #5dba72 !important; font-weight: 800; }
+    .neg { color: #f07060 !important; font-weight: 800; }
+
+    .fnote {
+      font-size: 6pt; color: #999; margin-top: 12pt;
+      padding-top: 6pt; border-top: 0.5pt solid #ccc; line-height: 1.8;
+    }
+
+    @page { size: landscape; margin: 0; }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 8mm; }
+      table.chunk { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+    }
+  `;
+
+  const docHdr = '<div class="doc-hdr"><div class="doc-title">' + aptTitle + '</div><div class="doc-meta">' + metaLine + '</div></div>';
+
+  const winHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+    '<title>Riveredge Matrix \u2014 Print Table</title>' +
+    '<style>' + css + '</style></head><body>' +
+    docHdr + body +
+    '<p class="fnote">' + footerNote + '</p>' +
+    '</body></html>';
+
+  const pw = window.open('', '_blank', 'width=1300,height=900,scrollbars=yes');
+  if(!pw) { alert('Please allow popups for this page to use Print Table.'); return; }
+  pw.document.open();
+  pw.document.write(winHTML);
+  pw.document.close();
+  pw.onload = function() { pw.focus(); pw.print(); };
+  setTimeout(function() { pw.focus(); pw.print(); }, 900);
+}
+
+
 // Close print modal on Escape
 document.addEventListener('keydown', function(e) {
   if(e.key === 'Escape' && document.getElementById('print-modal').classList.contains('open')) {
