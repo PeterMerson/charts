@@ -3009,7 +3009,16 @@ function openPrintView(sections) {
     ? '  ·  My Unit View: Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.type + ', ' + MY_UNIT.shares + ' shares, ' + (MY_UNIT.shares/TOTAL_SHARES*100).toFixed(3) + '% of building)'
     : '  ·  Building Totals';
   const principalLabel = SHOW_PRINCIPAL ? '  ·  Mortgage Principal Included' : '';
- 
+
+  // Update title to show apartment prominently
+  const titleEl = document.getElementById('print-modal-title');
+  if(titleEl) {
+    titleEl.textContent = (MYUNIT_VIEW_ON && MY_UNIT)
+      ? 'Riveredge Income & Expense Matrix — Apt ' + MY_UNIT.apt + ' (' + MY_UNIT.type + ', ' + MY_UNIT.shares + ' shares)'
+      : 'Riveredge Income & Expense Matrix — Print Preview';
+  }
+
+
   document.querySelector('#print-modal-header #print-modal-meta').textContent =
     'Year Range: ' + f + ' – ' + t + '  ·  ' + years.length + ' years' + unitLabel + principalLabel +
     '  ·  Source: Audited Annual Financial Statements 1990–2024';
@@ -3180,6 +3189,7 @@ function closePrintModal() {
 function printToPDFWindow() {
   // Grab the rendered HTML from the modal body
   const headerMeta = document.querySelector('#print-modal-header #print-modal-meta').textContent;
+  const headerTitle = document.getElementById('print-modal-title') ? document.getElementById('print-modal-title').textContent : 'Riveredge Income & Expense Matrix — Print Preview';
   const bodyHTML = document.getElementById('print-modal-body').innerHTML;
  
   const printCSS = `
@@ -3229,7 +3239,7 @@ function printToPDFWindow() {
 </head>
 <body>
 <div class="print-doc-header">
-  <div class="print-doc-title">Riveredge <em>Income &amp; Expense Matrix</em></div>
+  <div class="print-doc-title">${headerTitle.replace('Income & Expense Matrix', 'Income <em>&amp;</em> Expense Matrix')}</div>
   <div class="print-doc-meta">${headerMeta}</div>
 </div>
 <div class="content">${bodyHTML}</div>
