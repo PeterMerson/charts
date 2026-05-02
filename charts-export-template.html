@@ -312,8 +312,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
             const ps = perShare[i.dataIndex];
             return [
               (v>=0?' Surplus: +':' Deficit: -') + '$' + Math.abs(v).toLocaleString(),
-              '',
-              ' Per share: ' + (ps>=0?'+':'-') + '$' + Math.abs(ps).toFixed(2) + '/sh'
+              ' Per Share: ' + (ps>=0?'+':'-') + '$' + Math.abs(ps).toFixed(2) + '/sh'
             ];
           },
           afterBody: items => {
@@ -367,7 +366,12 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           afterBody: items => {
             if(items.length < 2) return '';
             const net = items[0].parsed.y - items[1].parsed.y;
-            return ['', (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString()];
+            const ps = net / TOTAL_SHARES;
+            return [
+              '',
+              (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString(),
+              ' Per Share: '+(ps>=0?'+':'-')+'$'+Math.abs(ps).toFixed(2)+'/sh'
+            ];
           }
         }}
       },
