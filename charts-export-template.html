@@ -365,12 +365,13 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           label: i => ' ' + i.dataset.label + ': $' + i.parsed.y.toLocaleString(),
           afterBody: items => {
             if(items.length < 2) return '';
-            const net = items[0].parsed.y - items[1].parsed.y;
             const yr = parseInt(items[0].label);
             const idx = ALL_YEARS.indexOf(yr);
             const rawInc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
             const rawExp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0) + (CONFIG.showPrincipal ? MORTGAGE_PRINCIPAL[idx] : 0);
-            const ps = (rawInc - rawExp) / TOTAL_SHARES;
+            const rawNet = rawInc - rawExp;
+            const net = sc(rawNet);
+            const ps = rawNet / TOTAL_SHARES;
             return [
               '',
               (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString(),
