@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Riveredge Financial Charts</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -140,6 +141,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 </div>
 
 <script>
+Chart.register(ChartDataLabels);
 window.onload = function() {
 // ── DATA ──
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
@@ -258,21 +260,54 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
     return sc(inc - exp);
   });
+  // Per-share values always use building total / TOTAL_SHARES
+  const perShare = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let inc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return (inc - exp) / TOTAL_SHARES;
+  });
   new Chart(document.getElementById('c-net'), {
     type: 'bar',
     data: { labels: years, datasets: [{
       data: vals,
       backgroundColor: vals.map(v => v>=0 ? 'rgba(63,185,80,0.85)' : 'rgba(244,122,112,0.85)'),
       borderColor: vals.map(v => v>=0 ? '#3fb950' : '#f47a70'),
-      borderWidth: 1, borderRadius: 3
+      borderWidth: 1, borderRadius: 3,
+      datalabels: {
+        display: true,
+        anchor: ctx => ctx.dataset.data[ctx.dataIndex] >= 0 ? 'end' : 'start',
+        align:  ctx => ctx.dataset.data[ctx.dataIndex] >= 0 ? 'end' : 'start',
+        offset: 2,
+        color: ctx => ctx.dataset.data[ctx.dataIndex] >= 0 ? '#3fb950' : '#f47a70',
+        font: { family: 'IBM Plex Mono', size: 9, weight: '600' },
+        formatter: (v, ctx) => {
+          const ps = perShare[ctx.dataIndex];
+          const sign = ps >= 0 ? '+' : '-';
+          return sign + '$' + Math.abs(ps).toFixed(2) + '/sh
+' + years[ctx.dataIndex];
+        }
+      }
     }]},
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 36, bottom: 8 } },
       plugins: {
         legend: { display: false },
+        datalabels: {},
         tooltip: { ...TOOLTIP_OPTS, callbacks: {
           title: i => i[0].label,
-          label: i => { const v=i.parsed.y; return (v>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(v).toLocaleString(); },
+          label: i => {
+            const v = i.parsed.y;
+            const ps = perShare[i.dataIndex];
+            const sign = v >= 0 ? '+' : '-';
+            const psSign = ps >= 0 ? '+' : '-';
+            return [
+              (v>=0?' Surplus: +':' Deficit: -') + '$' + Math.abs(v).toLocaleString(),
+              ' Per share: ' + psSign + '$' + Math.abs(ps).toFixed(2) + '/sh'
+            ];
+          },
           afterBody: items => {
             const yr = parseInt(items[0].label);
             if(MAINT_PDF_URLS[yr]) {
