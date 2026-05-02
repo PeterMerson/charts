@@ -366,7 +366,11 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           afterBody: items => {
             if(items.length < 2) return '';
             const net = items[0].parsed.y - items[1].parsed.y;
-            const ps = net / TOTAL_SHARES;
+            const yr = parseInt(items[0].label);
+            const idx = ALL_YEARS.indexOf(yr);
+            const rawInc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+            const rawExp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0) + (CONFIG.showPrincipal ? MORTGAGE_PRINCIPAL[idx] : 0);
+            const ps = (rawInc - rawExp) / TOTAL_SHARES;
             return [
               '',
               (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString(),
