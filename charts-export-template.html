@@ -536,7 +536,15 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
 (function() {
   const P1_END = 2005, P2_START = 2006;
   const vals = years.map(y => sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]));
+  // Pre-seed cumulative totals for years BEFORE the selected range
+  // so partial-range views show the correct running total
   let cum1 = 0, cum2 = 0;
+  ALL_YEARS.forEach(y => {
+    if(years.indexOf(y) >= 0) return; // skip years in the selected range
+    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
+    if(y <= P1_END) cum1 += v;
+    else if(y < years[0]) cum2 += v; // only pre-seed up to range start
+  });
   const cumP1 = [], cumP2 = [];
   years.forEach(y => {
     const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
