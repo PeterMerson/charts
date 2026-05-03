@@ -187,6 +187,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 </div>
 
 <script>
+var barLabelPlugin;
 window.onload = function() {
 // ── DATA ──
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
@@ -314,7 +315,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 
   // Inline label plugin — no external dependency
-  const barLabelPlugin = {
+  barLabelPlugin = {
     id: 'barLabels',
     afterDatasetsDraw(chart) {
       const { ctx, data, scales: { x, y } } = chart;
