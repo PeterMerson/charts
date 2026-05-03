@@ -642,42 +642,29 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
 var _lbChart = null;
 
 function openLightbox(canvasId, title, sub) {
-  // Get the source Chart.js instance
   var srcCanvas = document.getElementById(canvasId);
   if(!srcCanvas) return;
   var srcChart = Chart.getChart(srcCanvas);
   if(!srcChart) return;
 
-  // Populate header
   document.getElementById('lightbox-title').textContent = title;
   document.getElementById('lightbox-sub').textContent = sub;
 
-  // Destroy any previous lightbox chart
   if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
 
-  // Clone the chart config deeply
-  var cfg = JSON.parse(JSON.stringify({
-    type: srcChart.config.type,
-    data: srcChart.config.data,
-    options: srcChart.config.options
-  }));
-
-  // Make it look good at full size
-  if(cfg.options && cfg.options.plugins && cfg.options.plugins.legend) {
-    cfg.options.plugins.legend.labels = cfg.options.plugins.legend.labels || {};
-    cfg.options.plugins.legend.labels.font = { family: 'IBM Plex Mono', size: 13 };
-  }
-  if(cfg.options) {
-    cfg.options.responsive = true;
-    cfg.options.maintainAspectRatio = false;
-    if(cfg.options.layout) cfg.options.layout.padding = 20;
-  }
-
-  // Re-attach the inline barLabels plugin if this is the net income chart
-  var plugins = canvasId === 'c-net' ? [barLabelPlugin] : [];
-
+  // Use the live config directly — preserves all callback functions
+  var srcCfg = srcChart.config;
   var lbCanvas = document.getElementById('lightbox-canvas');
-  _lbChart = new Chart(lbCanvas, { type: cfg.type, data: cfg.data, options: cfg.options, plugins: plugins });
+
+  // Re-attach inline plugins (barLabelPlugin needs closure vars from c-net IIFE)
+  var extraPlugins = canvasId === 'c-net' ? [barLabelPlugin] : [];
+
+  _lbChart = new Chart(lbCanvas, {
+    type: srcCfg.type,
+    data: srcCfg.data,          // shared data reference — always current
+    options: srcCfg.options,    // shared options — preserves ALL callbacks
+    plugins: extraPlugins
+  });
 
   document.getElementById('chart-lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
