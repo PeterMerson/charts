@@ -37,7 +37,48 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(201,168,76,0.2);
   border-radius: 8px; overflow: hidden;
+  position: relative; cursor: pointer;
 }
+.chart-card:hover .expand-hint { opacity: 1; }
+.expand-hint {
+  position: absolute; top: 10px; right: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: #c9a84c; opacity: 0; transition: opacity 0.2s;
+  letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none;
+}
+/* Lightbox overlay */
+#chart-lightbox {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(7,18,36,0.96);
+  align-items: center; justify-content: center;
+}
+#chart-lightbox.open { display: flex; }
+#lightbox-inner {
+  background: #0d2240; border: 2px solid #c9a84c;
+  border-radius: 10px; overflow: hidden;
+  width: 92vw; height: 88vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+}
+#lightbox-header {
+  background: #0a1a30; border-bottom: 2px solid #c9a84c;
+  padding: 10px 18px; display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+#lightbox-title { font-family: 'Playfair Display', serif; font-size: 1.1rem;
+  font-weight: 900; color: #f7f3ec; }
+#lightbox-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: #c9a84c; margin-top: 2px; letter-spacing: 0.06em; text-transform: uppercase; }
+#lightbox-close {
+  background: transparent; border: 1px solid #c9a84c; color: #c9a84c;
+  font-size: 1rem; width: 30px; height: 30px; border-radius: 4px;
+  cursor: pointer; font-family: monospace; line-height: 1;
+  transition: all 0.15s;
+}
+#lightbox-close:hover { background: #c9a84c; color: #0d2240; }
+#lightbox-body { flex: 1; padding: 16px; min-height: 0; }
+#lightbox-canvas-wrap { width: 100%; height: 100%; }
+#lightbox-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
 .chart-card.wide { grid-column: 1 / -1; }
 .card-header {
   background: rgba(13,34,64,0.8); padding: 14px 20px;
@@ -71,7 +112,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 <div class="charts-grid">
 
   <!-- 1. Net Income -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-net','Net Income — Surplus / Deficit','TOTAL INCOME MINUS TOTAL EXPENSES · BAR CHART · GREEN = SURPLUS · RED = DEFICIT')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Net Income — Surplus / Deficit</div>
       <div class="card-sub">Total Income minus Total Expenses · Bar Chart · Green = surplus · Red = deficit</div>
@@ -80,7 +122,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 2. Total Income vs Total Expenses -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-compare','Total Income vs Total Expenses','LINE CHART · GREEN = INCOME · RED = EXPENSES')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Total Income vs Total Expenses</div>
       <div class="card-sub">Line Chart · Green = Income · Red = Expenses</div>
@@ -89,7 +132,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 3. Total Income -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-maint','Total Income','LINE CHART · ALL INCOME CATEGORIES COMBINED · CPI-U INFLATION BASELINE')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Total Income</div>
       <div class="card-sub">Line Chart · All income categories combined · CPI-U inflation baseline</div>
@@ -98,7 +142,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 4. Total Expenses -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-exp','Total Expenses','LINE CHART · ALL EXPENSE CATEGORIES COMBINED')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Total Expenses</div>
       <div class="card-sub">Line Chart · All expense categories combined</div>
@@ -107,7 +152,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 5. Capital Expenditures -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-capex','Capital Expenditures','BAR CHART · MAJOR BUILDING INVESTMENTS BY YEAR')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Capital Expenditures</div>
       <div class="card-sub">Bar Chart · Major building investments by year</div>
@@ -116,7 +162,8 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 6. Total Liquidity -->
-  <div class="chart-card">
+  <div class="chart-card" onclick="openLightbox('c-liq','Total Liquidity (Cash & Equiv + Reserve)','BAR CHART · BUILDING’S TOTAL FINANCIAL CUSHION · WESTCHESTER BENCHMARKS SHOWN')">
+    <span class="expand-hint">⛶ expand</span>
     <div class="card-header">
       <div class="card-title">Total Liquidity (Cash &amp; Equiv + Reserve)</div>
       <div class="card-sub">Bar Chart · Building's total financial cushion · Westchester benchmarks shown</div>
@@ -590,6 +637,76 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 }; // end window.onload
+
+// ── LIGHTBOX ──
+var _lbChart = null;
+
+function openLightbox(canvasId, title, sub) {
+  // Get the source Chart.js instance
+  var srcCanvas = document.getElementById(canvasId);
+  if(!srcCanvas) return;
+  var srcChart = Chart.getChart(srcCanvas);
+  if(!srcChart) return;
+
+  // Populate header
+  document.getElementById('lightbox-title').textContent = title;
+  document.getElementById('lightbox-sub').textContent = sub;
+
+  // Destroy any previous lightbox chart
+  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
+
+  // Clone the chart config deeply
+  var cfg = JSON.parse(JSON.stringify({
+    type: srcChart.config.type,
+    data: srcChart.config.data,
+    options: srcChart.config.options
+  }));
+
+  // Make it look good at full size
+  if(cfg.options && cfg.options.plugins && cfg.options.plugins.legend) {
+    cfg.options.plugins.legend.labels = cfg.options.plugins.legend.labels || {};
+    cfg.options.plugins.legend.labels.font = { family: 'IBM Plex Mono', size: 13 };
+  }
+  if(cfg.options) {
+    cfg.options.responsive = true;
+    cfg.options.maintainAspectRatio = false;
+    if(cfg.options.layout) cfg.options.layout.padding = 20;
+  }
+
+  // Re-attach the inline barLabels plugin if this is the net income chart
+  var plugins = canvasId === 'c-net' ? [barLabelPlugin] : [];
+
+  var lbCanvas = document.getElementById('lightbox-canvas');
+  _lbChart = new Chart(lbCanvas, { type: cfg.type, data: cfg.data, options: cfg.options, plugins: plugins });
+
+  document.getElementById('chart-lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if(e && e.target !== document.getElementById('chart-lightbox') && e.target !== document.getElementById('lightbox-close')) return;
+  document.getElementById('chart-lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
+}
+
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') closeLightbox({ target: document.getElementById('chart-lightbox') });
+});
 </script>
+<div id="chart-lightbox" onclick="closeLightbox(event)">
+  <div id="lightbox-inner">
+    <div id="lightbox-header">
+      <div>
+        <div id="lightbox-title"></div>
+        <div id="lightbox-sub"></div>
+      </div>
+      <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+    </div>
+    <div id="lightbox-body">
+      <div id="lightbox-canvas-wrap"><canvas id="lightbox-canvas"></canvas></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
