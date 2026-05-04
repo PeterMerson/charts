@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Financial Charts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0d2240; --gold: #c9a84c; --text: #f7f3ec;
+  --green: #3fb950; --red: #f47a70; --blue: #58a6ff;
+}
+body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240; color: #f7f3ec; }
+.header {
+  background: #0a1a30; border-bottom: 3px solid var(--gold);
+  padding: 20px 40px;
+}
+.header-title {
+  font-family: Georgia, serif; font-size: 1.5rem; font-weight: 900;
+  color: var(--text); margin-bottom: 4px;
+}
+.header-title em { color: var(--gold); font-style: normal; }
+.header-meta { font-size: 0.65rem; color: var(--gold); letter-spacing: 0.08em; line-height: 1.6; }
+.controls {
+  background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(201,168,76,0.2);
+  padding: 14px 40px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+}
+.ctrl-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--gold); }
+.ctrl-val { font-size: 0.8rem; color: var(--text); font-weight: 600; }
+.charts-grid {
+  max-width: 1400px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; padding: 32px 40px;
+}
+.chart-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 8px; overflow: hidden;
+  position: relative; cursor: pointer;
+}
+.chart-card:hover .expand-hint { opacity: 1; }
+.expand-hint {
+  position: absolute; top: 10px; right: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: #c9a84c; opacity: 0; transition: opacity 0.2s;
+  letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none;
+}
+/* Lightbox overlay */
+#chart-lightbox {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(7,18,36,0.96);
+  align-items: center; justify-content: center;
+}
+#chart-lightbox.open { display: flex; }
+#lightbox-inner {
+  background: #0d2240; border: 2px solid #c9a84c;
+  border-radius: 10px; overflow: hidden;
+  width: 92vw; height: 88vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+}
+#lightbox-header {
+  background: #0a1a30; border-bottom: 2px solid #c9a84c;
+  padding: 10px 18px; display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+#lightbox-title { font-family: 'Playfair Display', serif; font-size: 1.1rem;
+  font-weight: 900; color: #f7f3ec; }
+#lightbox-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: #c9a84c; margin-top: 2px; letter-spacing: 0.06em; text-transform: uppercase; }
+#lightbox-close {
+  background: transparent; border: 1px solid #c9a84c; color: #c9a84c;
+  font-size: 1rem; width: 30px; height: 30px; border-radius: 4px;
+  cursor: pointer; font-family: monospace; line-height: 1;
+  transition: all 0.15s;
+}
+#lightbox-close:hover { background: #c9a84c; color: #0d2240; }
+#lightbox-body { flex: 1; padding: 16px; min-height: 0; }
+#lightbox-canvas-wrap { width: 100%; height: 100%; }
+#lightbox-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+.chart-card.wide { grid-column: 1 / -1; }
+.card-header {
+  background: rgba(13,34,64,0.8); padding: 14px 20px;
+  border-bottom: 2px solid rgba(201,168,76,0.3);
+}
+.card-title { font-family: Georgia, serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.card-sub { font-size: 0.6rem; color: rgba(201,168,76,0.7); letter-spacing: 0.1em; text-transform: uppercase; }
+.card-body { padding: 16px 20px; }
+.chart-wrap { position: relative; height: 280px; }
+.footer {
+  text-align: center; padding: 24px 40px;
+  font-size: 0.6rem; color: rgba(201,168,76,0.5);
+  border-top: 1px solid rgba(201,168,76,0.2); letter-spacing: 0.1em;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title" id="main-title">Riveredge <em>Income &amp; Expense Matrix</em> — Financial Charts</div>
+  <div class="header-meta" id="main-meta"></div>
+</div>
+
+<div class="controls">
+  <div><div class="ctrl-label">Year Range</div><div class="ctrl-val" id="ctrl-years">—</div></div>
+  <div><div class="ctrl-label">Unit View</div><div class="ctrl-val" id="ctrl-unit">Building Totals</div></div>
+  <div><div class="ctrl-label">Mortgage Principal</div><div class="ctrl-val" id="ctrl-principal">—</div></div>
+  <div><div class="ctrl-label">Source</div><div class="ctrl-val">Audited Annual Financial Statements 1990–2024</div></div>
+</div>
+
+<div class="charts-grid">
+
+  <!-- 1. Net Income -->
+  <div class="chart-card" onclick="openLightbox('c-net','Net Income — Surplus / Deficit','TOTAL INCOME MINUS TOTAL EXPENSES · BAR CHART · GREEN = SURPLUS · RED = DEFICIT')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Net Income — Surplus / Deficit</div>
+      <div class="card-sub">Total Income minus Total Expenses · Bar Chart · Green = surplus · Red = deficit</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-net"></canvas></div></div>
+  </div>
+
+  <!-- 2. Total Income vs Total Expenses -->
+  <div class="chart-card" onclick="openLightbox('c-compare','Total Income vs Total Expenses','LINE CHART · GREEN = INCOME · RED = EXPENSES')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Total Income vs Total Expenses</div>
+      <div class="card-sub">Line Chart · Green = Income · Red = Expenses</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-compare"></canvas></div></div>
+  </div>
+
+  <!-- 3. Total Income -->
+  <div class="chart-card" onclick="openLightbox('c-maint','Total Income','LINE CHART · ALL INCOME CATEGORIES COMBINED · CPI-U INFLATION BASELINE')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Total Income</div>
+      <div class="card-sub">Line Chart · All income categories combined · CPI-U inflation baseline</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-maint"></canvas></div></div>
+  </div>
+
+  <!-- 4. Total Expenses -->
+  <div class="chart-card" onclick="openLightbox('c-exp','Total Expenses','LINE CHART · ALL EXPENSE CATEGORIES COMBINED')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Total Expenses</div>
+      <div class="card-sub">Line Chart · All expense categories combined</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-exp"></canvas></div></div>
+  </div>
+
+  <!-- 5. Capital Expenditures -->
+  <div class="chart-card" onclick="openLightbox('c-capex','Capital Expenditures','BAR CHART · MAJOR BUILDING INVESTMENTS BY YEAR')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Capital Expenditures</div>
+      <div class="card-sub">Bar Chart · Major building investments by year</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-capex"></canvas></div></div>
+  </div>
+
+  <!-- 6. Total Liquidity -->
+  <div class="chart-card" onclick="openLightbox('c-liq','Total Liquidity (Cash & Equiv + Reserve)','BAR CHART · BUILDING’S TOTAL FINANCIAL CUSHION · WESTCHESTER BENCHMARKS SHOWN')">
+    <span class="expand-hint">⛶ expand</span>
+    <div class="card-header">
+      <div class="card-title">Total Liquidity (Cash &amp; Equiv + Reserve)</div>
+      <div class="card-sub">Bar Chart · Building's total financial cushion · Westchester benchmarks shown</div>
+    </div>
+    <div class="card-body"><div class="chart-wrap"><canvas id="c-liq"></canvas></div></div>
+  </div>
+
+</div>
+
+<div style="background:#fff3cd;border:2px solid #c9a84c;border-left:8px solid #c9a84c;padding:16px 40px;display:flex;gap:14px;align-items:flex-start;margin:0;">
+  <span style="font-size:1.4rem;color:#c9a84c;flex-shrink:0;">&#9432;</span>
+  <div style="font-family:IBM Plex Mono,monospace;font-size:0.72rem;color:#5a3e00;line-height:1.7;">
+    <strong>Mortgage Principal Payments are included in all expense and net income figures on these charts.</strong><br>
+    These charts reflect the full cash cost of operating the building each year — including principal repayment on the underlying mortgage. Mortgage Principal is excluded from the audited Income Statement by accounting convention, but represents a real cash obligation paid by shareholders. The Riveredge Matrix allows toggling Principal on or off; these charts always show the complete cash picture. <strong>All Special Assessment income is excluded in these calculations, 1993 &amp; 2002 thru 2006.</strong>
+  </div>
+</div>
+<div class="footer">
+  RIVEREDGE OWNERS, INC. &nbsp;·&nbsp; 1-3 DAVID LANE, YONKERS NY &nbsp;·&nbsp;
+  SOURCE: AUDITED ANNUAL FINANCIAL STATEMENTS 1990–2024 &nbsp;·&nbsp;
+  PRODUCED BY PETER MERSON · APT 8T &nbsp;·&nbsp; IN CONJUNCTION WITH CLAUDE AI (ANTHROPIC) · CLAUDE.AI
+</div>
+
+<script>
+var barLabelPlugin;
+window.onload = function() {
+// ── DATA ──
+const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const TOTAL_SHARES = 85027;
+
+const INCOME = {
+  "Maintenance Charges": [1020324,1020324,1020324,1027976,1048884,1066534,1074031,1073289,1073379,1042612,1069444,1075712,1069345,1088387,1161724,1308354,1571429,1570096,1587982,1620174,1620174,1620174,1620174,1531251,1513447,1513447,1507782,1513404,1513404,1513404,1513404,1513404,1503542,1513404,1644840],
+  "Parking":             [87315,84893,85403,83638,83792,82754,82684,80162,78700,77113,76065,80649,86754,87193,84212,83814,85139,87939,87407,88235,88043,88352,87530,85794,86622,85896,87949,87754,86302,86251,83510,80949,81578,81329,80383],
+  "Laundry":             [15025,15000,15000,15550,15600,15600,15600,15600,15600,14300,17283,17838,27727,26278,23477,29926,28597,39492,35355,33798,36357,34675,31954,29333,28676,26581,28937,30524,31379,30853,26325,26000,25635,26280,25850],
+  "Transfer Fees":       [8750,10189,1026,6276,11231,11798,8481,11693,15735,20941,30057,17042,16019,15271,30594,18224,13233,9309,7818,7233,0,3251,3707,11602,10126,7378,4956,6121,4364,3457,3234,13024,12598,7599,4378],
+  "Interest":            [32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776],
+  "Miscellaneous":       [11836,3284,4076,8433,9582,15376,9882,12994,11548,20226,6502,7569,9256,4955,7103,8617,14022,5131,5529,26690,7146,11997,9663,37358,13735,19712,12367,8729,8247,7976,3356,11189,8643,9734,6421],
+  "Storage":             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1719,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023],
+  "SpecialAssessment":   [0,0,0,170050,0,0,0,0,0,0,0,0,63771,191313,189681,191313,127542,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+};
+
+const EXPENSES = {
+  "Real Estate Taxes":  [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242],
+  "Utilities":          [104562,88133,90745,92375,91005,88951,106499,92253,81239,89577,148203,130296,122339,168270,171051,232000,211495,259964,302455,191123,251570,248050,291470,271746,337417,199659,175192,199826,215961,231878,163262,232313,344997,290726,328592],
+  "Payroll":            [110540,111036,125652,133297,137797,127715,130715,137073,143621,141939,142862,157841,162718,172346,166694,188198,185106,166463,164760,155977,158597,166778,182676,180957,187354,205605,205640,220249,223696,238312,239114,236860,235531,249503,262939],
+  "Mortgage Interest":  [433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,139656,139217,136748,134153,131439,128522,125512,122321,120862,115424],
+  "Repairs & Maint.":   [82760,85751,113059,93777,109903,83332,79472,73216,62731,83622,128259,232217,117152,141385,156003,120358,110046,108752,156132,178962,174561,192528,160652,132144,229776,263380,150620,163940,154212,139146,134721,230215,199709,224945,495817],
+  "Insurance":          [18834,22208,23521,22324,23100,26217,26181,26264,29617,34158,31445,36238,47531,46519,60106,63743,64626,68873,52752,49013,57164,59481,57732,57757,64292,71196,65161,63759,66478,67615,64733,73682,76529,86587,99094],
+  "Security":           [36400,35843,31908,35336,32978,34155,34296,36149,38515,35989,41865,38131,48819,46157,49395,46115,47102,46998,53504,49606,50564,55463,53133,51562,56237,52724,54226,56376,60748,61180,60629,63439,71560,72322,77374],
+  "Management Fee":     [25250,27000,27000,27000,30000,30000,30000,30750,31000,31000,31000,31232,31000,31000,31000,33250,34000,31333,30000,30000,30000,39816,39816,41807,42643,43496,44246,45131,46033,46954,47893,48552,49341,51150,52725],
+  "Water & Sewer":      [9624,9996,8468,8586,8995,17993,14000,5038,4627,9055,6903,7286,7639,5303,14056,9202,11909,12223,19675,15650,21137,21851,17196,32294,27383,38772,43820,41666,31278,37334,34416,48244,46731,52920,52221],
+  "Legal & Audit":      [4350,10206,8521,7994,5905,7106,9445,94442,10713,6243,13782,12597,32421,24977,12651,16887,8050,9261,4950,104876,10560,12285,31756,8979,8520,11069,7961,27642,48669,46161,9225,76978,24450,39560,10953],
+  "Corp Tax & Misc.":   [14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,16206,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577]
+};
+
+const MORTGAGE_PRINCIPAL = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052];
+const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
+const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
+const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508];
+const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869];
+const CPI_U_DATA = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
+
+function getCPIIndexed(years) {
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const val = years[0] === y ? 100 : null; // placeholder
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return (cpi / startCPI) * 100;
+  });
+}
+
+function scaleToMatch(baseVals, years) {
+  // Scale CPI to match the first value of baseVals
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return Math.round(baseVals[0] * (cpi / startCPI));
+  });
+}
+
+const MAINT_INCREASES = {
+  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',2013:'-6%',2023:'+9%',2024:'+1.5%',2025:'+4%'
+};
+const MAINT_PDF_URLS = {
+  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
+  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
+};;
+
+// ── CONFIG (injected at export time) ──
+const CONFIG = {
+  fromYear: 1990,
+  toYear:   2024,
+  showPrincipal: true,  // Always included for full cash picture
+  myUnit: {"apt":"8T","shares":544,"type":"1BR","building":"Woodside"},
+  myUnitOn: true
+};
+
+const years = ALL_YEARS.filter(y => y >= (CONFIG.fromYear||1990) && y <= (CONFIG.toYear||2024));
+const scale = (CONFIG.myUnitOn && CONFIG.myUnit) ? CONFIG.myUnit.shares / TOTAL_SHARES : 1;
+
+function sc(v) { return Math.round(v * scale); }
+function fmtM(v) { return v >= 1000000 ? '$'+(v/1000000).toFixed(2)+'M' : '$'+(v/1000).toFixed(0)+'K'; }
+function fmtD(v) { return '$'+Math.abs(v).toLocaleString(); }
+
+// ── UPDATE HEADER ──
+const unitLabel = (CONFIG.myUnitOn && CONFIG.myUnit)
+  ? 'My Unit View: Apt ' + CONFIG.myUnit.apt + ' (' + CONFIG.myUnit.type + ', ' + CONFIG.myUnit.shares + ' shares)'
+  : 'Building Totals';
+const principalLabel = CONFIG.showPrincipal ? 'Mortgage Principal Included' : 'Mortgage Principal Excluded';
+
+if(CONFIG.myUnitOn && CONFIG.myUnit) {
+  document.getElementById('main-title').innerHTML =
+    'Riveredge <em>Income &amp; Expense Matrix</em> — Apt ' + CONFIG.myUnit.apt + ' (' + CONFIG.myUnit.type + ', ' + CONFIG.myUnit.shares + ' shares)';
+}
+document.getElementById('main-meta').textContent =
+  'Year Range: ' + CONFIG.fromYear + ' – ' + CONFIG.toYear + '  ·  ' + years.length + ' years  ·  ' + unitLabel + '  ·  ' + principalLabel + '  ·  Source: Audited Annual Financial Statements 1990–2024';
+document.getElementById('ctrl-years').textContent = CONFIG.fromYear + ' – ' + CONFIG.toYear + ' (' + years.length + ' years)';
+document.getElementById('ctrl-unit').textContent = unitLabel;
+document.getElementById('ctrl-principal').textContent = principalLabel;
+
+// ── CHART DEFAULTS ──
+const TOOLTIP_OPTS = {
+  backgroundColor: '#0d2240', titleColor: '#c9a84c',
+  bodyColor: '#f0f4fa', borderColor: '#2a4a6a', borderWidth: 1, padding: 10
+};
+const TICK_OPTS = { font: { family: 'IBM Plex Mono', size: 10, weight: 'bold' }, color: '#c9a84c' };
+const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
+
+// ── 1. NET INCOME BAR ──
+(function() {
+  const vals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let inc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return sc(inc - exp);
+  });
+  const perShare = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let inc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return (inc - exp) / TOTAL_SHARES;
+  });
+
+  // Inline label plugin — no external dependency
+  barLabelPlugin = {
+    id: 'barLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data, scales: { x, y } } = chart;
+      ctx.save();
+      ctx.font = '600 8px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      data.datasets[0].data.forEach((v, i) => {
+        const ps = perShare[i];
+        const positive = v >= 0;
+        const xPos = x.getPixelForValue(i);
+        const yPos = y.getPixelForValue(v);
+        const label1 = (ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh';
+        const label2 = String(years[i]);
+        ctx.fillStyle = positive ? '#3fb950' : '#f47a70';
+        const offset = positive ? -22 : 22;
+        ctx.fillText(label1, xPos, yPos + offset);
+        ctx.fillText(label2, xPos, yPos + offset + 11);
+      });
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('c-net'), {
+    type: 'bar',
+    plugins: [barLabelPlugin],
+    data: { labels: years, datasets: [{
+      data: vals,
+      backgroundColor: vals.map(v => v>=0 ? 'rgba(63,185,80,0.85)' : 'rgba(244,122,112,0.85)'),
+      borderColor: vals.map(v => v>=0 ? '#3fb950' : '#f47a70'),
+      borderWidth: 1, borderRadius: 3
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 30, bottom: 8 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: {
+          title: i => i[0].label,
+          label: i => {
+            const v = i.parsed.y;
+            const ps = perShare[i.dataIndex];
+            return [
+              (v>=0?' Surplus: +':' Deficit: -') + '$' + Math.abs(v).toLocaleString(),
+              ' Per Share: ' + (ps>=0?'+':'-') + '$' + Math.abs(ps).toFixed(2) + '/sh'
+            ];
+          },
+          afterBody: items => {
+            const yr = parseInt(items[0].label);
+            if(MAINT_PDF_URLS[yr]) {
+              const pct = MAINT_INCREASES[yr] || '';
+              return ['', '📄 Maintenance ' + pct + ' — click chart to open Board Memo →'];
+            }
+            return [];
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation:45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => (v>=0?'+':'-')+'$'+Math.abs(v/1000).toFixed(0)+'K' }}
+      },
+      onClick: (e, els) => {
+        if(!els.length) return;
+        const yr = parseInt(years[els[0].index]);
+        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
+      }
+    }
+  });
+})();
+
+// ── 2. TOTAL INCOME VS TOTAL EXPENSES LINE ──
+(function() {
+  const incVals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    return sc(Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0));
+  });
+  const expVals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return sc(exp);
+  });
+  new Chart(document.getElementById('c-compare'), {
+    type: 'line',
+    data: { labels: years, datasets: [
+      { label: 'Total Income', data: incVals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.1)', borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#3fb950', tension: 0.3, fill: true },
+      { label: 'Total Expenses', data: expVals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.1)', borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#f47a70', tension: 0.3, fill: true }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+          title: i => i[0].label,
+          label: i => ' ' + i.dataset.label + ': $' + i.parsed.y.toLocaleString(),
+          afterBody: items => {
+            if(items.length < 2) return '';
+            const yr = parseInt(items[0].label);
+            const idx = ALL_YEARS.indexOf(yr);
+            const rawInc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+            const rawExp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0) + (CONFIG.showPrincipal ? MORTGAGE_PRINCIPAL[idx] : 0);
+            const rawNet = rawInc - rawExp;
+            const net = sc(rawNet);
+            const ps = rawNet / TOTAL_SHARES;
+            return [
+              '',
+              (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString(),
+              ' Per Share: '+(ps>=0?'+':'-')+'$'+Math.abs(ps).toFixed(2)+'/sh'
+            ];
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      }
+    }
+  });
+})();
+
+// ── 3. TOTAL INCOME LINE + CPI ──
+(function() {
+  const vals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    return sc(Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0));
+  });
+  const cpiVals = scaleToMatch(vals, years);
+  new Chart(document.getElementById('c-maint'), {
+    type: 'line',
+    data: { labels: years, datasets: [
+      { label: 'Total Income', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
+        borderWidth: 3, tension: 0.3, fill: true,
+        pointRadius: 4, pointBackgroundColor: '#3fb950', pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if income tracked inflation)', data: cpiVals,
+        borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false, tension: 0.3 }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+          title: i => i[0].label,
+          label: i => {
+            if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
+            return ' Total Income: $' + i.parsed.y.toLocaleString();
+          },
+          afterBody: items => {
+            const main = items.find(i => i.datasetIndex===0);
+            const cpi  = items.find(i => i.datasetIndex===1);
+            if(main && cpi) {
+              const diff = main.parsed.y - cpi.parsed.y;
+              const sign = diff >= 0 ? '+' : '-';
+              return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
+            }
+            return [];
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      }
+    }
+  });
+})();
+
+// ── 4. TOTAL EXPENSES LINE + CPI ──
+(function() {
+  const vals = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return sc(exp);
+  });
+  const cpiVals = scaleToMatch(vals, years);
+  new Chart(document.getElementById('c-exp'), {
+    type: 'line',
+    data: { labels: years, datasets: [
+      { label: 'Total Expenses', data: vals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.08)',
+        borderWidth: 3, tension: 0.3, fill: true,
+        pointRadius: 4, pointBackgroundColor: '#f47a70', pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if expenses tracked inflation)', data: cpiVals,
+        borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false, tension: 0.3 }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+          title: i => i[0].label,
+          label: i => {
+            if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
+            return ' Total Expenses: $' + i.parsed.y.toLocaleString();
+          },
+          afterBody: items => {
+            const main = items.find(i => i.datasetIndex===0);
+            const cpi  = items.find(i => i.datasetIndex===1);
+            if(main && cpi) {
+              const diff = main.parsed.y - cpi.parsed.y;
+              const sign = diff >= 0 ? '+' : '-';
+              return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
+            }
+            return [];
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      }
+    }
+  });
+})();
+
+// ── 5. CAPITAL EXPENDITURES BAR + CUMULATIVE LINES ──
+(function() {
+  const P1_END = 2005, P2_START = 2006;
+  const vals = years.map(y => sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]));
+  // Pre-seed cumulative totals for years BEFORE the selected range
+  // so partial-range views show the correct running total
+  let cum1 = 0, cum2 = 0;
+  ALL_YEARS.forEach(y => {
+    if(years.indexOf(y) >= 0) return; // skip years in the selected range
+    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
+    if(y <= P1_END) cum1 += v;
+    else if(y < years[0]) cum2 += v; // only pre-seed up to range start
+  });
+  const cumP1 = [], cumP2 = [];
+  years.forEach(y => {
+    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
+    if(y <= P1_END) { cum1 += v; cumP1.push(cum1); cumP2.push(null); }
+    else            { cum2 += v; cumP1.push(null);  cumP2.push(cum2); }
+  });
+  new Chart(document.getElementById('c-capex'), {
+    type: 'bar',
+    data: { labels: years, datasets: [
+      { type: 'bar', label: 'Capital Expenditures', data: vals,
+        backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
+        borderWidth: 1, borderRadius: 3 },
+      { type: 'line', label: 'Cumulative 1990–2005', data: cumP1, yAxisID: 'y2',
+        borderColor: '#58a6ff', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === P1_END ? 7 : 2),
+        pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
+      { type: 'line', label: 'Cumulative 2006–2024', data: cumP2, yAxisID: 'y2',
+        borderColor: '#e8a020', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === 2024 ? 7 : 2),
+        pointBackgroundColor: '#e8a020', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 16,
+          filter: item => item.text && item.text.indexOf('Cumulative') > -1 } },
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+          title: i => i[0].label,
+          label: i => {
+            if(i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString();
+            if(i.parsed.y == null) return null;
+            return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString();
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+        y2: { position: 'right',
+          title: { display: true, text: 'Cumulative CapEx', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888',
+            callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K') },
+          grid: { drawOnChartArea: false }
+        }
+      }
+    }
+  });
+})();
+
+// ── 6. TOTAL LIQUIDITY BAR ──
+(function() {
+  const vals = years.map(y => sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]));
+  const wHigh = years.map(y => sc(W_BENCH_HIGH[ALL_YEARS.indexOf(y)]));
+  const wLow  = years.map(y => sc(W_BENCH_LOW[ALL_YEARS.indexOf(y)]));
+  const base2006 = sc(271218);
+  new Chart(document.getElementById('c-liq'), {
+    type: 'bar',
+    data: { labels: years, datasets: [
+      { type: 'bar', label: 'Total Liquidity', data: vals,
+        backgroundColor: 'rgba(88,166,255,0.75)', borderColor: '#58a6ff',
+        borderWidth: 1, borderRadius: 3 },
+      { type: 'line', label: 'W.High Standard $5,000/unit', data: wHigh,
+        borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false },
+      { type: 'line', label: 'W.Low Standard $3,500/unit', data: wLow,
+        borderColor: '#f47a70', borderWidth: 2, borderDash: [6,4],
+        pointRadius: 0, fill: false }
+    ]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#c9a84c', boxWidth: 16 }},
+        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+          title: i => i[0].label,
+          label: i => {
+            if(i.datasetIndex===0) return ' Total Liquidity: $'+i.parsed.y.toLocaleString();
+            if(i.datasetIndex===1) return ' W.High $5,000/unit: $'+Math.round(i.parsed.y).toLocaleString();
+            return ' W.Low $3,500/unit: $'+Math.round(i.parsed.y).toLocaleString();
+          },
+          afterBody: items => {
+            const main = items.find(i=>i.datasetIndex===0);
+            if(!main) return [];
+            const change = main.parsed.y - base2006;
+            const sign = change>=0?'+':'-';
+            return ['', ' Change from 2006: '+sign+'$'+Math.abs(change).toLocaleString()];
+          }
+        }}
+      },
+      scales: {
+        x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      }
+    }
+  });
+})();
+}; // end window.onload
+
+// ── LIGHTBOX ──
+var _lbChart = null;
+
+function openLightbox(canvasId, title, sub) {
+  var srcCanvas = document.getElementById(canvasId);
+  if(!srcCanvas) return;
+  var srcChart = Chart.getChart(srcCanvas);
+  if(!srcChart) return;
+
+  document.getElementById('lightbox-title').textContent = title;
+  document.getElementById('lightbox-sub').textContent = sub;
+
+  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
+
+  // Use the live config directly — preserves all callback functions
+  var srcCfg = srcChart.config;
+  var lbCanvas = document.getElementById('lightbox-canvas');
+
+  // Re-attach inline plugins (barLabelPlugin needs closure vars from c-net IIFE)
+  var extraPlugins = canvasId === 'c-net' ? [barLabelPlugin] : [];
+
+  _lbChart = new Chart(lbCanvas, {
+    type: srcCfg.type,
+    data: srcCfg.data,          // shared data reference — always current
+    options: srcCfg.options,    // shared options — preserves ALL callbacks
+    plugins: extraPlugins
+  });
+
+  document.getElementById('chart-lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if(e && e.target !== document.getElementById('chart-lightbox') && e.target !== document.getElementById('lightbox-close')) return;
+  document.getElementById('chart-lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
+}
+
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') closeLightbox({ target: document.getElementById('chart-lightbox') });
+});
+</script>
+<div id="chart-lightbox" onclick="closeLightbox(event)">
+  <div id="lightbox-inner">
+    <div id="lightbox-header">
+      <div>
+        <div id="lightbox-title"></div>
+        <div id="lightbox-sub"></div>
+      </div>
+      <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+    </div>
+    <div id="lightbox-body">
+      <div id="lightbox-canvas-wrap"><canvas id="lightbox-canvas"></canvas></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
