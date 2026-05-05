@@ -37,48 +37,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(201,168,76,0.2);
   border-radius: 8px; overflow: hidden;
-  position: relative; cursor: pointer;
 }
-.chart-card:hover .expand-hint { opacity: 1; }
-.expand-hint {
-  position: absolute; top: 10px; right: 12px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
-  color: #c9a84c; opacity: 0; transition: opacity 0.2s;
-  letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none;
-}
-/* Lightbox overlay */
-#chart-lightbox {
-  display: none; position: fixed; inset: 0; z-index: 9999;
-  background: rgba(7,18,36,0.96);
-  align-items: center; justify-content: center;
-}
-#chart-lightbox.open { display: flex; }
-#lightbox-inner {
-  background: #0d2240; border: 2px solid #c9a84c;
-  border-radius: 10px; overflow: hidden;
-  width: 92vw; height: 88vh;
-  display: flex; flex-direction: column;
-  box-shadow: 0 20px 80px rgba(0,0,0,0.7);
-}
-#lightbox-header {
-  background: #0a1a30; border-bottom: 2px solid #c9a84c;
-  padding: 10px 18px; display: flex; justify-content: space-between; align-items: center;
-  flex-shrink: 0;
-}
-#lightbox-title { font-family: 'Playfair Display', serif; font-size: 1.1rem;
-  font-weight: 900; color: #f7f3ec; }
-#lightbox-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
-  color: #c9a84c; margin-top: 2px; letter-spacing: 0.06em; text-transform: uppercase; }
-#lightbox-close {
-  background: transparent; border: 1px solid #c9a84c; color: #c9a84c;
-  font-size: 1rem; width: 30px; height: 30px; border-radius: 4px;
-  cursor: pointer; font-family: monospace; line-height: 1;
-  transition: all 0.15s;
-}
-#lightbox-close:hover { background: #c9a84c; color: #0d2240; }
-#lightbox-body { flex: 1; padding: 16px; min-height: 0; }
-#lightbox-canvas-wrap { width: 100%; height: 100%; }
-#lightbox-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
 .chart-card.wide { grid-column: 1 / -1; }
 .card-header {
   background: rgba(13,34,64,0.8); padding: 14px 20px;
@@ -112,8 +71,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 <div class="charts-grid">
 
   <!-- 1. Net Income -->
-  <div class="chart-card" onclick="openLightbox('c-net','Net Income — Surplus / Deficit','TOTAL INCOME MINUS TOTAL EXPENSES · BAR CHART · GREEN = SURPLUS · RED = DEFICIT')">
-    <span class="expand-hint">⛶ expand</span>
+  <div class="chart-card">
     <div class="card-header">
       <div class="card-title">Net Income — Surplus / Deficit</div>
       <div class="card-sub">Total Income minus Total Expenses · Bar Chart · Green = surplus · Red = deficit</div>
@@ -122,8 +80,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 2. Total Income vs Total Expenses -->
-  <div class="chart-card" onclick="openLightbox('c-compare','Total Income vs Total Expenses','LINE CHART · GREEN = INCOME · RED = EXPENSES')">
-    <span class="expand-hint">⛶ expand</span>
+  <div class="chart-card">
     <div class="card-header">
       <div class="card-title">Total Income vs Total Expenses</div>
       <div class="card-sub">Line Chart · Green = Income · Red = Expenses</div>
@@ -131,19 +88,17 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
     <div class="card-body"><div class="chart-wrap"><canvas id="c-compare"></canvas></div></div>
   </div>
 
-  <!-- 3. Total Income -->
-  <div class="chart-card" onclick="openLightbox('c-maint','Total Income','LINE CHART · ALL INCOME CATEGORIES COMBINED · CPI-U INFLATION BASELINE')">
-    <span class="expand-hint">⛶ expand</span>
+  <!-- 3. Maintenance Charges -->
+  <div class="chart-card">
     <div class="card-header">
-      <div class="card-title">Total Income</div>
-      <div class="card-sub">Line Chart · All income categories combined · CPI-U inflation baseline</div>
+      <div class="card-title">Maintenance Charges</div>
+      <div class="card-sub">Line Chart · Largest income category · Per share annotations</div>
     </div>
     <div class="card-body"><div class="chart-wrap"><canvas id="c-maint"></canvas></div></div>
   </div>
 
   <!-- 4. Total Expenses -->
-  <div class="chart-card" onclick="openLightbox('c-exp','Total Expenses','LINE CHART · ALL EXPENSE CATEGORIES COMBINED')">
-    <span class="expand-hint">⛶ expand</span>
+  <div class="chart-card">
     <div class="card-header">
       <div class="card-title">Total Expenses</div>
       <div class="card-sub">Line Chart · All expense categories combined</div>
@@ -152,8 +107,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 5. Capital Expenditures -->
-  <div class="chart-card" onclick="openLightbox('c-capex','Capital Expenditures','BAR CHART · MAJOR BUILDING INVESTMENTS BY YEAR')">
-    <span class="expand-hint">⛶ expand</span>
+  <div class="chart-card">
     <div class="card-header">
       <div class="card-title">Capital Expenditures</div>
       <div class="card-sub">Bar Chart · Major building investments by year</div>
@@ -162,8 +116,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   </div>
 
   <!-- 6. Total Liquidity -->
-  <div class="chart-card" onclick="openLightbox('c-liq','Total Liquidity (Cash & Equiv + Reserve)','BAR CHART · BUILDING’S TOTAL FINANCIAL CUSHION · WESTCHESTER BENCHMARKS SHOWN')">
-    <span class="expand-hint">⛶ expand</span>
+  <div class="chart-card">
     <div class="card-header">
       <div class="card-title">Total Liquidity (Cash &amp; Equiv + Reserve)</div>
       <div class="card-sub">Bar Chart · Building's total financial cushion · Westchester benchmarks shown</div>
@@ -177,7 +130,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
   <span style="font-size:1.4rem;color:#c9a84c;flex-shrink:0;">&#9432;</span>
   <div style="font-family:IBM Plex Mono,monospace;font-size:0.72rem;color:#5a3e00;line-height:1.7;">
     <strong>Mortgage Principal Payments are included in all expense and net income figures on these charts.</strong><br>
-    These charts reflect the full cash cost of operating the building each year — including principal repayment on the underlying mortgage. Mortgage Principal is excluded from the audited Income Statement by accounting convention, but represents a real cash obligation paid by shareholders. The Riveredge Matrix allows toggling Principal on or off; these charts always show the complete cash picture. <strong>All Special Assessment income is excluded in these calculations, 1993 &amp; 2002 thru 2006.</strong>
+    These charts reflect the full cash cost of operating the building each year — including principal repayment on the underlying mortgage. Mortgage Principal is excluded from the audited Income Statement by accounting convention, but represents a real cash obligation paid by shareholders. The Riveredge Matrix allows toggling Principal on or off; these charts always show the complete cash picture.
   </div>
 </div>
 <div class="footer">
@@ -187,7 +140,6 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 </div>
 
 <script>
-var barLabelPlugin;
 window.onload = function() {
 // ── DATA ──
 const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
@@ -208,7 +160,7 @@ const EXPENSES = {
   "Real Estate Taxes":  [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242],
   "Utilities":          [104562,88133,90745,92375,91005,88951,106499,92253,81239,89577,148203,130296,122339,168270,171051,232000,211495,259964,302455,191123,251570,248050,291470,271746,337417,199659,175192,199826,215961,231878,163262,232313,344997,290726,328592],
   "Payroll":            [110540,111036,125652,133297,137797,127715,130715,137073,143621,141939,142862,157841,162718,172346,166694,188198,185106,166463,164760,155977,158597,166778,182676,180957,187354,205605,205640,220249,223696,238312,239114,236860,235531,249503,262939],
-  "Mortgage Interest":  [433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,139656,139217,136748,134153,131439,128522,125512,122321,120862,115424],
+  "Mortgage Interest":  [433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,141555,139217,136748,134153,131439,128522,125512,122321,120862,115424],
   "Repairs & Maint.":   [82760,85751,113059,93777,109903,83332,79472,73216,62731,83622,128259,232217,117152,141385,156003,120358,110046,108752,156132,178962,174561,192528,160652,132144,229776,263380,150620,163940,154212,139146,134721,230215,199709,224945,495817],
   "Insurance":          [18834,22208,23521,22324,23100,26217,26181,26264,29617,34158,31445,36238,47531,46519,60106,63743,64626,68873,52752,49013,57164,59481,57732,57757,64292,71196,65161,63759,66478,67615,64733,73682,76529,86587,99094],
   "Security":           [36400,35843,31908,35336,32978,34155,34296,36149,38515,35989,41865,38131,48819,46157,49395,46115,47102,46998,53504,49606,50564,55463,53133,51562,56237,52724,54226,56376,60748,61180,60629,63439,71560,72322,77374],
@@ -241,21 +193,7 @@ function scaleToMatch(baseVals, years) {
     const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
     return Math.round(baseVals[0] * (cpi / startCPI));
   });
-}
-
-const MAINT_INCREASES = {
-  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',2013:'-6%',2023:'+9%',2024:'+1.5%',2025:'+4%'
-};
-const MAINT_PDF_URLS = {
-  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
-  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
-  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
-  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
-  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
-  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
-  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
-  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
-};;
+}2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};
 
 // ── CONFIG (injected at export time) ──
 const CONFIG = {
@@ -306,42 +244,8 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
     return sc(inc - exp);
   });
-  const perShare = years.map(y => {
-    const idx = ALL_YEARS.indexOf(y);
-    let inc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
-    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
-    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
-    return (inc - exp) / TOTAL_SHARES;
-  });
-
-  // Inline label plugin — no external dependency
-  barLabelPlugin = {
-    id: 'barLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx, data, scales: { x, y } } = chart;
-      ctx.save();
-      ctx.font = '600 8px IBM Plex Mono, monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      data.datasets[0].data.forEach((v, i) => {
-        const ps = perShare[i];
-        const positive = v >= 0;
-        const xPos = x.getPixelForValue(i);
-        const yPos = y.getPixelForValue(v);
-        const label1 = (ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh';
-        const label2 = String(years[i]);
-        ctx.fillStyle = positive ? '#3fb950' : '#f47a70';
-        const offset = positive ? -22 : 22;
-        ctx.fillText(label1, xPos, yPos + offset);
-        ctx.fillText(label2, xPos, yPos + offset + 11);
-      });
-      ctx.restore();
-    }
-  };
-
   new Chart(document.getElementById('c-net'), {
     type: 'bar',
-    plugins: [barLabelPlugin],
     data: { labels: years, datasets: [{
       data: vals,
       backgroundColor: vals.map(v => v>=0 ? 'rgba(63,185,80,0.85)' : 'rgba(244,122,112,0.85)'),
@@ -350,37 +254,16 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     }]},
     options: {
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 30, bottom: 8 } },
       plugins: {
         legend: { display: false },
         tooltip: { ...TOOLTIP_OPTS, callbacks: {
           title: i => i[0].label,
-          label: i => {
-            const v = i.parsed.y;
-            const ps = perShare[i.dataIndex];
-            return [
-              (v>=0?' Surplus: +':' Deficit: -') + '$' + Math.abs(v).toLocaleString(),
-              ' Per Share: ' + (ps>=0?'+':'-') + '$' + Math.abs(ps).toFixed(2) + '/sh'
-            ];
-          },
-          afterBody: items => {
-            const yr = parseInt(items[0].label);
-            if(MAINT_PDF_URLS[yr]) {
-              const pct = MAINT_INCREASES[yr] || '';
-              return ['', '📄 Maintenance ' + pct + ' — click chart to open Board Memo →'];
-            }
-            return [];
-          }
+          label: i => { const v=i.parsed.y; return (v>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(v).toLocaleString(); }
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation:45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => (v>=0?'+':'-')+'$'+Math.abs(v/1000).toFixed(0)+'K' }}
-      },
-      onClick: (e, els) => {
-        if(!els.length) return;
-        const yr = parseInt(years[els[0].index]);
-        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
@@ -401,7 +284,12 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   new Chart(document.getElementById('c-compare'), {
     type: 'line',
     data: { labels: years, datasets: [
-      { label: 'Total Income', data: incVals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.1)', borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#3fb950', tension: 0.3, fill: true },
+      { label: 'Total Income', data: incVals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.1)', borderWidth: 3,
+        pointRadius: years.map(y => MAINT_PDF_URLS[y] ? 8 : 4),
+        pointStyle: years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle'),
+        pointBackgroundColor: years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950'),
+        pointBorderColor: '#fff', pointBorderWidth: 1.5,
+        tension: 0.3, fill: true },
       { label: 'Total Expenses', data: expVals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.1)', borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#f47a70', tension: 0.3, fill: true }
     ]},
     options: {
@@ -418,38 +306,50 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
             const rawInc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
             const rawExp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0) + (CONFIG.showPrincipal ? MORTGAGE_PRINCIPAL[idx] : 0);
             const rawNet = rawInc - rawExp;
-            const net = sc(rawNet);
+            const net2 = sc(rawNet);
             const ps = rawNet / TOTAL_SHARES;
-            return [
+            const lines = [
               '',
-              (net>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net).toLocaleString(),
+              (net2>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(net2).toLocaleString(),
               ' Per Share: '+(ps>=0?'+':'-')+'$'+Math.abs(ps).toFixed(2)+'/sh'
             ];
+            if(MAINT_PDF_URLS[yr]) {
+              const pct = MAINT_INCREASES[yr] || '';
+              lines.push('');
+              lines.push('📄 Maintenance ' + pct + ' — click chart to open Board Memo →');
+            }
+            return lines;
           }
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      },
+      onClick: (e, els) => {
+        if(!els.length) return;
+        const yr = parseInt(years[els[0].index]);
+        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
 })();
 
-// ── 3. TOTAL INCOME LINE + CPI ──
+// ── 3. MAINTENANCE CHARGES LINE + CPI ──
 (function() {
-  const vals = years.map(y => {
-    const idx = ALL_YEARS.indexOf(y);
-    return sc(Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0));
-  });
+  const vals = years.map(y => sc(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(y)]));
   const cpiVals = scaleToMatch(vals, years);
+  const pointColors = years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950');
+  const pointStyles = years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle');
+  const pointRadii = years.map(y => MAINT_PDF_URLS[y] ? 9 : 4);
   new Chart(document.getElementById('c-maint'), {
     type: 'line',
     data: { labels: years, datasets: [
-      { label: 'Total Income', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
+      { label: 'Maintenance Charges', data: vals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.08)',
         borderWidth: 3, tension: 0.3, fill: true,
-        pointRadius: 4, pointBackgroundColor: '#3fb950', pointBorderColor: '#fff', pointBorderWidth: 2 },
-      { label: 'CPI-U (if income tracked inflation)', data: cpiVals,
+        pointRadius: pointRadii, pointBackgroundColor: pointColors,
+        pointStyle: pointStyles, pointBorderColor: '#fff', pointBorderWidth: 2 },
+      { label: 'CPI-U (if maintenance tracked inflation)', data: cpiVals,
         borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4],
         pointRadius: 0, fill: false, tension: 0.3 }
     ]},
@@ -461,7 +361,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           title: i => i[0].label,
           label: i => {
             if(i.datasetIndex === 1) return ' CPI baseline: $' + i.parsed.y.toLocaleString();
-            return ' Total Income: $' + i.parsed.y.toLocaleString();
+            return ' Maintenance: $' + i.parsed.y.toLocaleString();
           },
           afterBody: items => {
             const main = items.find(i => i.datasetIndex===0);
@@ -471,6 +371,8 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
               const sign = diff >= 0 ? '+' : '-';
               return ['', ' vs CPI baseline: ' + sign + '$' + Math.abs(diff).toLocaleString()];
             }
+            const yr = parseInt(items[0]?.label);
+            if(MAINT_PDF_URLS[yr]) return ['', '\u25C6 Click to open Board Memo'];
             return [];
           }
         }}
@@ -478,6 +380,11 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+      },
+      onClick: (e, els) => {
+        if(!els.length) return;
+        const yr = parseInt(years[els[0].index]);
+        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
@@ -513,6 +420,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
             return ' Total Expenses: $' + i.parsed.y.toLocaleString();
           },
           afterBody: items => {
+
             const main = items.find(i => i.datasetIndex===0);
             const cpi  = items.find(i => i.datasetIndex===1);
             if(main && cpi) {
@@ -532,68 +440,28 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 
-// ── 5. CAPITAL EXPENDITURES BAR + CUMULATIVE LINES ──
+// ── 5. CAPITAL EXPENDITURES BAR ──
 (function() {
-  const P1_END = 2005, P2_START = 2006;
   const vals = years.map(y => sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]));
-  // Pre-seed cumulative totals for years BEFORE the selected range
-  // so partial-range views show the correct running total
-  let cum1 = 0, cum2 = 0;
-  ALL_YEARS.forEach(y => {
-    if(years.indexOf(y) >= 0) return; // skip years in the selected range
-    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
-    if(y <= P1_END) cum1 += v;
-    else if(y < years[0]) cum2 += v; // only pre-seed up to range start
-  });
-  const cumP1 = [], cumP2 = [];
-  years.forEach(y => {
-    const v = sc(CAPEX_DATA[ALL_YEARS.indexOf(y)] || 0);
-    if(y <= P1_END) { cum1 += v; cumP1.push(cum1); cumP2.push(null); }
-    else            { cum2 += v; cumP1.push(null);  cumP2.push(cum2); }
-  });
   new Chart(document.getElementById('c-capex'), {
     type: 'bar',
-    data: { labels: years, datasets: [
-      { type: 'bar', label: 'Capital Expenditures', data: vals,
-        backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
-        borderWidth: 1, borderRadius: 3 },
-      { type: 'line', label: 'Cumulative 1990–2005', data: cumP1, yAxisID: 'y2',
-        borderColor: '#58a6ff', backgroundColor: 'transparent',
-        borderWidth: 2.5, borderDash: [6,3],
-        pointRadius: years.map(y => y === P1_END ? 7 : 2),
-        pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff',
-        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
-      { type: 'line', label: 'Cumulative 2006–2024', data: cumP2, yAxisID: 'y2',
-        borderColor: '#e8a020', backgroundColor: 'transparent',
-        borderWidth: 2.5, borderDash: [6,3],
-        pointRadius: years.map(y => y === 2024 ? 7 : 2),
-        pointBackgroundColor: '#e8a020', pointBorderColor: '#fff',
-        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
-    ]},
+    data: { labels: years, datasets: [{
+      data: vals,
+      backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726',
+      borderWidth: 1, borderRadius: 3
+    }]},
     options: {
       responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 16,
-          filter: item => item.text && item.text.indexOf('Cumulative') > -1 } },
-        tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+        legend: { display: false },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: {
           title: i => i[0].label,
-          label: i => {
-            if(i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString();
-            if(i.parsed.y == null) return null;
-            return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString();
-          }
+          label: i => ' CapEx: $' + i.parsed.y.toLocaleString()
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
-        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
-        y2: { position: 'right',
-          title: { display: true, text: 'Cumulative CapEx', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
-          ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888',
-            callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K') },
-          grid: { drawOnChartArea: false }
-        }
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
       }
     }
   });
@@ -646,63 +514,6 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
   });
 })();
 }; // end window.onload
-
-// ── LIGHTBOX ──
-var _lbChart = null;
-
-function openLightbox(canvasId, title, sub) {
-  var srcCanvas = document.getElementById(canvasId);
-  if(!srcCanvas) return;
-  var srcChart = Chart.getChart(srcCanvas);
-  if(!srcChart) return;
-
-  document.getElementById('lightbox-title').textContent = title;
-  document.getElementById('lightbox-sub').textContent = sub;
-
-  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
-
-  // Use the live config directly — preserves all callback functions
-  var srcCfg = srcChart.config;
-  var lbCanvas = document.getElementById('lightbox-canvas');
-
-  // Re-attach inline plugins (barLabelPlugin needs closure vars from c-net IIFE)
-  var extraPlugins = canvasId === 'c-net' ? [barLabelPlugin] : [];
-
-  _lbChart = new Chart(lbCanvas, {
-    type: srcCfg.type,
-    data: srcCfg.data,          // shared data reference — always current
-    options: srcCfg.options,    // shared options — preserves ALL callbacks
-    plugins: extraPlugins
-  });
-
-  document.getElementById('chart-lightbox').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLightbox(e) {
-  if(e && e.target !== document.getElementById('chart-lightbox') && e.target !== document.getElementById('lightbox-close')) return;
-  document.getElementById('chart-lightbox').classList.remove('open');
-  document.body.style.overflow = '';
-  if(_lbChart) { _lbChart.destroy(); _lbChart = null; }
-}
-
-document.addEventListener('keydown', function(e) {
-  if(e.key === 'Escape') closeLightbox({ target: document.getElementById('chart-lightbox') });
-});
 </script>
-<div id="chart-lightbox" onclick="closeLightbox(event)">
-  <div id="lightbox-inner">
-    <div id="lightbox-header">
-      <div>
-        <div id="lightbox-title"></div>
-        <div id="lightbox-sub"></div>
-      </div>
-      <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-    </div>
-    <div id="lightbox-body">
-      <div id="lightbox-canvas-wrap"><canvas id="lightbox-canvas"></canvas></div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
