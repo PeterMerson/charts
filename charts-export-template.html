@@ -193,7 +193,21 @@ function scaleToMatch(baseVals, years) {
     const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
     return Math.round(baseVals[0] * (cpi / startCPI));
   });
-}2004:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2005:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2007:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2008:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',2013:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2024:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'};
+}
+
+const MAINT_INCREASES = {
+  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',2013:'-6%',2023:'+9%',2024:'+1.5%',2025:'+4%'
+};
+const MAINT_PDF_URLS = {
+  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
+  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
+};
 
 // ── CONFIG (injected at export time) ──
 const CONFIG = {
@@ -420,7 +434,6 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
             return ' Total Expenses: $' + i.parsed.y.toLocaleString();
           },
           afterBody: items => {
-
             const main = items.find(i => i.datasetIndex===0);
             const cpi  = items.find(i => i.datasetIndex===1);
             if(main && cpi) {
