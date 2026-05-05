@@ -304,8 +304,41 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
     return sc(inc - exp);
   });
+  const perShare = years.map(y => {
+    const idx = ALL_YEARS.indexOf(y);
+    let inc = Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment'?s:s+INCOME[k][idx], 0);
+    let exp = Object.values(EXPENSES).reduce((s,arr) => s+arr[idx], 0);
+    if(CONFIG.showPrincipal) exp += MORTGAGE_PRINCIPAL[idx];
+    return (inc - exp) / TOTAL_SHARES;
+  });
+
+  barLabelPlugin = {
+    id: 'barLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx, data, scales: { x, y } } = chart;
+      ctx.save();
+      ctx.font = '600 8px IBM Plex Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      data.datasets[0].data.forEach((v, i) => {
+        const ps = perShare[i];
+        const positive = v >= 0;
+        const xPos = x.getPixelForValue(i);
+        const yPos = y.getPixelForValue(v);
+        const label1 = (ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh';
+        const label2 = String(years[i]);
+        ctx.fillStyle = positive ? '#3fb950' : '#f47a70';
+        const offset = positive ? -22 : 22;
+        ctx.fillText(label1, xPos, yPos + offset);
+        ctx.fillText(label2, xPos, yPos + offset + 11);
+      });
+      ctx.restore();
+    }
+  };
+
   new Chart(document.getElementById('c-net'), {
     type: 'bar',
+    plugins: [barLabelPlugin],
     data: { labels: years, datasets: [{
       data: vals,
       backgroundColor: vals.map(v => v>=0 ? 'rgba(63,185,80,0.85)' : 'rgba(244,122,112,0.85)'),
@@ -314,16 +347,37 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
     }]},
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 30, bottom: 8 } },
       plugins: {
         legend: { display: false },
         tooltip: { ...TOOLTIP_OPTS, callbacks: {
           title: i => i[0].label,
-          label: i => { const v=i.parsed.y; return (v>=0?' Surplus: +':' Deficit: -')+'$'+Math.abs(v).toLocaleString(); }
+          label: i => {
+            const v = i.parsed.y;
+            const ps = perShare[i.dataIndex];
+            return [
+              (v>=0?' Surplus: +':' Deficit: -') + '$' + Math.abs(v).toLocaleString(),
+              ' Per Share: ' + (ps>=0?'+':'-') + '$' + Math.abs(ps).toFixed(2) + '/sh'
+            ];
+          },
+          afterBody: items => {
+            const yr = parseInt(items[0].label);
+            if(MAINT_PDF_URLS[yr]) {
+              const pct = MAINT_INCREASES[yr] || '';
+              return ['', '📄 Maintenance ' + pct + ' — click chart to open Board Memo →'];
+            }
+            return [];
+          }
         }}
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation:45 }},
         y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => (v>=0?'+':'-')+'$'+Math.abs(v/1000).toFixed(0)+'K' }}
+      },
+      onClick: (e, els) => {
+        if(!els.length) return;
+        const yr = parseInt(years[els[0].index]);
+        if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
       }
     }
   });
