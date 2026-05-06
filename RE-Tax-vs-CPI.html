@@ -126,6 +126,42 @@ canvas { width: 100% !important; }
 .stat-val.blue   { color: #3a8fd4; }
 .stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; font-family: 'Courier New', monospace; }
 @media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+.retax-table-wrap {
+  margin-bottom: 16px; overflow-x: auto;
+}
+.retax-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'Courier New', monospace; font-size: 12px;
+}
+.retax-table thead tr {
+  background: #0d2240;
+}
+.retax-table thead th {
+  padding: 7px 8px; color: #c9a84c; text-align: right;
+  border-right: 1px solid rgba(201,168,76,0.2);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+}
+.retax-table thead th.cat-hdr {
+  text-align: left; border-right: 2px solid #c9a84c; min-width: 130px;
+}
+.retax-table tbody tr { background: #fff; }
+.retax-table tbody tr:nth-child(even) { background: #f5f7fb; }
+.retax-table tbody td {
+  padding: 6px 8px; text-align: right;
+  border-right: 1px solid #dde4ef; color: #1a3a5c;
+  font-weight: 600; white-space: nowrap;
+}
+.retax-table tbody td.cat-cell {
+  text-align: left; font-weight: 700; color: #0d2240;
+  border-right: 2px solid #b0bdd4;
+}
+.retax-table tbody td.dip { color: #c03030; font-weight: 800; }
+.retax-table-label {
+  font-family: 'Courier New', monospace; font-size: 11px;
+  color: #8a9aaa; text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 6px; margin-top: 14px;
+}
 .footer-note {
   text-align: center; font-size: 11px; color: #9aaa9a;
   font-family: 'Courier New', monospace; line-height: 1.6;
@@ -159,6 +195,8 @@ canvas { width: 100% !important; }
     <div class="audit-source">Source: Riveredge Owners, Inc. · Audited Annual Financial Statement · Exact wording from auditor's notes</div>
     <div class="audit-body" id="audit-body"></div>
   </div>
+
+
 
   <p class="audit-hint"><strong>● Click a red marker on the chart to read the audited footnote for that tax appeal year</strong></p>
 
@@ -201,6 +239,13 @@ canvas { width: 100% !important; }
   <div class="note-box">
     ⚠ &nbsp; <strong>Notable dips in 1997, 2009 and 2021</strong> reflect successful tax appeals/abatements — confirmed by elevated Legal &amp; Audit fees in those same years. These three campaigns alone saved approximately <strong>$637,000</strong> in a single year each. The ongoing discipline of keeping taxes below the CPI trajectory accounts for the remaining ~$3 million in cumulative savings.
   </div>
+
+
+  <p class="retax-table-label">Riveredge Real Estate Taxes — Audited Annual Figures 1990–2024</p>
+  <div class="retax-table-wrap"><table class="retax-table"><thead><tr><th class="cat-hdr">Category</th><th>1990</th><th>1991</th><th>1992</th><th>1993</th><th>1994</th><th>1995</th><th>1996</th><th>1997</th><th>1998</th><th>1999</th></tr></thead><tbody><tr><td class="cat-cell">Real Estate Taxes</td><td>$265,982</td><td>$273,827</td><td>$277,303</td><td>$295,757</td><td>$302,044</td><td>$267,846</td><td>$241,053</td><td class="dip">$135,681</td><td>$252,250</td><td>$235,110</td></tr></tbody></table></div>
+  <div class="retax-table-wrap"><table class="retax-table"><thead><tr><th class="cat-hdr">Category</th><th>2000</th><th>2001</th><th>2002</th><th>2003</th><th>2004</th><th>2005</th><th>2006</th><th>2007</th><th>2008</th><th>2009</th></tr></thead><tbody><tr><td class="cat-cell">Real Estate Taxes</td><td>$266,507</td><td>$276,498</td><td>$288,391</td><td>$299,670</td><td>$351,533</td><td>$372,308</td><td>$397,399</td><td>$407,434</td><td>$378,212</td><td class="dip">$301,570</td></tr></tbody></table></div>
+  <div class="retax-table-wrap"><table class="retax-table"><thead><tr><th class="cat-hdr">Category</th><th>2010</th><th>2011</th><th>2012</th><th>2013</th><th>2014</th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th></tr></thead><tbody><tr><td class="cat-cell">Real Estate Taxes</td><td>$314,334</td><td>$321,051</td><td>$315,063</td><td>$326,072</td><td>$346,985</td><td>$365,790</td><td>$360,439</td><td>$366,335</td><td>$379,323</td><td>$399,172</td></tr></tbody></table></div>
+  <div class="retax-table-wrap"><table class="retax-table"><thead><tr><th class="cat-hdr">Category</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead><tbody><tr><td class="cat-cell">Real Estate Taxes</td><td>$381,895</td><td class="dip">$240,345</td><td>$365,157</td><td>$369,302</td><td>$384,242</td></tr></tbody></table></div>
 
   <p class="footer-note">
     CPI data: U.S. Bureau of Labor Statistics via Federal Reserve Bank of Minneapolis (CPI-U, 1982–84 = 100). RE Tax data: Riveredge audited annual financial statements 1990–2024.<br>
