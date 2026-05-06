@@ -194,7 +194,7 @@ canvas { width: 100% !important; }
     <canvas id="chart" height="320"></canvas>
   </div>
 
-  <p class="audit-hint">● Click a red marker on the chart to read the audited footnote for that tax appeal year</p>
+  <p class="audit-hint"><strong>● Click a red marker on the chart to read the audited footnote for that tax appeal year</strong></p>
 
   <div class="audit-panel" id="audit-panel">
     <button class="audit-close" onclick="closeAudit()">✕ close</button>
@@ -434,6 +434,7 @@ new Chart(ctx, {
 
 // ── Audit footnote data ──
 const auditNotes = {
+
   1997: {
     heading: "Note 6: REAL ESTATE TAXES — PROFESSIONAL FEES",
     body: "Real estate tax expense is reduced by tax certiorari refunds of $113,939. Included in professional fees is legal fees of $81,881 related to the tax certiorari."
