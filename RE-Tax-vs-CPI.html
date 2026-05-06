@@ -130,6 +130,45 @@ canvas { width: 100% !important; }
   font-family: 'Courier New', monospace; line-height: 1.6;
   margin-top: 8px;
 }
+.audit-panel {
+  display: none; background: #fff; border-radius: 10px;
+  border-left: 5px solid #e03040;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  padding: 20px 24px; margin-bottom: 16px;
+  font-family: 'Courier New', monospace;
+  animation: fadeIn 0.2s ease;
+}
+.audit-panel.open { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.audit-year {
+  font-size: 1.3rem; font-weight: bold; color: #e03040;
+  margin-bottom: 4px; font-family: 'Georgia', serif;
+}
+.audit-heading {
+  font-size: 12px; font-weight: bold;
+  color: #1a2a3a; margin-bottom: 10px;
+}
+.audit-source {
+  font-size: 10px; font-family: 'Courier New', monospace;
+  color: #8a9aaa; text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.audit-body {
+  font-size: 12px; color: #2a3a4a; line-height: 1.8;
+}
+.audit-body strong { color: #1a2a3a; }
+.audit-close {
+  float: right; background: none; border: 1px solid #e03040;
+  color: #e03040; border-radius: 4px; padding: 2px 10px;
+  cursor: pointer; font-family: 'Courier New', monospace;
+  font-size: 11px; margin-left: 12px;
+}
+.audit-close:hover { background: #e03040; color: #fff; }
+.audit-hint {
+  text-align: center; font-size: 11px; color: #c9722a;
+  font-family: 'Courier New', monospace; margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
 
 @media (max-width: 600px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -140,10 +179,10 @@ canvas { width: 100% !important; }
 </head>
 <body>
 <div class="wrapper">
-
+<!--
   <a href="https://petermerson.github.io/charts/Building-Introduction.html" class="back-link">← Back to Know Your Building</a>
-
-  <h1 class="page-title">Real Estate Taxes vs. CPI</h1>
+-->
+  <h1 class="page-title">Riveredge Real Estate Taxes vs. CPI</h1>
   <p class="page-sub">Both series indexed to 100 in 1990 — showing cumulative growth relative to baseline &nbsp;|&nbsp; 1990–2024</p>
 
   <div class="legend-row">
@@ -153,6 +192,16 @@ canvas { width: 100% !important; }
 
   <div class="chart-card">
     <canvas id="chart" height="320"></canvas>
+  </div>
+
+  <p class="audit-hint">● Click a red marker on the chart to read the audited footnote for that tax appeal year</p>
+
+  <div class="audit-panel" id="audit-panel">
+    <button class="audit-close" onclick="closeAudit()">✕ close</button>
+    <div class="audit-year" id="audit-year"></div>
+    <div class="audit-heading" id="audit-heading"></div>
+    <div class="audit-source">Source: Riveredge Owners, Inc. · Audited Annual Financial Statement · Exact wording from auditor’s notes</div>
+    <div class="audit-body" id="audit-body"></div>
   </div>
 
   <div class="stats-row">
@@ -198,13 +247,13 @@ canvas { width: 100% !important; }
   <div class="note-box">
     ⚠ &nbsp; <strong>Notable dips in 1997 (index ~51), 2009 (index ~113) and 2021 (index ~90)</strong> reflect successful tax appeals/abatements — confirmed by elevated Legal &amp; Audit fees in those same years. These three campaigns alone saved approximately <strong>$637,000</strong> in a single year each. The ongoing discipline of keeping taxes below the CPI trajectory accounts for the remaining ~$3 million in cumulative savings.
   </div>
-
+<!--
   <div class="note-box" style="border-left-color:#3a8fd4;background:#eaf3fb;color:#0c3a5c;">
     ⓘ &nbsp; <strong>Note on the ~$3.6M vs. $255,173 figures:</strong> The ~$3.6 million is the <strong>cumulative 35-year savings</strong> — the sum of every year's gap between actual taxes paid and what taxes would have been had they grown at the CPI rate from 1990 through 2024. The $255,173 figure that appears in the <a href="https://petermerson.github.io/charts/Riveredge-Expense-vs-CPI-Analysis.html" target="_blank" style="color:#185fa5;">Expense vs. CPI Analysis</a> reflects only the <strong>single-year 2024 savings</strong> on that same basis — what was saved in that one year alone. Both figures are correct and consistent. They are measuring the same thing over different time spans.
 
 
   </div>
-
+-->
   <p class="footer-note">
     CPI data: U.S. Bureau of Labor Statistics via Federal Reserve Bank of Minneapolis (CPI-U, 1982–84 = 100). RE Tax data: Riveredge audited annual financial statements 1990–2024.<br>
     Savings calculation: actual RE taxes vs. CPI-indexed projection from 1990 baseline of $265,982. &nbsp;·&nbsp; 85,027 total shares.
@@ -306,6 +355,12 @@ new Chart(ctx, {
     responsive: true,
     maintainAspectRatio: true,
     interaction: { mode: 'index', intersect: false },
+    onClick: (evt, elements, chart) => {
+      if(!elements.length) return;
+      const i = elements[0].index;
+      const yr = years[i];
+      if(dipYears.includes(yr)) showAudit(yr);
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -376,6 +431,37 @@ new Chart(ctx, {
     }
   }
 });
+
+// ── Audit footnote data ──
+const auditNotes = {
+  1997: {
+    heading: "Note 6: REAL ESTATE TAXES — PROFESSIONAL FEES",
+    body: "Real estate tax expense is reduced by tax certiorari refunds of $113,939. Included in professional fees is legal fees of $81,881 related to the tax certiorari."
+  },
+  2009: {
+    heading: "11. REAL ESTATE TAX REFUND:",
+    body: "In August 2009, the Corporation was successful in its real estate tax assessment proceedings. A refund representing the years 1998-2004, 2005, 2006 and 2007 was awarded to the Corporation. The gross amount of the real estate tax refund was $256,431. After certiorari legal fees that totaled $85,442 and other legal expenses, a net check of $158,699 was received by the Corporation and deposited into a CD account with the Astoria Federal Savings Bank. When the CD matured in December 2009 the funds were used to purchase another CD with Signature Bank. See Note 3."
+  },
+  2021: {
+    heading: "10. Real Estate Tax Refunds",
+    body: "During February 2022, the Corporation settled the property tax review proceedings from the City of Yonkers and Westchester County. The settlement pertaining to tax periods 2016 through 2020 resulted in gross tax refunds amounting to $123,918 and gross tax savings amounting to $40,353. The gross tax refunds have been included as a reduction of real estate tax expense for the year ended December 31, 2001; whereas gross tax savings is given to the Corporation in the form of reduced real estate tax bills. The associated legal fees amounted to $59,237 and were expensed during 2021. As of December 31, 2021, real estate tax refunds receivable was $123,918, and real estate tax refund legal fees payable was $59,237, as shown on the accompanying Balance Sheet."
+  }
+};
+
+function showAudit(yr) {
+  const note = auditNotes[yr];
+  if(!note) return;
+  document.getElementById('audit-year').textContent = yr + ' — Tax Appeal Year';
+  document.getElementById('audit-heading').textContent = note.heading;
+  document.getElementById('audit-body').innerHTML = note.body;
+  const panel = document.getElementById('audit-panel');
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeAudit() {
+  document.getElementById('audit-panel').classList.remove('open');
+}
 </script>
 </body>
 </html>
