@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real Estate Taxes vs. CPI — Riveredge 1990–2024</title>
+<title>Riveredge RE Taxes — Actual Dollar Values vs. CPI Trajectory 1990–2024</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,16 +16,6 @@ body {
 }
 .wrapper { max-width: 900px; margin: 0 auto; }
 
-.back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'Courier New', monospace; font-size: 11px;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: #6a7a8a; text-decoration: none;
-  margin-bottom: 20px;
-  transition: color 0.15s;
-}
-.back-link:hover { color: #1a2a3a; }
-
 .page-title {
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   font-weight: bold; color: #1F4E79;
@@ -36,7 +26,6 @@ body {
   text-align: center; margin-bottom: 20px;
   font-family: 'Courier New', monospace;
 }
-
 .legend-row {
   display: flex; justify-content: center; gap: 16px;
   flex-wrap: wrap; margin-bottom: 20px;
@@ -58,65 +47,33 @@ body {
 }
 canvas { width: 100% !important; }
 
-.stats-row {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 12px; margin-bottom: 16px;
-}
-.stat-card {
-  background: #fff; border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  padding: 14px 16px; text-align: center;
-}
-.stat-label {
-  font-family: 'Courier New', monospace; font-size: 10px;
-  text-transform: uppercase; letter-spacing: 1px;
-  color: #8a9aaa; margin-bottom: 5px;
-}
-.stat-val {
-  font-size: 22px; font-weight: bold; color: #1F4E79;
-}
-.stat-val.orange { color: #c9722a; }
-.stat-val.blue   { color: #3a8fd4; }
-.stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; font-family: 'Courier New', monospace; }
-
-/* SAVINGS CALLOUT — new prominent block */
 .savings-block {
-  background: #1F4E79;
-  border-radius: 10px;
-  padding: 20px 28px;
-  margin-bottom: 16px;
+  background: #1F4E79; border-radius: 10px;
+  padding: 20px 28px; margin-bottom: 16px;
   display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
 }
 .savings-num {
   font-size: 2.8rem; font-weight: bold;
-  color: #f0c96a; white-space: nowrap; line-height: 1;
-  flex-shrink: 0;
+  color: #f0c96a; white-space: nowrap; line-height: 1; flex-shrink: 0;
 }
 .savings-num span {
   display: block; font-size: 11px; font-weight: normal;
   color: rgba(240,201,106,0.75); font-family: 'Courier New', monospace;
   text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
 }
-.savings-text {
-  flex: 1; min-width: 260px;
-}
-.savings-text h3 {
-  font-size: 1rem; color: #f0e8d0; margin-bottom: 6px; font-weight: bold;
-}
+.savings-text { flex: 1; min-width: 260px; }
+.savings-text h3 { font-size: 1rem; color: #f0e8d0; margin-bottom: 6px; font-weight: bold; }
 .savings-text p {
   font-size: 13px; color: rgba(240,232,208,0.8); line-height: 1.7;
   font-family: 'Courier New', monospace;
 }
-.savings-pills {
-  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;
-}
+.savings-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .savings-pill {
   font-family: 'Courier New', monospace; font-size: 11px;
   padding: 4px 10px; border-radius: 20px;
   background: rgba(240,201,106,0.15); border: 1px solid rgba(240,201,106,0.4);
   color: #f0c96a;
 }
-
 .note-box {
   background: #fff8e7; border-left: 4px solid #e6a817;
   border-radius: 0 8px 8px 0; padding: 12px 16px;
@@ -124,11 +81,10 @@ canvas { width: 100% !important; }
   font-family: 'Courier New', monospace; line-height: 1.6;
 }
 .note-box strong { color: #3a2800; }
-
-.footer-note {
-  text-align: center; font-size: 11px; color: #9aaa9a;
-  font-family: 'Courier New', monospace; line-height: 1.6;
-  margin-top: 8px;
+.audit-hint {
+  text-align: center; font-size: 12px; color: #c9722a;
+  font-family: 'Courier New', monospace; margin-bottom: 16px;
+  letter-spacing: 0.05em;
 }
 .audit-panel {
   display: none; background: #fff; border-radius: 10px;
@@ -140,23 +96,10 @@ canvas { width: 100% !important; }
 }
 .audit-panel.open { display: block; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-.audit-year {
-  font-size: 1.3rem; font-weight: bold; color: #e03040;
-  margin-bottom: 4px; font-family: 'Georgia', serif;
-}
-.audit-heading {
-  font-size: 12px; font-weight: bold;
-  color: #1a2a3a; margin-bottom: 10px;
-}
-.audit-source {
-  font-size: 10px; font-family: 'Courier New', monospace;
-  color: #8a9aaa; text-transform: uppercase; letter-spacing: 0.08em;
-  margin-bottom: 10px;
-}
-.audit-body {
-  font-size: 12px; color: #2a3a4a; line-height: 1.8;
-}
-.audit-body strong { color: #1a2a3a; }
+.audit-year { font-size: 1.3rem; font-weight: bold; color: #e03040; margin-bottom: 4px; font-family: 'Georgia', serif; }
+.audit-heading { font-size: 12px; font-weight: bold; color: #1a2a3a; margin-bottom: 6px; }
+.audit-source { font-size: 10px; color: #8a9aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.audit-body { font-size: 12px; color: #2a3a4a; line-height: 1.8; }
 .audit-close {
   float: right; background: none; border: 1px solid #e03040;
   color: #e03040; border-radius: 4px; padding: 2px 10px;
@@ -164,14 +107,12 @@ canvas { width: 100% !important; }
   font-size: 11px; margin-left: 12px;
 }
 .audit-close:hover { background: #e03040; color: #fff; }
-.audit-hint {
-  text-align: center; font-size: 11px; color: #c9722a;
-  font-family: 'Courier New', monospace; margin-bottom: 8px;
-  letter-spacing: 0.05em;
+.footer-note {
+  text-align: center; font-size: 11px; color: #9aaa9a;
+  font-family: 'Courier New', monospace; line-height: 1.6;
+  margin-top: 8px;
 }
-
 @media (max-width: 600px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
   .savings-block { flex-direction: column; gap: 16px; }
   .savings-num { font-size: 2.2rem; }
 }
@@ -179,60 +120,31 @@ canvas { width: 100% !important; }
 </head>
 <body>
 <div class="wrapper">
-<!--
-  <a href="https://petermerson.github.io/charts/Building-Introduction.html" class="back-link">← Back to Know Your Building</a>
--->
+
   <h1 class="page-title">Riveredge Real Estate Taxes vs. CPI</h1>
-  <p class="page-sub">Both series indexed to 100 in 1990 — showing cumulative growth relative to baseline &nbsp;|&nbsp; 1990–2024</p>
+  <p class="page-sub">What Riveredge actually paid each year vs. what taxes would have been if they tracked inflation from the 1990 baseline of $265,982 &nbsp;|&nbsp; 1990–2024</p>
 
   <div class="legend-row">
-    <div class="leg-pill leg-retax"><div class="leg-dot" style="background:#c9722a;"></div>Riveredge RE Taxes (indexed)</div>
-    <div class="leg-pill leg-cpi"><div class="leg-dot" style="background:#3a8fd4;"></div>US CPI-U (indexed)</div>
+    <div class="leg-pill leg-retax"><div class="leg-dot" style="background:#c9722a;"></div>Actual RE Taxes paid</div>
+    <div class="leg-pill leg-cpi"><div class="leg-dot" style="background:#3a8fd4;"></div>CPI-projected trajectory (shaded area)</div>
   </div>
 
   <div class="chart-card">
-    <canvas id="chart" height="320"></canvas>
+    <canvas id="chart" height="340"></canvas>
   </div>
-
-  <p class="audit-hint"><strong>● Click a red marker on the chart to read the audited footnote for that tax appeal year</strong></p>
 
   <div class="audit-panel" id="audit-panel">
     <button class="audit-close" onclick="closeAudit()">✕ close</button>
     <div class="audit-year" id="audit-year"></div>
     <div class="audit-heading" id="audit-heading"></div>
-    <div class="audit-source">Source: Riveredge Owners, Inc. · Audited Annual Financial Statement · Exact wording from auditor’s notes</div>
+    <div class="audit-source">Source: Riveredge Owners, Inc. · Audited Annual Financial Statement · Exact wording from auditor's notes</div>
     <div class="audit-body" id="audit-body"></div>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">RE Tax Growth</div>
-      <div class="stat-val orange">+44%</div>
-      <div class="stat-sub">1990 → 2024</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">CPI Growth</div>
-      <div class="stat-val blue">+140%</div>
-      <div class="stat-sub">1990 → 2024</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">RE Taxes 1990</div>
-      <div class="stat-val">$265,982</div>
-      <div class="stat-sub">Base year</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">RE Taxes 2024</div>
-      <div class="stat-val">$384,242</div>
-      <div class="stat-sub">Latest year</div>
-    </div>
-  </div>
+  <p class="audit-hint"><strong>● Click a red marker on the chart to read the audited footnote for that tax appeal year</strong></p>
 
-  <!-- SAVINGS CALLOUT — new -->
   <div class="savings-block">
-    <div class="savings-num">
-      ~$3.6M
-      <span>Estimated cumulative savings</span>
-    </div>
+    <div class="savings-num">~$3.6M<span>Estimated cumulative savings</span></div>
     <div class="savings-text">
       <h3>Estimated cumulative RE tax savings vs. CPI-adjusted trajectory: ~$3.6 million (1990–2024)</h3>
       <p>Had Riveredge's real estate taxes simply grown at the rate of general inflation (CPI), the building would have paid an estimated $14.75 million in taxes over 35 years. Actual taxes paid: $11.12 million. The difference — approximately $3.6 million — was saved through successful tax appeals and abatement challenges, returning roughly <strong style="color:#f0c96a;">$42.67 per share</strong> to shareholders over 35 years ($1.22/share/year on average).</p>
@@ -245,15 +157,9 @@ canvas { width: 100% !important; }
   </div>
 
   <div class="note-box">
-    ⚠ &nbsp; <strong>Notable dips in 1997 (index ~51), 2009 (index ~113) and 2021 (index ~90)</strong> reflect successful tax appeals/abatements — confirmed by elevated Legal &amp; Audit fees in those same years. These three campaigns alone saved approximately <strong>$637,000</strong> in a single year each. The ongoing discipline of keeping taxes below the CPI trajectory accounts for the remaining ~$3 million in cumulative savings.
+    ⚠ &nbsp; <strong>Notable dips in 1997, 2009 and 2021</strong> reflect successful tax appeals/abatements — confirmed by elevated Legal &amp; Audit fees in those same years. These three campaigns alone saved approximately <strong>$637,000</strong> in a single year each. The ongoing discipline of keeping taxes below the CPI trajectory accounts for the remaining ~$3 million in cumulative savings.
   </div>
-<!--
-  <div class="note-box" style="border-left-color:#3a8fd4;background:#eaf3fb;color:#0c3a5c;">
-    ⓘ &nbsp; <strong>Note on the ~$3.6M vs. $255,173 figures:</strong> The ~$3.6 million is the <strong>cumulative 35-year savings</strong> — the sum of every year's gap between actual taxes paid and what taxes would have been had they grown at the CPI rate from 1990 through 2024. The $255,173 figure that appears in the <a href="https://petermerson.github.io/charts/Riveredge-Expense-vs-CPI-Analysis.html" target="_blank" style="color:#185fa5;">Expense vs. CPI Analysis</a> reflects only the <strong>single-year 2024 savings</strong> on that same basis — what was saved in that one year alone. Both figures are correct and consistent. They are measuring the same thing over different time spans.
 
-
-  </div>
--->
   <p class="footer-note">
     CPI data: U.S. Bureau of Labor Statistics via Federal Reserve Bank of Minneapolis (CPI-U, 1982–84 = 100). RE Tax data: Riveredge audited annual financial statements 1990–2024.<br>
     Savings calculation: actual RE taxes vs. CPI-indexed projection from 1990 baseline of $265,982. &nbsp;·&nbsp; 85,027 total shares.
@@ -262,19 +168,37 @@ canvas { width: 100% !important; }
 </div>
 
 <script>
-const years = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
-const reTax = [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242];
-const cpiRaw = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
+const years    = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const reTax    = [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242];
+const cpiRaw   = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
 
 const base1990 = reTax[0];
 const cpiBase  = cpiRaw[0];
-
-const reTaxIdx = reTax.map(v => parseFloat((v / base1990 * 100).toFixed(1)));
-const cpiIdx   = cpiRaw.map(v => parseFloat((v / cpiBase * 100).toFixed(1)));
-
-// dip markers
+const cpiProjected = years.map((y, i) => Math.round(base1990 * cpiRaw[i] / cpiBase));
 const dipYears = [1997, 2009, 2021];
 
+// Blue CPI area fill — identical approach to the indexed chart
+const cpiAreaPlugin = {
+  id: 'cpiArea',
+  beforeDatasetsDraw(chart) {
+    const { ctx, scales: { x, y }, chartArea } = chart;
+    if (!x || !y || !chartArea) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(cpiProjected[0]));
+    for (let i = 1; i < cpiProjected.length; i++) {
+      ctx.lineTo(x.getPixelForValue(i), y.getPixelForValue(cpiProjected[i]));
+    }
+    ctx.lineTo(x.getPixelForValue(cpiProjected.length - 1), chartArea.bottom);
+    ctx.lineTo(x.getPixelForValue(0), chartArea.bottom);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(58,143,212,0.12)';
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
+// Red dip markers
 const dipPlugin = {
   id: 'dipMarkers',
   afterDatasetsDraw(chart) {
@@ -284,7 +208,7 @@ const dipPlugin = {
     years.forEach((yr, i) => {
       if (!dipYears.includes(yr)) return;
       const xPos = x.getPixelForValue(i);
-      const yPos = y.getPixelForValue(reTaxIdx[i]);
+      const yPos = y.getPixelForValue(reTax[i]);
       ctx.beginPath();
       ctx.arc(xPos, yPos, 7, 0, Math.PI * 2);
       ctx.fillStyle = '#e03040';
@@ -293,28 +217,9 @@ const dipPlugin = {
     ctx.restore();
   }
 };
-Chart.register(dipPlugin);
 
-const cpiAreaPlugin = {
-  id: 'cpiArea',
-  beforeDatasetsDraw(chart) {
-    const { ctx, scales: { x, y }, chartArea } = chart;
-    if (!x || !y || !chartArea) return;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(cpiIdx[0]));
-    for (let i = 1; i < cpiIdx.length; i++) {
-      ctx.lineTo(x.getPixelForValue(i), y.getPixelForValue(cpiIdx[i]));
-    }
-    ctx.lineTo(x.getPixelForValue(cpiIdx.length - 1), chartArea.bottom);
-    ctx.lineTo(x.getPixelForValue(0), chartArea.bottom);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(58,143,212,0.12)';
-    ctx.fill();
-    ctx.restore();
-  }
-};
 Chart.register(cpiAreaPlugin);
+Chart.register(dipPlugin);
 
 const ctx = document.getElementById('chart').getContext('2d');
 new Chart(ctx, {
@@ -323,8 +228,8 @@ new Chart(ctx, {
     labels: years,
     datasets: [
       {
-        label: 'US CPI-U (indexed)',
-        data: cpiIdx,
+        label: 'CPI-projected trajectory',
+        data: cpiProjected,
         borderColor: '#3a8fd4',
         backgroundColor: 'transparent',
         borderWidth: 2,
@@ -334,11 +239,11 @@ new Chart(ctx, {
         pointBorderColor: '#fff',
         pointBorderWidth: 1.5,
         tension: 0.3,
-        order: 1
+        order: 2
       },
       {
-        label: 'Riveredge RE Taxes (indexed)',
-        data: reTaxIdx,
+        label: 'Actual RE Taxes paid',
+        data: reTax,
         borderColor: '#c9722a',
         backgroundColor: 'transparent',
         borderWidth: 2.5,
@@ -347,7 +252,7 @@ new Chart(ctx, {
         pointBorderColor: '#fff',
         pointBorderWidth: 1.5,
         tension: 0.3,
-        order: 2
+        order: 1
       }
     ]
   },
@@ -355,11 +260,10 @@ new Chart(ctx, {
     responsive: true,
     maintainAspectRatio: true,
     interaction: { mode: 'index', intersect: false },
-    onClick: (evt, elements, chart) => {
-      if(!elements.length) return;
-      const i = elements[0].index;
-      const yr = years[i];
-      if(dipYears.includes(yr)) showAudit(yr);
+    onClick: (evt, elements) => {
+      if (!elements.length) return;
+      const yr = years[elements[0].index];
+      if (dipYears.includes(yr)) showAudit(yr);
     },
     plugins: {
       legend: { display: false },
@@ -375,8 +279,8 @@ new Chart(ctx, {
           label: item => {
             const i = item.dataIndex;
             const isCPI = item.dataset.label.includes('CPI');
-            if (isCPI) return ' CPI index: ' + cpiIdx[i].toFixed(1);
-            return ' RE Tax index: ' + reTaxIdx[i].toFixed(1);
+            if (isCPI) return ' CPI-projected: $' + cpiProjected[i].toLocaleString('en-US');
+            return ' Actual paid: $' + reTax[i].toLocaleString('en-US');
           },
           labelColor: item => {
             const isCPI = item.dataset.label.includes('CPI');
@@ -386,23 +290,15 @@ new Chart(ctx, {
           afterBody: items => {
             const i = items[0].dataIndex;
             const yr = years[i];
-            const actual    = reTax[i];
-            const projected = Math.round(base1990 * cpiRaw[i] / cpiBase);
-            const saved = projected - actual;
-            const lines = [
-              '',
-              ' Actual: $' + actual.toLocaleString('en-US'),
-              '',
-              ' CPI-projected: $' + projected.toLocaleString('en-US'),
-            ];
-            if (saved > 0) lines.push(' Saved vs CPI: $' + saved.toLocaleString('en-US'));
-            else lines.push(' Above CPI: $' + Math.abs(saved).toLocaleString('en-US'));
-            if (dipYears.includes(yr)) lines.push(' ★ Tax appeal year');
+            const saved = cpiProjected[i] - reTax[i];
+            const lines = [''];
+            if (saved > 0) lines.push(' ✓ Saved vs CPI: $' + saved.toLocaleString('en-US'));
+            else lines.push(' ▲ Above CPI: $' + Math.abs(saved).toLocaleString('en-US'));
+            if (dipYears.includes(yr)) lines.push(' ★ Tax appeal year — click to read audited note');
             return lines;
           }
         }
-      },
-      dipMarkers: {}
+      }
     },
     scales: {
       x: {
@@ -417,14 +313,14 @@ new Chart(ctx, {
       y: {
         title: {
           display: true,
-          text: 'Index (1990 = 100)',
+          text: 'Annual RE Taxes ($)',
           color: '#8a9aaa',
           font: { size: 11, family: 'Courier New' }
         },
         ticks: {
           color: '#8a9aaa',
           font: { size: 11, family: 'Courier New' },
-          callback: v => v
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
         },
         grid: { color: '#e8e4dc' }
       }
@@ -432,29 +328,28 @@ new Chart(ctx, {
   }
 });
 
-// ── Audit footnote data ──
+// ── Audit footnote data (verbatim from audited annual reports) ──
 const auditNotes = {
-
   1997: {
-    heading: "Note 6: REAL ESTATE TAXES — PROFESSIONAL FEES",
-    body: "Real estate tax expense is reduced by tax certiorari refunds of $113,939. Included in professional fees is legal fees of $81,881 related to the tax certiorari."
+    heading: 'Note 6: REAL ESTATE TAXES — PROFESSIONAL FEES',
+    body: 'Real estate tax expense is reduced by tax certiorari refunds of $113,939. Included in professional fees is legal fees of $81,881 related to the tax certiorari.'
   },
   2009: {
-    heading: "11. REAL ESTATE TAX REFUND:",
-    body: "In August 2009, the Corporation was successful in its real estate tax assessment proceedings. A refund representing the years 1998-2004, 2005, 2006 and 2007 was awarded to the Corporation. The gross amount of the real estate tax refund was $256,431. After certiorari legal fees that totaled $85,442 and other legal expenses, a net check of $158,699 was received by the Corporation and deposited into a CD account with the Astoria Federal Savings Bank. When the CD matured in December 2009 the funds were used to purchase another CD with Signature Bank. See Note 3."
+    heading: '11. REAL ESTATE TAX REFUND:',
+    body: 'In August 2009, the Corporation was successful in its real estate tax assessment proceedings. A refund representing the years 1998-2004, 2005, 2006 and 2007 was awarded to the Corporation. The gross amount of the real estate tax refund was $256,431. After certiorari legal fees that totaled $85,442 and other legal expenses, a net check of $158,699 was received by the Corporation and deposited into a CD account with the Astoria Federal Savings Bank. When the CD matured in December 2009 the funds were used to purchase another CD with Signature Bank. See Note 3.'
   },
   2021: {
-    heading: "10. Real Estate Tax Refunds",
-    body: "During February 2022, the Corporation settled the property tax review proceedings from the City of Yonkers and Westchester County. The settlement pertaining to tax periods 2016 through 2020 resulted in gross tax refunds amounting to $123,918 and gross tax savings amounting to $40,353. The gross tax refunds have been included as a reduction of real estate tax expense for the year ended December 31, 2021; whereas gross tax savings is given to the Corporation in the form of reduced real estate tax bills. The associated legal fees amounted to $59,237 and were expensed during 2021. As of December 31, 2021, real estate tax refunds receivable was $123,918, and real estate tax refund legal fees payable was $59,237, as shown on the accompanying Balance Sheet."
+    heading: '10. Real Estate Tax Refunds',
+    body: 'During February 2022, the Corporation settled the property tax review proceedings from the City of Yonkers and Westchester County. The settlement pertaining to tax periods 2016 through 2020 resulted in gross tax refunds amounting to $123,918 and gross tax savings amounting to $40,353. The gross tax refunds have been included as a reduction of real estate tax expense for the year ended December 31, 2021; whereas gross tax savings is given to the Corporation in the form of reduced real estate tax bills. The associated legal fees amounted to $59,237 and were expensed during 2021. As of December 31, 2021, real estate tax refunds receivable was $123,918, and real estate tax refund legal fees payable was $59,237, as shown on the accompanying Balance Sheet.'
   }
 };
 
 function showAudit(yr) {
   const note = auditNotes[yr];
-  if(!note) return;
+  if (!note) return;
   document.getElementById('audit-year').textContent = yr + ' — Tax Appeal Year';
   document.getElementById('audit-heading').textContent = note.heading;
-  document.getElementById('audit-body').innerHTML = note.body;
+  document.getElementById('audit-body').textContent = note.body;
   const panel = document.getElementById('audit-panel');
   panel.classList.add('open');
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
