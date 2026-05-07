@@ -2176,12 +2176,12 @@ function printChartsAsPDF() {
     '</style></head><body>' +
     '<div class="hdr"><div class="hdr-title">' + titleStr + '</div>' +
     '<div class="hdr-meta">' + metaStr + '</div></div>' +
+    rows +
     '<div class="principal-notice">' +
     '<span class="principal-icon">&#9432;</span>' +
-    '<strong>Mortgage Principal Payments are included in all expense and net income figures.</strong>' +
-    '&nbsp; These charts reflect the full cash cost of operating the building each year — including principal repayment — which is excluded from the audited Income Statement by accounting convention but represents a real shareholder obligation.' +
+    '<strong>Mortgage Principal Payments are included in all expense and net income figures on these charts.</strong>' +
+    '&nbsp; These charts reflect the full cash cost of operating the building each year — including principal repayment on the underlying mortgage. Mortgage Principal is excluded from the audited Income Statement by accounting convention, but represents a real cash obligation paid by shareholders. The Riveredge Matrix allows toggling Principal on or off; these charts always show the complete cash picture. <strong>All Special Assessment income is excluded in these calculations, 1993 &amp; 2002 thru 2006.</strong>' +
     '</div>' +
-    rows +
     '<div class="footer">Riveredge Owners, Inc. &nbsp;&middot;&nbsp; 1-3 David Lane, Yonkers NY &nbsp;&middot;&nbsp; Produced by Peter Merson &nbsp;&middot;&nbsp; Apt 8T &nbsp;&middot;&nbsp; In conjunction with Claude AI (Anthropic) &nbsp;&middot;&nbsp; claude.ai</div>' +
     '</body></html>';
 
@@ -3228,6 +3228,7 @@ function openPrintView(sections) {
     'Year Range: ' + f + ' – ' + t + '  ·  ' + years.length + ' years' + unitLabel + principalLabel +
     '  ·  Source: Audited Annual Financial Statements 1990–2024';
  
+
   function scaleVal(v) {
     return (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(v * MY_UNIT.shares / TOTAL_SHARES) : v;
   }
