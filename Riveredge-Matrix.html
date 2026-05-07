@@ -2071,8 +2071,7 @@ function printChartsAsPDF() {
     exp += (MORTGAGE_PRINCIPAL[idx]||0); // always include
     return sc(exp);
   });
-  var maintVals = years.map(function(y){ return sc(INCOME['Maintenance Charges'][ALL_YEARS.indexOf(y)]); });
-  var maintCPI  = scaleToMatch(maintVals, years);
+  var incCPI    = scaleToMatch(incVals, years);
   var expCPI    = scaleToMatch(expVals, years);
   var capexVals = years.map(function(y){ return sc(CAPEX_DATA[ALL_YEARS.indexOf(y)]); });
   var liqVals   = years.map(function(y){ return sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]); });
@@ -2120,8 +2119,8 @@ function printChartsAsPDF() {
     { plugins:{ legend:{ labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#1a3a5c', boxWidth:16 } } }, scales: scaleOpts(fmtM) });
 
   var img3 = chartImgData('line', years,
-    [{ label:'Maintenance Charges', data:maintVals, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,0.08)', borderWidth:3, pointRadius:3, tension:0.3, fill:true },
-     { label:'CPI-U baseline', data:maintCPI, borderColor:'#c9a84c', borderWidth:2, borderDash:[6,4], pointRadius:0, tension:0.3, fill:false }],
+    [{ label:'Total Income', data:incVals, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,0.08)', borderWidth:3, pointRadius:3, tension:0.3, fill:true },
+     { label:'CPI-U baseline', data:incCPI, borderColor:'#c9a84c', borderWidth:2, borderDash:[6,4], pointRadius:0, tension:0.3, fill:false }],
     { plugins:{ legend:{ labels:{ font:{family:'IBM Plex Mono',size:9}, color:'#1a3a5c', boxWidth:16 } } }, scales: scaleOpts(fmtM) });
 
   var img4 = chartImgData('line', years,
@@ -2140,7 +2139,7 @@ function printChartsAsPDF() {
   var charts = [
     { img: img1, title: 'Net Income — Surplus / Deficit', sub: 'Bar Chart · Green = Surplus · Red = Deficit' },
     { img: img2, title: 'Total Income vs Total Expenses', sub: 'Line Chart · Green = Income · Red = Expenses' },
-    { img: img3, title: 'Maintenance Charges', sub: 'Line Chart · Dashed gold line = CPI-U baseline (what maintenance would be if it tracked inflation)' },
+    { img: img3, title: 'Total Income', sub: 'Line Chart · All income categories combined · Dashed gold line = CPI-U baseline' },
     { img: img4, title: 'Total Expenses', sub: 'Line Chart · Dashed gold line = CPI-U baseline (what expenses would be if they tracked inflation)' },
     { img: img5, title: 'Capital Expenditures', sub: 'Bar Chart · Major building investments by year' },
     { img: img6, title: 'Total Liquidity (Cash & Equiv + Reserve)', sub: 'Bar Chart · Building\'s total financial cushion' }
@@ -3228,7 +3227,6 @@ function openPrintView(sections) {
     'Year Range: ' + f + ' – ' + t + '  ·  ' + years.length + ' years' + unitLabel + principalLabel +
     '  ·  Source: Audited Annual Financial Statements 1990–2024';
  
-
   function scaleVal(v) {
     return (MYUNIT_VIEW_ON && MY_UNIT) ? Math.round(v * MY_UNIT.shares / TOTAL_SHARES) : v;
   }
