@@ -3533,8 +3533,9 @@ function openExpRank() {
   // Update header
   document.getElementById('exp-rank-title').textContent =
     'Expense Ranking' + unitSuffix + ' — ' + from + '–' + to + ' (' + nYears + ' year' + (nYears>1?'s':'') + ')';
+  const principalLabel = SHOW_PRINCIPAL ? 'Mortgage Principal Included' : 'Mortgage Principal Excluded';
   document.getElementById('exp-rank-sub').textContent =
-    'Total: $' + total.toLocaleString('en-US') + '  ·  Ranked high to low  ·  Click bar for details';
+    'Total: $' + total.toLocaleString('en-US') + '  ·  Ranked high to low  ·  ' + principalLabel + '  ·  Click bar for details';
 
   // Destroy previous chart
   if(_expRankChart) { _expRankChart.destroy(); _expRankChart = null; }
@@ -3571,11 +3572,17 @@ function openExpRank() {
               const v = items.parsed.y;
               const pct = (v / total * 100).toFixed(1);
               const perYr = Math.round(v / nYears);
-              return [
+              const cat = items.label;
+              const lines = [
                 ' Total: $' + v.toLocaleString('en-US'),
                 ' % of expenses: ' + pct + '%',
                 ' Avg/year: $' + perYr.toLocaleString('en-US')
               ];
+              if(cat === 'Mortgage Interest') {
+                lines.push('');
+                lines.push(' ' + (SHOW_PRINCIPAL ? '✓ Mortgage Principal Included' : '⚠ Mortgage Principal Excluded'));
+              }
+              return lines;
             }
           }
         }
