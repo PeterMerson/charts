@@ -176,7 +176,7 @@
  },
 {
     "Year": "2025",
-     "Expenses": { "Pool expense including supplies": 49165, "Landscaping": 62335, "Janitorial supplies": 22763, "Miscellaneous repairs and general contracting": 9835, "Plumbing, heating boiler": 54916, "Water damages and mold remediation": 0, "Elevator": 13254, "Painting, plastering and apartment repairs": 6750, "Doors,locks,windows and intercom": 14837, "Laundry room": 8132, "Exterminating": 5713, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 4029, "Exterior": 1500,"Other Insurance refunds": -4726,"Fire and water damages,net": 6520,"Roadway repairs": 0,"miscellaneous-A": 0,"miscellaneous-B": 0 },
+     "Expenses": { "Pool expense including supplies": 49165, "Landscaping": 62335, "Janitorial supplies": 22763, "Miscellaneous repairs and general contracting": 9835, "Plumbing, heating boiler": 54916, "Water damages and mold remediation": 0, "Elevator": 13254, "Painting, plastering and apartment repairs": 6750, "Doors,locks,windows and intercom": 14837, "Laundry room": 8132, "Exterminating": 5713, "Electric repairs": 0, "Apartment repairs": 0, "Storm related damages and cleanup costs, net": 0, "Fencing": 4029, "Exterior": 1500,"Other Insurance refunds": 0,"Fire and water damages,net": 6520,"Roadway repairs": 0,"miscellaneous-A": 0,"miscellaneous-B": 0 },
      "Utilities": { "Fuel Oil": 245961, "Electric & Gas": 58300 },
  }	
 ]
