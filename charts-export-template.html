@@ -188,7 +188,7 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: #0d2240;
 <script>
 window.onload = function() {
 // ── DATA ──
-const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
 const TOTAL_SHARES = 85027;
 
 const INCOME = {
@@ -216,12 +216,12 @@ const EXPENSES = {
   "Corp Tax & Misc.":   [14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,16206,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577]
 };
 
-const MORTGAGE_PRINCIPAL = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052];
-const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304];
-const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793];
-const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508];
-const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869];
-const CPI_U_DATA = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2];
+const MORTGAGE_PRINCIPAL = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052,73761];
+const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304,157995];
+const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793,2135505];
+const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508,560226];
+const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869,800182];
+const CPI_U_DATA = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2,320.9];
 
 function getCPIIndexed(years) {
   const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
@@ -282,7 +282,7 @@ if(CONFIG.myUnitOn && CONFIG.myUnit) {
     'Riveredge <em>Income &amp; Expense Matrix</em> — Apt ' + CONFIG.myUnit.apt + ' (' + CONFIG.myUnit.type + ', ' + CONFIG.myUnit.shares + ' shares)';
 }
 document.getElementById('main-meta').textContent =
-  'Year Range: ' + CONFIG.fromYear + ' – ' + CONFIG.toYear + '  ·  ' + years.length + ' years  ·  ' + unitLabel + '  ·  ' + principalLabel + '  ·  Source: Audited Annual Financial Statements 1990–2024';
+  'Year Range: ' + CONFIG.fromYear + ' – ' + CONFIG.toYear + '  ·  ' + years.length + ' years  ·  ' + unitLabel + '  ·  ' + principalLabel + '  ·  Source: Audited Annual Financial Statements 1990–2025';
 document.getElementById('ctrl-years').textContent = CONFIG.fromYear + ' – ' + CONFIG.toYear + ' (' + years.length + ' years)';
 document.getElementById('ctrl-unit').textContent = unitLabel;
 document.getElementById('ctrl-principal').textContent = principalLabel;
@@ -576,7 +576,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         pointRadius: years.map(y => y === P1_END ? 7 : 2),
         pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff',
         pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
-      { type: 'line', label: 'Cumulative 2006–2024', data: cumP2, yAxisID: 'y2',
+      { type: 'line', label: 'Cumulative 2006–2025', data: cumP2, yAxisID: 'y2',
         borderColor: '#e8a020', backgroundColor: 'transparent',
         borderWidth: 2.5, borderDash: [6,3],
         pointRadius: years.map(y => y === years[years.length-1] && y >= P2_START ? 7 : 2),
@@ -614,10 +614,18 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
 
 // ── 6. TOTAL LIQUIDITY BAR ──
 (function() {
+  const P2_START = 2006;
   const vals = years.map(y => sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]));
   const wHigh = years.map(y => sc(W_BENCH_HIGH[ALL_YEARS.indexOf(y)]));
   const wLow  = years.map(y => sc(W_BENCH_LOW[ALL_YEARS.indexOf(y)]));
   const base2006 = sc(271218);
+  // Cumulative liquidity from 2006 onward
+  let cumLiq = 0;
+  const cumLiqData = years.map(y => {
+    if(y < P2_START) return null;
+    cumLiq += sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)] || 0);
+    return cumLiq;
+  });
   new Chart(document.getElementById('c-liq'), {
     type: 'bar',
     data: { labels: years, datasets: [
@@ -629,7 +637,13 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         pointRadius: 0, fill: false },
       { type: 'line', label: 'W.Low Standard $3,500/unit', data: wLow,
         borderColor: '#f47a70', borderWidth: 2, borderDash: [6,4],
-        pointRadius: 0, fill: false }
+        pointRadius: 0, fill: false },
+      { type: 'line', label: 'Cumulative 2006–2025', data: cumLiqData, yAxisID: 'y2',
+        borderColor: '#e8a020', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === years[years.length-1] && y >= P2_START ? 7 : 2),
+        pointBackgroundColor: '#e8a020', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
     ]},
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -640,7 +654,9 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
           label: i => {
             if(i.datasetIndex===0) return ' Total Liquidity: $'+i.parsed.y.toLocaleString();
             if(i.datasetIndex===1) return ' W.High $5,000/unit: $'+Math.round(i.parsed.y).toLocaleString();
-            return ' W.Low $3,500/unit: $'+Math.round(i.parsed.y).toLocaleString();
+            if(i.datasetIndex===2) return ' W.Low $3,500/unit: $'+Math.round(i.parsed.y).toLocaleString();
+            if(i.parsed.y == null) return null;
+            return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString();
           },
           afterBody: items => {
             const main = items.find(i=>i.datasetIndex===0);
@@ -653,7 +669,13 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
-        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+        y2: { position: 'right',
+          title: { display: true, text: 'Cumulative Liquidity (2006–2025)', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888',
+            callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K') },
+          grid: { drawOnChartArea: false }
+        }
       }
     }
   });
