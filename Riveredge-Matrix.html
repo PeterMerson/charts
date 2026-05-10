@@ -227,6 +227,7 @@ table.matrix { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mo
 
 
 
+
 .matrix tbody tr.net-row td { color: #f7f3ec; border-right-color: #2a3a2a; }
 .matrix tbody tr.net-row td.cat-col { font-family: 'Playfair Display', serif; font-size: 0.8rem; font-weight: 700; color: #6fcf82; background: #1a2e1a; }
  
@@ -2726,6 +2727,29 @@ function selectCapCat(cat, years) {
     });
   }
 
+  // Add cumulative Liquidity line from 2006 onward (bar mode only, Liquidity category only)
+  if(isLiq && isBar) {
+    const LIQ_START = 2006;
+    let cumLiq = 0;
+    const cumLiqData = [];
+    years.forEach(y => {
+      if(y < LIQ_START) { cumLiqData.push(null); }
+      else {
+        const raw = CAP_DATA[cat][ALL_YEARS.indexOf(y)] || 0;
+        cumLiq += Math.round(raw * scale);
+        cumLiqData.push(cumLiq);
+      }
+    });
+    datasets.push({
+      type:'line', label:'Cumulative 2006\u20132025', data:cumLiqData, yAxisID:'y2',
+      borderColor:'#e8a020', backgroundColor:'transparent',
+      borderWidth:2.5, borderDash:[6,3],
+      pointRadius:years.map(y=>y===2025?7:2),
+      pointBackgroundColor:'#e8a020', pointBorderColor:'#fff',
+      pointBorderWidth:1.5, pointHoverRadius:7, tension:0.3, spanGaps:false
+    });
+  }
+
   // Add cumulative CapEx lines for the two periods (bar mode only, CapEx category only)
   const isCapEx = cat === 'Capital Expenditures';
   if(isCapEx && isBar) {
@@ -2763,7 +2787,7 @@ function selectCapCat(cat, years) {
     options: { responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
       plugins:{
-        legend:{ display: isLiq || (isCapEx && isBar),
+        legend:{ display: isLiq || (isCapEx && isBar) || (isLiq && isBar),
           labels:{ color:'#1a3a5c', font:{family:'IBM Plex Mono',size:11, weight:'bold'},
             boxWidth:20, padding:12,
             filter: item => item.text.indexOf(catLabel) === -1
@@ -2796,8 +2820,8 @@ function selectCapCat(cat, years) {
       scales:{
         x:{ ticks:{font:{family:'IBM Plex Mono',size:10, weight:'bold'},color:'#1a3a5c',maxRotation:90,callback:(v,i)=>years[i]}, grid:{color:'#dde4ef'} },
         y:{ ticks:{font:{family:'IBM Plex Mono',size:10, weight:'bold'},color:'#1a3a5c',callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':(v/1000).toFixed(0)+'K')}, grid:{color:'#dde4ef'} },
-        y2:{ display: isCapEx && isBar, position:'right',
-          title:{ display:true, text:'Cumulative CapEx', font:{family:'IBM Plex Mono',size:9}, color:'#888' },
+        y2:{ display: (isCapEx || isLiq) && isBar, position:'right',
+          title:{ display:true, text: isLiq ? 'Cumulative Liquidity (2006–2025)' : 'Cumulative CapEx', font:{family:'IBM Plex Mono',size:9}, color:'#888' },
           ticks:{font:{family:'IBM Plex Mono',size:9},color:'#888',
             callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'K')},
           grid:{drawOnChartArea:false}
@@ -2959,6 +2983,7 @@ const APARTMENTS = [
   {apt:'4D', shares:524, type:'1BR', building:'Woodside'},
   {apt:'4E', shares:667, type:'2BR', building:'Woodside'},
   {apt:'4F', shares:686, type:'3BR', building:'Riverside'},
+
   {apt:'4G', shares:571, type:'1BR', building:'Riverside'},
   {apt:'4H', shares:581, type:'Jr 2BR', building:'Riverside'},
   {apt:'4J', shares:571, type:'1BR', building:'Riverside'},
@@ -3718,6 +3743,7 @@ scrollAllRight();
       </div>
     </div>
     <div id="print-modal-body">
+
       <!-- Populated by openPrintView() -->
     </div>
   </div>
