@@ -578,7 +578,7 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         pointRadius: years.map(y => y === P1_END ? 7 : 2),
         pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff',
         pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
-      { type: 'line', label: 'Cumulative 2006–2024', data: cumP2, yAxisID: 'y2',
+      { type: 'line', label: 'Cumulative 2006–2025', data: cumP2, yAxisID: 'y2',
         borderColor: '#e8a020', backgroundColor: 'transparent',
         borderWidth: 2.5, borderDash: [6,3],
         pointRadius: years.map(y => y === years[years.length-1] && y >= P2_START ? 7 : 2),
@@ -616,10 +616,17 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
 
 // ── 6. TOTAL LIQUIDITY BAR ──
 (function() {
+  const P2_START = 2006;
   const vals = years.map(y => sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)]));
   const wHigh = years.map(y => sc(W_BENCH_HIGH[ALL_YEARS.indexOf(y)]));
   const wLow  = years.map(y => sc(W_BENCH_LOW[ALL_YEARS.indexOf(y)]));
   const base2006 = sc(271218);
+  let cumLiq = 0;
+  const cumLiqData = years.map(y => {
+    if(y < P2_START) return null;
+    cumLiq += sc(LIQUIDITY_DATA[ALL_YEARS.indexOf(y)] || 0);
+    return cumLiq;
+  });
   new Chart(document.getElementById('c-liq'), {
     type: 'bar',
     data: { labels: years, datasets: [
@@ -631,7 +638,13 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         pointRadius: 0, fill: false },
       { type: 'line', label: 'W.Low Standard $3,500/unit', data: wLow,
         borderColor: '#f47a70', borderWidth: 2, borderDash: [6,4],
-        pointRadius: 0, fill: false }
+        pointRadius: 0, fill: false },
+      { type: 'line', label: 'Cumulative 2006–2025', data: cumLiqData, yAxisID: 'y2',
+        borderColor: '#e8a020', backgroundColor: 'transparent',
+        borderWidth: 2.5, borderDash: [6,3],
+        pointRadius: years.map(y => y === years[years.length-1] && y >= P2_START ? 7 : 2),
+        pointBackgroundColor: '#e8a020', pointBorderColor: '#fff',
+        pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
     ]},
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -640,9 +653,10 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
         tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
           title: i => i[0].label,
           label: i => {
-            if(i.datasetIndex===0) return ' Total Liquidity: $'+i.parsed.y.toLocaleString();
-            if(i.datasetIndex===1) return ' W.High $5,000/unit: $'+Math.round(i.parsed.y).toLocaleString();
-            return ' W.Low $3,500/unit: $'+Math.round(i.parsed.y).toLocaleString();
+            if(i.datasetIndex===0) return [' Total Liquidity: $'+i.parsed.y.toLocaleString(), ''];
+            if(i.datasetIndex===1) return [' W.High $5,000/unit: $'+Math.round(i.parsed.y).toLocaleString(), ''];
+            if(i.datasetIndex===2) return ' W.Low $3,500/unit: $'+Math.round(i.parsed.y).toLocaleString();
+            return null;
           },
           afterBody: items => {
             const main = items.find(i=>i.datasetIndex===0);
@@ -655,7 +669,13 @@ const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
       },
       scales: {
         x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
-        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+        y2: { position: 'right',
+          title: { display: true, text: 'Cumulative Liquidity (2006–2025)', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+          ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888',
+            callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : (v/1000).toFixed(0)+'K') },
+          grid: { drawOnChartArea: false }
+        }
       }
     }
   });
