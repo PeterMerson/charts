@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge — 36 Years of Financial Data</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d2240;--navy2:#071830;--gold:#c9a84c;--gold-lt:#e8c96a;
+  --green:#3fb950;--red:#f47a70;--blue:#58a6ff;--text:#f7f3ec;
+  --muted:rgba(247,243,236,0.55);--card:rgba(255,255,255,0.035);--border:rgba(201,168,76,0.2);
+}
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .masthead{background:#0d2240!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .chart-card{break-inside:avoid;border:1px solid #ccc!important}
+  .verdict{background:#f0f7f0!important;border-left-color:#2a6e2a!important}
+}
+html{scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+.masthead{background:linear-gradient(135deg,var(--navy2) 0%,var(--navy) 55%,#0a1e38 100%);border-bottom:3px solid var(--gold);padding:52px 64px 44px;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 75% 40%,rgba(201,168,76,0.07) 0%,transparent 65%);pointer-events:none}
+.mast-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px}
+.mast-title{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;line-height:1.1;margin-bottom:10px}
+.mast-title em{color:var(--gold);font-style:normal}
+.mast-sub{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:rgba(201,168,76,0.65);letter-spacing:0.07em;margin-top:6px}
+.mast-pills{display:flex;gap:20px;flex-wrap:wrap;margin-top:32px}
+.pill{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:4px;padding:10px 18px}
+.pill-label{font-family:'IBM Plex Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);margin-bottom:4px}
+.pill-val{font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:600;color:var(--text)}
+.pill-val.green{color:var(--green)}.pill-val.gold{color:var(--gold-lt)}
+.intro{max-width:860px;margin:40px 64px 8px;font-size:1.05rem;line-height:1.75;color:rgba(247,243,236,0.82)}
+.intro strong{color:var(--text)}
+.section{margin:40px 64px 0}
+.section-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold);margin-bottom:6px}
+.section-headline{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.25}
+.section-takeaway{font-size:0.95rem;line-height:1.65;color:var(--muted);margin-bottom:22px;max-width:820px}
+.section-takeaway strong{color:var(--text)}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 24px 18px}
+.chart-wrap{position:relative;height:320px}
+.verdict{margin:36px 64px 0;background:rgba(63,185,80,0.07);border:1px solid rgba(63,185,80,0.25);border-left:5px solid var(--green);border-radius:0 8px 8px 0;padding:26px 32px}
+.verdict-title{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--green);margin-bottom:10px}
+.verdict p{font-size:0.98rem;line-height:1.75;color:rgba(247,243,236,0.88)}
+.verdict strong{color:var(--text)}
+.acct-box{margin:28px 64px 0;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);border-left:5px solid var(--gold);border-radius:0 8px 8px 0;padding:22px 28px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+.acct-label{font-family:'IBM Plex Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);margin-bottom:6px}
+.acct-val{font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--text)}
+.acct-text{flex:1;font-size:0.93rem;line-height:1.7;color:rgba(247,243,236,0.82);min-width:280px}
+.acct-text strong{color:var(--text)}
+footer{margin:48px 64px 0;padding:22px 0 32px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:rgba(201,168,76,0.38);letter-spacing:0.1em;text-align:center}
+@media(max-width:780px){
+  .masthead,.intro,.section,.verdict,.acct-box,footer{margin-left:20px;margin-right:20px}
+  .masthead{padding:32px 20px 28px}.mast-title{font-size:1.9rem}.chart-wrap{height:260px}
+}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="mast-eyebrow">Riveredge Owners, Inc. &nbsp;·&nbsp; 1-3 David Lane, Yonkers NY &nbsp;·&nbsp; Board Presentation · May 2026</div>
+  <div class="mast-title">36 Years of <em>Financial Data.</em></div>
+  <div class="mast-sub">Audited Annual Statements 1990–2025 &nbsp;·&nbsp; Three charts that tell the full story</div>
+  <div class="mast-pills">
+    <div class="pill"><div class="pill-label">Period Covered</div><div class="pill-val">1990 – 2025</div></div>
+    <div class="pill"><div class="pill-label">Surplus Years</div><div class="pill-val green">27 of 36</div></div>
+    <div class="pill"><div class="pill-label">Total CapEx Invested</div><div class="pill-val gold">$4,650,952</div></div>
+    <div class="pill"><div class="pill-label">2025 Year-End Cash</div><div class="pill-val gold">$2,135,505</div></div>
+    <div class="pill"><div class="pill-label">2025 Net Surplus</div><div class="pill-val green">+$228,492</div></div>
+    <div class="pill"><div class="pill-label">Accountant's Rec. Range</div><div class="pill-val">$564K – $847K</div></div>
+  </div>
+</div>
+
+<p class="intro">
+  The three charts below are drawn entirely from Riveredge's own <strong>audited annual financial statements</strong>.
+  They show the building's complete financial history from 1990 through 2025 — 36 years of data that many shareholders
+  and board members may never have seen in one place. Each chart tells a distinct part of the story.
+</p>
+
+<!-- CHART 1 -->
+<div class="section">
+  <div class="section-eyebrow">Chart 1 of 3 &nbsp;·&nbsp; Cash & Equivalents Year-End</div>
+  <div class="section-headline">Total Liquidity has grown 580% since 2005 — and sits 2.5× above the accountant's recommended ceiling.</div>
+  <div class="section-takeaway">
+    The building's year-end cash position stands at <strong>$2,135,505 in 2025</strong>, up from $313,914 at year-end 2005.
+    The two dashed lines show the reserve range the cooperative's own accountant recommended at the annual meeting:
+    4–6 months of operating expenses, <strong>recalculated each year from audited operating expenses</strong>. For 2025 that range is
+    <strong>$564,391 – $846,586</strong>. Current cash is <strong>2.5× the top of that range</strong>.
+    The dip in 2022–2024 was driven by a one-time $228,074 fire/water casualty event — and fully recovered in 2025.
+  </div>
+  <div class="chart-card"><div class="chart-wrap"><canvas id="chartLiq"></canvas></div></div>
+</div>
+
+<!-- CHART 2 -->
+<div class="section" style="margin-top:44px">
+  <div class="section-eyebrow">Chart 2 of 3 &nbsp;·&nbsp; Annual Net Income (Income minus All Expenses incl. Mortgage Principal)</div>
+  <div class="section-headline">The building has run a surplus in 27 of 36 years. 2024 was the only deficit since 2005 — and 2025 fully reversed it.</div>
+  <div class="section-takeaway">
+    Green bars are surplus years; red bars are deficit years. <strong>18 of the last 19 years</strong> have been in the black.
+    The 2024 deficit (the single red bar on the right) was caused entirely by a one-time $228,074 fire and water damage event —
+    not by structural financial weakness. <strong>2025 returned to surplus immediately, without any assessment</strong>,
+    following that year's record-high maintenance increase of 17%.
+    The orange dashed line marks the landmark 2006 surplus of $257,969 — the year of the 17% maintenance increase.
+    <strong>Click any bar</strong> to re-read the shareholder memo and view the vote count for that year.
+  </div>
+  <div class="chart-card"><div class="chart-wrap"><canvas id="chartNet"></canvas></div></div>
+</div>
+
+<!-- CHART 3 -->
+<div class="section" style="margin-top:44px">
+  <div class="section-eyebrow">Chart 3 of 3 &nbsp;·&nbsp; Capital Expenditures — Major Building Investments by Year</div>
+  <div class="section-headline">$2.73 million invested in the building since 2006 — funded entirely from operations, without a single assessment.</div>
+  <div class="section-takeaway">
+    The building has consistently invested in itself: roofing, boilers, pool, elevators, landscaping, and more.
+    This ongoing reinvestment <strong>has not depleted reserves</strong> — liquidity has continued to grow.
+    The two cumulative lines compare two distinct periods: <strong>blue = 1990–2005 ($1,920,214)</strong> and
+    <strong>gold = 2006–2025 ($2,730,738)</strong>, showing how capital investment has grown in the modern era.
+  </div>
+  <div class="chart-card"><div class="chart-wrap"><canvas id="chartCapex"></canvas></div></div>
+</div>
+
+<!-- ACCOUNTANT BOX -->
+<div class="acct-box">
+  <div><div class="acct-label">Accountant's Recommendation</div><div class="acct-val">4 – 6 Months of Operating Expenses</div></div>
+  <div><div class="acct-label">2025 Operating Expenses</div><div class="acct-val">$1,693,173</div></div>
+  <div><div class="acct-label">Recommended Range</div><div class="acct-val">$564,391 – $846,586</div></div>
+  <div><div class="acct-label">Actual 2025 Cash</div><div class="acct-val" style="color:var(--gold-lt)">$2,135,505</div></div>
+  <div class="acct-text">
+    <strong>The cooperative's own accountant stated publicly at the annual meeting</strong> that reserves should be
+    sized at 4–6 months of operating expenses. Current cash stands at <strong>3.8× the bottom</strong> and
+    <strong>2.5× the top</strong> of that recommended range.
+  </div>
+</div>
+
+<!-- VERDICT -->
+<div class="verdict">
+  <div class="verdict-title">&#x2713; Summary — What These Three Charts Show Together</div>
+  <p>
+    The building's liquidity has grown <strong>457% over 36 years</strong> and currently sits <strong>2.5 times above the ceiling
+    recommended by the cooperative's own accountant</strong>. The building has generated a surplus in <strong>27 of 36 years</strong>,
+    including 18 of the last 19, and returned to surplus in 2025 without any assessment. Over the same period,
+    <strong>$4.65 million was invested in capital improvements</strong>.
+    Taken together, these charts demonstrate a building in sound financial health that is fully capable of
+    funding its ongoing needs through normal operations. A special assessment of $1,020,324 is not supported
+    by the financial record.
+  </p>
+</div>
+
+<footer>
+  RIVEREDGE OWNERS, INC. &nbsp;·&nbsp; 1-3 DAVID LANE, YONKERS NY &nbsp;·&nbsp;
+  SOURCE: AUDITED ANNUAL FINANCIAL STATEMENTS 1990–2025 &nbsp;·&nbsp;
+  PREPARED BY PETER MERSON, APT 8T &nbsp;·&nbsp; MAY 2026
+</footer>
+
+<script>
+const YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+
+// Income arrays
+const INC_MAINT=[1020324,1020324,1020324,1027976,1048884,1066534,1074031,1073289,1073379,1042612,1069444,1075712,1069345,1088387,1161724,1308354,1571429,1570096,1587982,1620174,1620174,1620174,1620174,1531251,1513447,1513447,1507782,1513404,1513404,1513404,1513404,1513404,1503542,1513404,1644840,1667847];
+const INC_PARK=[87315,84893,85403,83638,83792,82754,82684,80162,78700,77113,76065,80649,86754,87193,84212,83814,85139,87939,87407,88235,88043,88352,87530,85794,86622,85896,87949,87754,86302,86251,83510,80949,81578,81329,80383,96261];
+const INC_LAUND=[15025,15000,15000,15550,15600,15600,15600,15600,15600,14300,17283,17838,27727,26278,23477,29926,28597,39492,35355,33798,36357,34675,31954,29333,28676,26581,28937,30524,31379,30853,26325,26000,25635,26280,25850,36585];
+const INC_TRANS=[8750,10189,1026,6276,11231,11798,8481,11693,15735,20941,30057,17042,16019,15271,30594,18224,13233,9309,7818,7233,0,3251,3707,11602,10126,7378,4956,6121,4364,3457,3234,13024,12598,7599,4378,7131];
+const INC_INT=[32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776,57349];
+const INC_MISC=[11836,3284,4076,8433,9582,15376,9882,12994,11548,20226,6502,7569,9256,4955,7103,8617,14022,5131,5529,26690,7146,11997,9663,37358,13735,19712,12367,8729,8247,7976,3356,11189,8643,9734,6421,24721];
+const INC_STOR=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1719,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023,31771];
+
+// Expense arrays
+const EXP_TAX=[265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242,396990];
+const EXP_UTIL=[104562,88133,90745,92375,91005,88951,106499,92253,81239,89577,148203,130296,122339,168270,171051,232000,211495,259964,302455,191123,251570,248050,291470,271746,337417,199659,175192,199826,215961,231878,163262,232313,344997,290726,328592,304261];
+const EXP_PAY=[110540,111036,125652,133297,137797,127715,130715,137073,143621,141939,142862,157841,162718,172346,166694,188198,185106,166463,164760,155977,158597,166778,182676,180957,187354,205605,205640,220249,223696,238312,239114,236860,235531,249503,262939,268934];
+const EXP_MORT=[433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,141555,139217,136748,134153,131439,128522,125512,122321,120862,115424,111699];
+const EXP_REP=[82760,85751,113059,93777,109903,83332,79472,73216,62731,83622,128259,232217,117152,141385,156003,120358,110046,108752,156132,178962,174561,192528,160652,132144,229776,263380,150620,163940,154212,139146,134721,230215,199709,224945,495817,259749];
+const EXP_INS=[18834,22208,23521,22324,23100,26217,26181,26264,29617,34158,31445,36238,47531,46519,60106,63743,64626,68873,52752,49013,57164,59481,57732,57757,64292,71196,65161,63759,66478,67615,64733,73682,76529,86587,99094,115384];
+const EXP_SEC=[36400,35843,31908,35336,32978,34155,34296,36149,38515,35989,41865,38131,48819,46157,49395,46115,47102,46998,53504,49606,50564,55463,53133,51562,56237,52724,54226,56376,60748,61180,60629,63439,71560,72322,77374,80153];
+const EXP_MGT=[25250,27000,27000,27000,30000,30000,30000,30750,31000,31000,31000,31232,31000,31000,31000,33250,34000,31333,30000,30000,30000,39816,39816,41807,42643,43496,44246,45131,46033,46954,47893,48552,49341,51150,52725,54439];
+const EXP_WAT=[9624,9996,8468,8586,8995,17993,14000,5038,4627,9055,6903,7286,7639,5303,14056,9202,11909,12223,19675,15650,21137,21851,17196,32294,27383,38772,43820,41666,31278,37334,34416,48244,46731,52920,52221,55523];
+const EXP_LEG=[4350,10206,8521,7994,5905,7106,9445,94442,10713,6243,13782,12597,32421,24977,12651,16887,8050,9261,4950,104876,10560,12285,31756,8979,8520,11069,7961,27642,48669,46161,9225,76978,24450,39560,10953,15720];
+const EXP_CORP=[14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,16206,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577,30321];
+const MORT_PRIN=[0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052,73761];
+const CAPEX=[242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304,157995];
+const LIQUIDITY=[383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793,2135505];
+
+// Per-year accountant recommended range (4-6 months of that year's operating expenses)
+const ACCT_LOW=[368635,371654,385463,385989,394020,375550,371991,360246,323428,326500,372288,408039,387633,417761,441077,461203,451081,459179,472876,441383,435563,450770,455259,424859,490295,471188,423715,448703,461526,474398,431244,467805,521075,527532,636986,564391];
+const ACCT_HIGH=[552952,557482,578195,578984,591030,563324,557986,540370,485142,489750,558432,612058,581449,626642,661616,691804,676622,688768,709314,662075,653344,676156,682889,637288,735442,706782,635572,673054,692289,711598,646866,701708,781613,791298,955479,846586];
+
+// Net income (income excl. special assessment minus all expenses incl. principal)
+const NET = YEARS.map((_,i) => {
+  const inc = INC_MAINT[i]+INC_PARK[i]+INC_LAUND[i]+INC_TRANS[i]+INC_INT[i]+INC_MISC[i]+INC_STOR[i];
+  const exp = EXP_TAX[i]+EXP_UTIL[i]+EXP_PAY[i]+EXP_MORT[i]+EXP_REP[i]+EXP_INS[i]+EXP_SEC[i]+EXP_MGT[i]+EXP_WAT[i]+EXP_LEG[i]+EXP_CORP[i]+MORT_PRIN[i];
+  return inc - exp;
+});
+
+const GRID  = {color:'rgba(201,168,76,0.08)'};
+const TICKS = {font:{family:'IBM Plex Mono',size:10},color:'rgba(201,168,76,0.6)'};
+const TOOLTIP = {
+  backgroundColor:'#071830',titleColor:'#c9a84c',bodyColor:'#f0f4fa',
+  borderColor:'#2a4a6a',borderWidth:1,padding:12,
+  titleFont:{family:'IBM Plex Mono',size:11},bodyFont:{family:'IBM Plex Mono',size:11}
+};
+
+function fmtM(v){
+  if(Math.abs(v)>=1e6) return '$'+(v/1e6).toFixed(2)+'M';
+  if(Math.abs(v)>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+Math.round(v).toLocaleString();
+}
+
+// ── CHART 1: LIQUIDITY ──────────────────────────────────────────────────────
+new Chart(document.getElementById('chartLiq'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {type:'bar',label:'Total Liquidity (Cash & Equiv.)',data:LIQUIDITY,
+     backgroundColor:YEARS.map((_,i)=>i===35?'rgba(201,168,76,0.85)':'rgba(88,166,255,0.72)'),
+     borderColor:YEARS.map((_,i)=>i===35?'#c9a84c':'#58a6ff'),borderWidth:1,borderRadius:3},
+    {type:'line',label:"Accountant's High Rec. (6 mo. operating exp.)",data:ACCT_HIGH,
+     borderColor:'#f47a70',borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false},
+    {type:'line',label:"Accountant's Low Rec. (4 mo. operating exp.)",data:ACCT_LOW,
+     borderColor:'#e8a020',borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false}
+  ]},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{font:{family:'IBM Plex Mono',size:10},color:'#c9a84c',boxWidth:18}},
+      tooltip:{...TOOLTIP,mode:'index',intersect:false,callbacks:{
+        title:i=>'Year '+i[0].label,
+        label:i=>{
+          if(i.datasetIndex===0) return '  Cash: $'+Math.round(i.parsed.y).toLocaleString();
+          return '  '+i.dataset.label;
+        },
+        afterBody:items=>{
+          const v=items[0].parsed.y;
+          const idx=items[0].dataIndex;
+          const high=ACCT_HIGH[idx];
+          const low=ACCT_LOW[idx];
+          const xHigh=(v/high).toFixed(1);
+          return['','  Rec. range: $'+Math.round(low).toLocaleString()+' \u2013 $'+Math.round(high).toLocaleString(),'  '+xHigh+'\u00d7 accountant\u2019s recommended ceiling'];
+        }
+      }}
+    },
+    scales:{
+      x:{grid:GRID,ticks:{...TICKS,maxRotation:45}},
+      y:{grid:GRID,ticks:{...TICKS,callback:v=>fmtM(v)}}
+    }
+  }
+});
+
+// ── CHART 2: NET INCOME ──────────────────────────────────────────────────────
+const MAINT_INCREASES={
+  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',
+  2013:'+5.45%',2023:'+9%',2024:'+1.5%',2025:'+4%'
+};
+const MAINT_PDF_URLS={
+  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
+  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
+};
+const REF_2006=NET[16];
+
+new Chart(document.getElementById('chartNet'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {label:'Annual Net Income (incl. Mortgage Principal)',data:NET,
+     backgroundColor:NET.map((v,i)=>{
+       if(i===34) return 'rgba(248,81,73,0.85)';
+       if(i===35) return 'rgba(63,185,80,0.85)';
+       return v>=0?'rgba(63,185,80,0.68)':'rgba(248,81,73,0.68)';
+     }),
+     borderColor:NET.map((v,i)=>{
+       if(i===34) return '#f47a70';
+       if(i===35) return '#3fb950';
+       return v>=0?'#3fb950':'#f47a70';
+     }),
+     borderWidth:1,borderRadius:3},
+    {type:'line',label:'2006 Surplus Reference ($257,969)',
+     data:YEARS.map(()=>REF_2006),
+     borderColor:'#c9a84c',borderWidth:1.5,borderDash:[6,4],pointRadius:0,fill:false}
+  ]},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{font:{family:'IBM Plex Mono',size:10},color:'#c9a84c',boxWidth:18}},
+      tooltip:{...TOOLTIP,mode:'index',intersect:false,callbacks:{
+        title:i=>'Year '+i[0].label,
+        label:i=>{
+          if(i.datasetIndex===1) return '  2006 reference: $257,969';
+          const v=i.parsed.y;
+          return [
+            (v>=0?'  Surplus: +':'  Deficit: -')+'$'+Math.abs(Math.round(v)).toLocaleString(),
+            '  Per Share: '+(v>=0?'+':'')+'$'+(v/85027).toFixed(2)+'/sh'
+          ];
+        },
+        afterBody:items=>{
+          const yr=parseInt(items[0].label);
+          if(MAINT_PDF_URLS[yr]){
+            const pct=MAINT_INCREASES[yr]||'';
+            return['','  \uD83D\uDCC4 Maintenance '+pct+' \u2014 click bar to open Board Memo \u2192'];
+          }
+          return[];
+        }
+      }}
+    },
+    scales:{
+      x:{grid:GRID,ticks:{...TICKS,maxRotation:45}},
+      y:{grid:GRID,ticks:{...TICKS,callback:v=>fmtM(v)}}
+    },
+    onClick:(evt,els)=>{
+      if(!els.length) return;
+      const yr=YEARS[els[0].index];
+      if(MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr],'_blank');
+    }
+  }
+});
+
+// ── CHART 3: CAPEX ───────────────────────────────────────────────────────────
+let c1=0,c2=0;
+const cum1990=CAPEX.map((v,i)=>{if(i>15)return null;c1+=v;return c1;});
+const cum2006=CAPEX.map((v,i)=>{if(i<16)return null;c2+=v;return c2;});
+
+new Chart(document.getElementById('chartCapex'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {type:'bar',label:'Annual CapEx',data:CAPEX,
+     backgroundColor:CAPEX.map((_,i)=>i<16?'rgba(88,166,255,0.6)':'rgba(201,168,76,0.8)'),
+     borderColor:CAPEX.map((_,i)=>i<16?'#58a6ff':'#c9a84c'),
+     borderWidth:1,borderRadius:3,yAxisID:'y'},
+    {type:'line',label:'Cumulative 1990\u20132005 ($1,920,214)',data:cum1990,
+     borderColor:'#58a6ff',backgroundColor:'transparent',
+     borderWidth:2,borderDash:[5,3],
+     pointRadius:YEARS.map((_,i)=>i===15?6:0),
+     pointBackgroundColor:'#58a6ff',pointBorderColor:'#fff',pointBorderWidth:2,
+     tension:0.35,spanGaps:false,yAxisID:'y2'},
+    {type:'line',label:'Cumulative 2006\u20132025 ($2,730,738)',data:cum2006,
+     borderColor:'#c9a84c',backgroundColor:'transparent',
+     borderWidth:2.5,borderDash:[6,3],
+     pointRadius:YEARS.map((_,i)=>i===35?6:0),
+     pointBackgroundColor:'#c9a84c',pointBorderColor:'#fff',pointBorderWidth:2,
+     tension:0.35,spanGaps:false,yAxisID:'y2'}
+  ]},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{font:{family:'IBM Plex Mono',size:10},color:'#c9a84c',boxWidth:18}},
+      tooltip:{...TOOLTIP,mode:'index',intersect:false,callbacks:{
+        title:i=>'Year '+i[0].label,
+        label:i=>{
+          if(i.datasetIndex===0) return '  Annual CapEx: $'+Math.round(i.parsed.y).toLocaleString();
+          if(i.parsed.y==null) return null;
+          return '  '+i.dataset.label.split('(')[0].trim()+': $'+Math.round(i.parsed.y).toLocaleString();
+        }
+      }}
+    },
+    scales:{
+      x:{grid:GRID,ticks:{...TICKS,maxRotation:45}},
+      y:{grid:GRID,ticks:{...TICKS,callback:v=>fmtM(v)},title:{display:true,text:'Annual CapEx',font:{family:'IBM Plex Mono',size:9},color:'#888'}},
+      y2:{position:'right',grid:{drawOnChartArea:false},
+          ticks:{...TICKS,callback:v=>fmtM(v)},
+          title:{display:true,text:'Cumulative',font:{family:'IBM Plex Mono',size:9},color:'#888'}}
+    }
+  }
+});
+</script>
+</body>
+</html>
