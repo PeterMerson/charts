@@ -180,6 +180,7 @@ const EXP_LEG=[4350,10206,8521,7994,5905,7106,9445,94442,10713,6243,13782,12597,
 const EXP_CORP=[14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,16206,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577,30321];
 const MORT_PRIN=[0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052,73761];
 const CAPEX=[242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304,157995];
+const CAPEX_DETAILS=[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[{"item":"Con Edison electrical upgrade","amount":24825},{"item":"New security system","amount":12250},{"item":"Intercom system","amount":9334},{"item":"Other misc","amount":109}],[{"item":"Security & key entry system","amount":53333},{"item":"Parking lot paved","amount":92225}],[{"item":"Lobby/Hallway renovation","amount":106449},{"item":"Manchester Mgmt (project mgr)","amount":5903},{"item":"New gym equipment","amount":52279}],[{"item":"Lobby/Hallway renovation","amount":320795},{"item":"Lobby desk","amount":11100},{"item":"Snow blower","amount":2000}],[{"item":"Lobby & hallways renovations","amount":117729},{"item":"Washers and dryers","amount":36310}],[{"item":"Basement renovation","amount":123192},{"item":"Floor mats","amount":2595},{"item":"Fencing","amount":12500},{"item":"Parking lot wall reconstruction","amount":8800}],[{"item":"Heating system upgrade","amount":66661},{"item":"Oil transfer pump","amount":40500},{"item":"Fencing","amount":4700},{"item":"New truck","amount":50464}],[{"item":"Heating system upgrade","amount":124079},{"item":"Elevator deposit","amount":31000},{"item":"Picnic area retaining wall demolition","amount":17900}],[{"item":"Elevator modernization","amount":250760},{"item":"Security cameras","amount":39475},{"item":"Storage bin deposit","amount":32700},{"item":"Bike rack purchase","amount":7965},{"item":"Retaining wall construction","amount":11000},{"item":"Lobby improvements","amount":9998}],[{"item":"Storage bins","amount":63395},{"item":"Gym equipment","amount":10723}],[{"item":"Storage bins","amount":1650},{"item":"Gym equipment","amount":696}],[{"item":"Storage bins","amount":17400},{"item":"Garage hydraulic heaters","amount":11000},{"item":"Garage door","amount":4500},{"item":"Pool dehumidifier","amount":10000}],[{"item":"Remodeling Superintendent's Apt","amount":68000},{"item":"Renovation of Board Room","amount":16620},{"item":"Lobby doors","amount":10000}],[{"item":"Garage restoration (deposit)","amount":20000},{"item":"Terrace restoration (deposit)","amount":20000},{"item":"Lobby doors","amount":10685},{"item":"Laundry equipment","amount":16675},{"item":"Logo mats","amount":5052},{"item":"Common property payable","amount":9529}],[{"item":"Garage restoration project","amount":69365},{"item":"Terrace and roof restoration","amount":55681},{"item":"Exterior work","amount":27175},{"item":"Electrical upgrades","amount":10200},{"item":"Equipment, furniture & fixtures","amount":23416}],[{"item":"Garage restoration","amount":85000},{"item":"Engineering","amount":800},{"item":"Paving project","amount":208159},{"item":"Plumbing upgrades","amount":19582},{"item":"Equipment & furniture purchases","amount":14027}],[{"item":"Roof and facade restoration","amount":15763},{"item":"Exterior work","amount":12900},{"item":"Equipment & furniture purchases","amount":12641}],[{"item":"Roof, parking garage & facade restoration","amount":316861},{"item":"Common property payable (credit)","amount":-218156},{"item":"Pool deck","amount":56700},{"item":"Equipment purchases","amount":2590}]];
 const LIQUIDITY=[383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793,2135505];
 
 // Per-year accountant recommended range (4-6 months of that year's operating expenses)
@@ -350,9 +351,24 @@ new Chart(document.getElementById('chartCapex'),{
       tooltip:{...TOOLTIP,mode:'index',intersect:false,callbacks:{
         title:i=>'Year '+i[0].label,
         label:i=>{
-          if(i.datasetIndex===0) return '  Annual CapEx: $'+Math.round(i.parsed.y).toLocaleString();
+          if(i.datasetIndex===0){
+            const idx=i.dataIndex;
+            const details=CAPEX_DETAILS[idx]||[];
+            const lines=['  Annual CapEx: $'+Math.round(i.parsed.y).toLocaleString()];
+            if(details.length){
+              lines.push('  ───────────────────────');
+              details.forEach(d=>{
+                const amt=d.amount<0?'($'+Math.abs(d.amount).toLocaleString()+') credit':'$'+d.amount.toLocaleString();
+                lines.push('  '+d.item+':  '+amt);
+              });
+            } else {
+              lines.push('  ───────────────────────');
+              lines.push('  (line-item detail not available)');
+            }
+            return lines;
+          }
           if(i.parsed.y==null) return null;
-          return '  '+i.dataset.label.split('(')[0].trim()+': $'+Math.round(i.parsed.y).toLocaleString();
+          return ['  ───────────────────────','  '+i.dataset.label.split('(')[0].trim()+': $'+Math.round(i.parsed.y).toLocaleString()];
         }
       }}
     },
