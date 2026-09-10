@@ -1,0 +1,350 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Insurance Costs — Actual Dollar Values vs. CPI Trajectory 1990–2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Georgia', serif;
+  background: #f5f2ed;
+  color: #1a2a3a;
+  padding: 32px 24px 48px;
+  min-height: 100vh;
+}
+.wrapper { max-width: 900px; margin: 0 auto; }
+
+.page-title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: bold; color: #1F4E79;
+  text-align: center; margin-bottom: 6px;
+}
+.page-sub {
+  font-size: 13px; color: #6a7a8a;
+  text-align: center; margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+}
+.legend-row {
+  display: flex; justify-content: center; gap: 16px;
+  flex-wrap: wrap; margin-bottom: 20px;
+}
+.leg-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 99px; font-size: 13px;
+  font-family: 'Courier New', monospace; border: 1.5px solid;
+}
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+.leg-ins { border-color: #c9722a; color: #7a3a00; background: #fef5ec; }
+.leg-cpi { border-color: #3a8fd4; color: #0c3a5c; background: #eaf3fb; }
+
+.chart-card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 28px 24px 20px;
+  margin-bottom: 16px;
+}
+canvas { width: 100% !important; }
+
+.overage-block {
+  background: #1F4E79; border-radius: 10px;
+  padding: 20px 28px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+}
+.overage-num {
+  font-size: 2.8rem; font-weight: bold;
+  color: #f0c96a; white-space: nowrap; line-height: 1; flex-shrink: 0;
+}
+.overage-num span {
+  display: block; font-size: 11px; font-weight: normal;
+  color: rgba(240,201,106,0.75); font-family: 'Courier New', monospace;
+  text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
+}
+.overage-text { flex: 1; min-width: 260px; }
+.overage-text h3 { font-size: 1rem; color: #f0e8d0; margin-bottom: 6px; font-weight: bold; }
+.overage-text p {
+  font-size: 13px; color: rgba(240,232,208,0.8); line-height: 1.7;
+  font-family: 'Courier New', monospace;
+}
+.overage-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.overage-pill {
+  font-family: 'Courier New', monospace; font-size: 11px;
+  padding: 4px 10px; border-radius: 20px;
+  background: rgba(240,201,106,0.15); border: 1px solid rgba(240,201,106,0.4);
+  color: #f0c96a;
+}
+.note-box {
+  background: #fff8e7; border-left: 4px solid #e6a817;
+  border-radius: 0 8px 8px 0; padding: 12px 16px;
+  margin-bottom: 16px; font-size: 12px; color: #5a4000;
+  font-family: 'Courier New', monospace; line-height: 1.6;
+}
+.note-box strong { color: #3a2800; }
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+.stat-card {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 14px 16px; text-align: center;
+}
+.stat-label {
+  font-family: 'Courier New', monospace; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: #8a9aaa; margin-bottom: 5px;
+}
+.stat-val { font-size: 22px; font-weight: bold; color: #1F4E79; }
+.stat-val.orange { color: #c9722a; }
+.stat-val.blue   { color: #3a8fd4; }
+.stat-sub { font-size: 11px; color: #aaa; margin-top: 2px; font-family: 'Courier New', monospace; }
+@media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+.ins-table-wrap {
+  margin-bottom: 16px; overflow-x: auto;
+}
+.ins-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'Courier New', monospace; font-size: 12px;
+}
+.ins-table thead tr {
+  background: #0d2240;
+}
+.ins-table thead th {
+  padding: 7px 8px; color: #c9a84c; text-align: right;
+  border-right: 1px solid rgba(201,168,76,0.2);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+}
+.ins-table thead th.cat-hdr {
+  text-align: left; border-right: 2px solid #c9a84c; min-width: 130px;
+}
+.ins-table tbody tr { background: #fff; }
+.ins-table tbody tr:nth-child(even) { background: #f5f7fb; }
+.ins-table tbody td {
+  padding: 6px 8px; text-align: right;
+  border-right: 1px solid #dde4ef; color: #1a3a5c;
+  font-weight: 600; white-space: nowrap;
+}
+.ins-table tbody td.cat-cell {
+  text-align: left; font-weight: 700; color: #0d2240;
+  border-right: 2px solid #b0bdd4;
+}
+.ins-table tbody td.spike { color: #c03030; font-weight: 800; }
+.ins-table-label {
+  font-family: 'Courier New', monospace; font-size: 11px;
+  color: #8a9aaa; text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 6px; margin-top: 14px;
+}
+.footer-note {
+  text-align: center; font-size: 11px; color: #9aaa9a;
+  font-family: 'Courier New', monospace; line-height: 1.6;
+  margin-top: 8px;
+}
+@media (max-width: 600px) {
+  .overage-block { flex-direction: column; gap: 16px; }
+  .overage-num { font-size: 2.2rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <h1 class="page-title">Riveredge Insurance Costs vs. CPI</h1>
+  <p class="page-sub">What Riveredge actually paid each year for insurance vs. what costs would have been if they simply tracked inflation from the 1990 baseline of $18,834 &nbsp;|&nbsp; 1990–2025</p>
+
+  <div class="legend-row">
+    <div class="leg-pill leg-ins"><div class="leg-dot" style="background:#c9722a;"></div>Actual Insurance Costs paid</div>
+    <div class="leg-pill leg-cpi"><div class="leg-dot" style="background:#3a8fd4;"></div>CPI-projected trajectory (shaded area)</div>
+  </div>
+
+  <div class="chart-card">
+    <canvas id="chart" height="340"></canvas>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Insurance Growth</div>
+      <div class="stat-val orange">+513%</div>
+      <div class="stat-sub">1990 → 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CPI Growth</div>
+      <div class="stat-val blue">+144%</div>
+      <div class="stat-sub">1990 → 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Insurance 1990</div>
+      <div class="stat-val">$18,834</div>
+      <div class="stat-sub">Base year</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Insurance 2025</div>
+      <div class="stat-val">$115,384</div>
+      <div class="stat-sub">Latest year</div>
+    </div>
+  </div>
+
+  <div class="overage-block">
+    <div class="overage-num">~$830K<span>Cumulative cost above CPI trajectory</span></div>
+    <div class="overage-text">
+      <h3>Cumulative insurance cost above the CPI-projected trajectory: ~$829,500 (1990–2025)</h3>
+      <p>Had Riveredge's insurance costs simply grown at the rate of general inflation (CPI), the building would have paid an estimated $1.09 million in insurance over 36 years. Actual insurance paid: $1.92 million. The difference — approximately $829,500 — is the amount insurance costs have outpaced inflation, or roughly <strong style="color:#f0c96a;">$9.76 per share</strong> over 36 years ($0.27/share/year on average). Unlike real estate taxes, insurance shows no comparable pattern of successful appeals bringing costs back toward the inflation trend.</p>
+      <div class="overage-pills">
+        <div class="overage-pill">2002: +31% year-over-year, the steepest single-year jump on record</div>
+        <div class="overage-pill">2004: +29% year-over-year, the second-steepest jump</div>
+        <div class="overage-pill">2022–2025: four years account for $234,893 (28%) of the entire 36-year gap</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    ⚠ &nbsp; <strong>Insurance has never tracked below the CPI trajectory.</strong> From 1991 onward, every single year's actual insurance cost exceeded what inflation alone would have produced from the 1990 baseline — the opposite pattern from real estate taxes over the same period. The gap has also been accelerating: the four years 2022–2025 alone contributed 28% of the entire 36-year cumulative overage, with 2024 and 2025 posting back-to-back double-digit percentage jumps ($86,587 → $99,094 → $115,384).
+  </div>
+
+  <p class="ins-table-label">Riveredge Insurance Costs — Audited Annual Figures 1990–2025</p>
+  <div class="ins-table-wrap"><table class="ins-table"><thead><tr><th class="cat-hdr">Category</th><th>1990</th><th>1991</th><th>1992</th><th>1993</th><th>1994</th><th>1995</th><th>1996</th><th>1997</th><th>1998</th><th>1999</th></tr></thead><tbody><tr><td class="cat-cell">Insurance</td><td>$18,834</td><td>$22,208</td><td>$23,521</td><td>$22,324</td><td>$23,100</td><td>$26,217</td><td>$26,181</td><td>$26,264</td><td>$29,617</td><td>$34,158</td></tr></tbody></table></div>
+  <div class="ins-table-wrap"><table class="ins-table"><thead><tr><th class="cat-hdr">Category</th><th>2000</th><th>2001</th><th>2002</th><th>2003</th><th>2004</th><th>2005</th><th>2006</th><th>2007</th><th>2008</th><th>2009</th></tr></thead><tbody><tr><td class="cat-cell">Insurance</td><td>$31,445</td><td>$36,238</td><td class="spike">$47,531</td><td>$46,519</td><td class="spike">$60,106</td><td>$63,743</td><td>$64,626</td><td>$68,873</td><td>$52,752</td><td>$49,013</td></tr></tbody></table></div>
+  <div class="ins-table-wrap"><table class="ins-table"><thead><tr><th class="cat-hdr">Category</th><th>2010</th><th>2011</th><th>2012</th><th>2013</th><th>2014</th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th></tr></thead><tbody><tr><td class="cat-cell">Insurance</td><td>$57,164</td><td>$59,481</td><td>$57,732</td><td>$57,757</td><td>$64,292</td><td>$71,196</td><td>$65,161</td><td>$63,759</td><td>$66,478</td><td>$67,615</td></tr></tbody></table></div>
+  <div class="ins-table-wrap"><table class="ins-table"><thead><tr><th class="cat-hdr">Category</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead><tbody><tr><td class="cat-cell">Insurance</td><td>$64,733</td><td>$73,682</td><td>$76,529</td><td>$86,587</td><td class="spike">$99,094</td><td class="spike">$115,384</td></tr></tbody></table></div>
+
+  <p class="footer-note">
+    CPI data: U.S. Bureau of Labor Statistics via Federal Reserve Bank of Minneapolis (CPI-U, 1982–84 = 100). Insurance data: Riveredge audited annual financial statements 1990–2025.<br>
+    Overage calculation: actual insurance costs vs. CPI-indexed projection from 1990 baseline of $18,834. &nbsp;·&nbsp; 85,027 total shares.
+  </p>
+
+</div>
+
+<script>
+const years    = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const insurance = [18834,22208,23521,22324,23100,26217,26181,26264,29617,34158,31445,36238,47531,46519,60106,63743,64626,68873,52752,49013,57164,59481,57732,57757,64292,71196,65161,63759,66478,67615,64733,73682,76529,86587,99094,115384];
+const cpiRaw   = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2,319.1];
+
+const base1990 = insurance[0];
+const cpiBase  = cpiRaw[0];
+const cpiProjected = years.map((y, i) => Math.round(base1990 * cpiRaw[i] / cpiBase));
+
+// Blue CPI area fill — same approach as the RE-Tax-vs-CPI chart
+const cpiAreaPlugin = {
+  id: 'cpiArea',
+  beforeDatasetsDraw(chart) {
+    const { ctx, scales: { x, y }, chartArea } = chart;
+    if (!x || !y || !chartArea) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(cpiProjected[0]));
+    for (let i = 1; i < cpiProjected.length; i++) {
+      ctx.lineTo(x.getPixelForValue(i), y.getPixelForValue(cpiProjected[i]));
+    }
+    ctx.lineTo(x.getPixelForValue(cpiProjected.length - 1), chartArea.bottom);
+    ctx.lineTo(x.getPixelForValue(0), chartArea.bottom);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(58,143,212,0.12)';
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
+Chart.register(cpiAreaPlugin);
+
+const ctx = document.getElementById('chart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'CPI-projected trajectory',
+        data: cpiProjected,
+        borderColor: '#3a8fd4',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [6, 3],
+        pointRadius: 3,
+        pointBackgroundColor: '#3a8fd4',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        tension: 0.3,
+        order: 2
+      },
+      {
+        label: 'Actual Insurance Costs paid',
+        data: insurance,
+        borderColor: '#c9722a',
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: '#c9722a',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        tension: 0.3,
+        order: 1
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a2a3a',
+        titleColor: '#f0c96a',
+        bodyColor: '#e8f0f8',
+        borderColor: '#3a8fd4',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          title: items => String(years[items[0].dataIndex]),
+          label: item => {
+            const i = item.dataIndex;
+            const isCPI = item.dataset.label.includes('CPI');
+            if (isCPI) return ' CPI-projected: $' + cpiProjected[i].toLocaleString('en-US');
+            return ' Actual paid: $' + insurance[i].toLocaleString('en-US');
+          },
+          labelColor: item => {
+            const isCPI = item.dataset.label.includes('CPI');
+            const col = isCPI ? '#3a8fd4' : '#c9722a';
+            return { borderColor: col, backgroundColor: col };
+          },
+          afterBody: items => {
+            const i = items[0].dataIndex;
+            const gap = insurance[i] - cpiProjected[i];
+            const lines = [''];
+            if (gap > 0) lines.push(' ▲ Above CPI trajectory: $' + gap.toLocaleString('en-US'));
+            else if (gap < 0) lines.push(' ✓ Below CPI trajectory: $' + Math.abs(gap).toLocaleString('en-US'));
+            else lines.push(' = At CPI baseline');
+            return lines;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#8a9aaa',
+          font: { size: 11, family: 'Courier New' },
+          maxRotation: 0,
+          callback: (val, i) => i % 5 === 0 ? years[i] : ''
+        },
+        grid: { color: '#e8e4dc' }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Annual Insurance Costs ($)',
+          color: '#8a9aaa',
+          font: { size: 11, family: 'Courier New' }
+        },
+        ticks: {
+          color: '#8a9aaa',
+          font: { size: 11, family: 'Courier New' },
+          callback: v => '$' + (v >= 1000000 ? (v/1000000).toFixed(2)+'M' : (v/1000).toFixed(0)+'K')
+        },
+        grid: { color: '#e8e4dc' }
+      }
+    }
+  }
+});
+</script>
+
+</body></html>
