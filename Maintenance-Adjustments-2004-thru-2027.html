@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riveredge Maintenance Adjustments 2004–2027</title>
+<style>
+  :root{
+    --bg:#0B1524; --card:#0F1B2D; --line:#22324B; --grid:#1C2B42;
+    --ink:#E8ECF2; --ink2:#AEB9C9; --muted:#7C8AA0;
+    --gold:#D4A63A; --maint:#BC8A22; --exp:#5E97DE;
+    --up:#E3B341; --down:#7FC4A0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Georgia,"Times New Roman",serif}
+  .wrap{max-width:1040px;margin:0 auto;padding:36px 24px 56px}
+  header{border-bottom:2px solid var(--gold);padding-bottom:14px;margin-bottom:22px}
+  .eyebrow{font:600 12px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  h1{font-size:30px;margin:8px 0 4px;font-weight:normal}
+  .sub{color:var(--ink2);font-size:14px;margin:0}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 26px}
+  .tile{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:6px;padding:14px 16px}
+  .tile .k{font:600 11px/1.3 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .tile .v{font-size:26px;margin:4px 0 2px}
+  .tile .d{font-size:13px;color:var(--ink2)}
+  h2{font-size:19px;font-weight:normal;color:var(--gold);margin:30px 0 10px}
+  table{width:100%;border-collapse:collapse;font:13.5px/1.35 system-ui,-apple-system,sans-serif;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:right;padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:bottom}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.phase td{background:#13233A;color:var(--gold);text-align:left;font:600 12.5px/1.4 system-ui,sans-serif;padding:9px 10px;white-space:normal}
+  tr.phase td span{color:var(--ink2);font-weight:normal}
+  tr.freeze td{color:var(--muted);font-style:italic;text-align:left;white-space:normal}
+  tr.total td{border-top:2px solid var(--gold);border-bottom:none;font-weight:700;background:#13233A}
+  tr.y27 td{background:rgba(212,166,58,.08)}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .rate b{color:var(--ink)} .rate{color:var(--ink2)}
+  .notes{font:12.5px/1.55 system-ui,sans-serif;color:var(--ink2);margin:10px 2px 0;padding-left:18px}
+  .notes li{margin:3px 0}
+  .chartcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 16px 10px;position:relative}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;font:13px system-ui,sans-serif;color:var(--ink2);margin:0 0 6px}
+  .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .legend i.dash{background:repeating-linear-gradient(90deg,var(--exp) 0 5px,transparent 5px 8px)}
+  svg text{font-family:system-ui,sans-serif}
+  #tip{position:absolute;pointer-events:none;background:#08111E;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:12.5px/1.45 system-ui,sans-serif;color:var(--ink);opacity:0;transition:opacity .1s;min-width:190px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  #tip .t{color:var(--gold);font-weight:700;margin-bottom:3px}
+  #tip .r{display:flex;justify-content:space-between;gap:14px}
+  #tip .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+  .take{font:13.5px/1.6 system-ui,sans-serif;color:var(--ink2);margin:12px 2px 0}
+  .take b{color:var(--ink)}
+  details{margin-top:10px;font:13px system-ui,sans-serif;color:var(--ink2)}
+  details summary{cursor:pointer;color:var(--gold)}
+  details table{margin-top:8px;font-size:12.5px}
+  footer{margin-top:28px;font:12px system-ui,sans-serif;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+  @media (max-width:760px){.tiles{grid-template-columns:1fr}.tablewrap{overflow-x:auto}}
+  @media print{body{background:#fff;color:#000}.tile,.chartcard,table{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Riveredge Owners, Inc. · 1-3 David Lane, Yonkers</div>
+  <h1>Cooperative Maintenance Adjustments, 2004–2027</h1>
+  <p class="sub">Every board-announced change, shown in dollars per share per year (85,027 shares outstanding)</p>
+</header>
+
+<div class="tiles">
+  <div class="tile"><div class="k">Rate before 2004 → 2027</div><div class="v">$12.75 → $23.77</div><div class="d">+$11.02 per share per year · +86%</div></div>
+  <div class="tile"><div class="k">Longest freeze</div><div class="v">10 yrs 10 mo</div><div class="d">Held at $17.80 from Mar 2013 to Dec 2023</div></div>
+  <div class="tile"><div class="k">2027 increase</div><div class="v">+$3.34 / share</div><div class="d">Largest per-share and dollar increase on this list (2006 was +$2.65)</div></div>
+</div>
+
+<h2>Adjustments by phase</h2>
+<div class="tablewrap">
+<table>
+  <thead><tr>
+    <th>Effective date</th><th>Change<br>(as stated)</th><th>Annual $<br>(as stated)</th>
+    <th>Rate per share / yr<br>before → after</th><th>Change<br>per share</th>
+    <th>Monthly per<br>100 shares</th><th>Cumulative vs.<br>2003 rate ($12.75)</th><th>Time since<br>prior change</th>
+  </tr></thead>
+  <tbody>
+    <tr class="phase"><td colspan="8">Phase 1 · 2004–2008 &nbsp;<span>Four increases in 4 yrs 8 mo — +$6.30 per share (+49%)</span></td></tr>
+    <tr><td>Jan 1, 2004</td><td class="up">+9.8%</td><td>$106,284</td><td class="rate">$12.75 → <b>$14.00</b></td><td class="up">+$1.25</td><td>+$10.42</td><td>+9.8%</td><td>—</td></tr>
+    <tr><td>Apr 1, 2005</td><td class="up">+13.5%</td><td>$157,000</td><td class="rate">$14.00 → <b>$15.85</b></td><td class="up">+$1.85</td><td>+$15.42</td><td>+24.3%</td><td>1 yr 3 mo</td></tr>
+    <tr><td>Jan 1, 2006</td><td class="up">+17.0%</td><td>$225,000</td><td class="rate">$15.85 → <b>$18.50</b></td><td class="up">+$2.65</td><td>+$22.08</td><td>+45.1%</td><td>9 mo</td></tr>
+    <tr><td>Sep 1, 2008</td><td class="up">+3.0%</td><td>$46,700</td><td class="rate">$18.50 → <b>$19.05</b></td><td class="up">+$0.55</td><td>+$4.58</td><td>+49.4%</td><td>2 yr 8 mo</td></tr>
+
+    <tr class="phase"><td colspan="8">Phase 2 · 2013–2023 &nbsp;<span>One decrease, then unchanged for nearly 11 years</span></td></tr>
+    <tr><td>Mar 1, 2013</td><td class="down">−6.0%<sup>1</sup></td><td>($106,284)</td><td class="rate">$19.05 → <b>$17.80</b></td><td class="down">−$1.25</td><td>−$10.42</td><td>+39.6%</td><td>4 yr 6 mo</td></tr>
+    <tr class="freeze"><td colspan="8">No change for 10 years 10 months (2013 refinancing to a 5.17% fully amortizing mortgage cut interest from $197k in 2012 to $148k in 2013)</td></tr>
+
+    <tr class="phase"><td colspan="8">Phase 3 · 2024–2027 &nbsp;<span>Four consecutive annual increases — +$5.97 per share (+34%)</span></td></tr>
+    <tr><td>Jan 1, 2024</td><td class="up">+9.0%</td><td>$134,342</td><td class="rate">$17.80 → <b>$19.38</b></td><td class="up">+$1.58</td><td>+$13.17</td><td>+52.0%</td><td>10 yr 10 mo</td></tr>
+    <tr><td>Jan 1, 2025</td><td class="up">+1.4%</td><td>$22,900</td><td class="rate">$19.38 → <b>$19.65</b><sup>2</sup></td><td class="up">+$0.27</td><td>+$2.25</td><td>+54.1%</td><td>1 yr</td></tr>
+    <tr><td>Jan 1, 2026</td><td class="up">+4.0%</td><td>$68,022</td><td class="rate">$19.65 → <b>$20.43</b></td><td class="up">+$0.78</td><td>+$6.50</td><td>+60.2%</td><td>1 yr</td></tr>
+    <tr class="y27"><td>Jan 1, 2027</td><td class="up">+16.35%</td><td>$283,990</td><td class="rate">$20.43 → <b>$23.77</b></td><td class="up">+$3.34</td><td>+$27.83</td><td>+86.4%</td><td>1 yr</td></tr>
+
+    <tr class="total"><td>Net, 2004 → 2027</td><td>+86.4%</td><td></td><td class="rate">$12.75 → <b>$23.77</b></td><td class="up">+$11.02</td><td>+$91.83</td><td>+86.4%</td><td>9 changes</td></tr>
+  </tbody>
+</table>
+</div>
+<ol class="notes">
+  <li>A $1.25 per-share cut is 6.6% of $19.05, not 6.0%. The stated dollar amount, ($106,284), is identical to the 2004 increase, so the 2013 decrease reversed exactly the 2004 increase.</li>
+  <li>$19.38 + 1.4% = $19.65; the 2026 rate of $20.43 is 4.0% above $19.65. The audited dataset carries $19.68 for 2025.</li>
+  <li>“Monthly per 100 shares” = change per share × 100 ÷ 12. For any apartment: shares × rate ÷ 12 = monthly maintenance.</li>
+  <li>Small increases before 2004 (1993–1996, and 2003: $12.60 → $12.75) appear in the audited data but not on the board’s list.</li>
+</ol>
+
+<h2>Maintenance vs. total operating expenses, per share</h2>
+<div class="chartcard" id="card">
+  <div class="legend">
+    <span><i style="background:var(--maint)"></i>Maintenance per share</span>
+    <span><i style="background:var(--exp)"></i>Total operating expenses per share</span>
+    <span><i class="dash"></i>2026–27 expense estimate (shaded: higher-growth case)</span>
+  </div>
+  <svg id="chart" viewBox="0 0 980 330" width="100%" role="img" aria-label="Line chart of maintenance per share versus total operating expenses per share, 1990 to 2027"></svg>
+  <div id="tip"></div>
+</div>
+<p class="take">
+  For 2027 the set maintenance rate is <b>$23.77</b> a share. Operating expenses are estimated at <b>$21.12</b> (or <b>$22.12</b> with faster 6% growth), which leaves about <b>$1.65–$2.65 a share</b> ($140k–$225k) above operating costs.
+  Other income (parking, laundry, storage, interest) added about $3.00 a share in 2025. Part of the gap goes to mortgage principal (≈ $0.96 a share in 2027) and to capital projects, and neither counts as an operating expense.
+</p>
+<details>
+  <summary>How 2026–2027 were estimated, and the data behind the chart</summary>
+  <ul class="notes">
+    <li><b>Maintenance:</b> 2026 and 2027 use the board-set rates ($20.43; $20.43 × 1.1635 = $23.77). For 1990–2025 the chart uses audited maintenance collected ÷ 85,027. Those years include partial-year effects (2005, 2008, 2013).</li>
+    <li><b>Expenses excluding mortgage interest:</b> 2025 audited ($1,581,474) grown at the 2019–2025 annual rate of 3.43%. The shaded high case uses 6% a year.</li>
+    <li><b>Mortgage interest:</b> projected from the 5.17% amortization schedule ($107.9k in 2026, $103.9k in 2027).</li>
+    <li>Operating expenses are the audited line items: RE taxes, utilities, payroll, mortgage interest, repairs, insurance, security, management, water/sewer, legal/audit and corporate tax/misc. Capital expenditures and mortgage principal are not included.</li>
+  </ul>
+  <div class="tablewrap"><table id="dtable"><thead><tr><th>Year</th><th>Maintenance / share</th><th>Op. expenses / share</th><th>Difference</th></tr></thead><tbody></tbody></table></div>
+</details>
+
+<footer>Sources: Board “Cooperative Maintenance Adjustments” list (2004–2027); audited financial statements 1990–2025 (Riveredge-Financial-Data_2.json). Per-share figures use 85,027 shares. 2026–2027 expenses are estimates.</footer>
+</div>
+
+<script>
+const D = [{"y": 1990, "m": 12.0, "e": 13.01, "est": false}, {"y": 1991, "m": 12.0, "e": 13.11, "est": false}, {"y": 1992, "m": 12.0, "e": 13.6, "est": false}, {"y": 1993, "m": 12.09, "e": 13.62, "est": false}, {"y": 1994, "m": 12.34, "e": 13.9, "est": false}, {"y": 1995, "m": 12.54, "e": 13.25, "est": false}, {"y": 1996, "m": 12.63, "e": 13.12, "est": false}, {"y": 1997, "m": 12.62, "e": 12.71, "est": false}, {"y": 1998, "m": 12.62, "e": 11.41, "est": false}, {"y": 1999, "m": 12.26, "e": 11.52, "est": false}, {"y": 2000, "m": 12.58, "e": 13.14, "est": false}, {"y": 2001, "m": 12.65, "e": 14.4, "est": false}, {"y": 2002, "m": 12.58, "e": 13.56, "est": false}, {"y": 2003, "m": 12.8, "e": 14.65, "est": false}, {"y": 2004, "m": 13.66, "e": 15.56, "est": false}, {"y": 2005, "m": 15.39, "e": 16.27, "est": false}, {"y": 2006, "m": 18.48, "e": 15.92, "est": false}, {"y": 2007, "m": 18.47, "e": 16.2, "est": false}, {"y": 2008, "m": 18.68, "e": 16.68, "est": false}, {"y": 2009, "m": 19.05, "e": 15.57, "est": false}, {"y": 2010, "m": 19.05, "e": 15.37, "est": false}, {"y": 2011, "m": 19.05, "e": 15.9, "est": false}, {"y": 2012, "m": 19.05, "e": 16.06, "est": false}, {"y": 2013, "m": 18.01, "e": 14.99, "est": false}, {"y": 2014, "m": 17.8, "e": 17.3, "est": false}, {"y": 2015, "m": 17.8, "e": 16.6, "est": false}, {"y": 2016, "m": 17.73, "e": 14.95, "est": false}, {"y": 2017, "m": 17.8, "e": 15.83, "est": false}, {"y": 2018, "m": 17.8, "e": 16.28, "est": false}, {"y": 2019, "m": 17.8, "e": 16.74, "est": false}, {"y": 2020, "m": 17.8, "e": 15.22, "est": false}, {"y": 2021, "m": 17.8, "e": 16.51, "est": false}, {"y": 2022, "m": 17.68, "e": 18.39, "est": false}, {"y": 2023, "m": 17.8, "e": 18.61, "est": false}, {"y": 2024, "m": 19.34, "e": 22.47, "est": false}, {"y": 2025, "m": 19.62, "e": 19.91, "est": false}, {"y": 2026, "m": 20.43, "e": 20.51, "eHi": 20.98, "est": true}, {"y": 2027, "m": 23.77, "e": 21.12, "eHi": 22.12, "est": true}];
+const svg = document.getElementById('chart'), tip = document.getElementById('tip'), card = document.getElementById('card');
+const W=980,H=330,m={l:52,r:62,t:14,b:34};
+const x0=1990,x1=2027,y0=10,y1=25;
+const X=y=>m.l+(y-x0)/(x1-x0)*(W-m.l-m.r), Y=v=>m.t+(1-(v-y0)/(y1-y0))*(H-m.t-m.b);
+const ns='http://www.w3.org/2000/svg';
+const el=(t,a,p=svg)=>{const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;};
+// grid
+for(let v=10;v<=25;v+=2.5){el('line',{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),stroke:'#1C2B42','stroke-width':1});
+  const t=el('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end','font-size':11,fill:'#7C8AA0'});t.textContent='$'+v.toFixed(v%1?1:0);}
+for(let y=1990;y<=2027;y+=5){const t=el('text',{x:X(y),y:H-12,'text-anchor':'middle','font-size':11,fill:'#7C8AA0'});t.textContent=y;}
+{const t=el('text',{x:X(2027),y:H-12,'text-anchor':'middle','font-size':11,fill:'#7C8AA0'});t.textContent='2027';}
+// estimate zone
+el('rect',{x:X(2025),y:m.t,width:X(2027)-X(2025),height:H-m.t-m.b,fill:'#ffffff',opacity:.035});
+{const t=el('text',{x:(X(2025)+X(2027))/2,y:m.t+12,'text-anchor':'middle','font-size':10,fill:'#7C8AA0'});t.textContent='est.';}
+// adjustment markers
+[[2004,'’04'],[2005.25,'’05'],[2006,'’06'],[2008.67,'’08'],[2013.17,'’13'],[2024,'’24'],[2025,'’25'],[2026,'’26'],[2027,'’27']].forEach(([y])=>{
+  el('line',{x1:X(y),x2:X(y),y1:H-m.b,y2:H-m.b-6,stroke:'#D4A63A','stroke-width':1.5});});
+// high-case band
+const a=D.find(r=>r.y===2025), est=D.filter(r=>r.est);
+const band=[[2025,a.e],...est.map(r=>[r.y,r.eHi])].map(([y,v])=>X(y)+','+Y(v)).join(' ')+' '+[...est].reverse().map(r=>X(r.y)+','+Y(r.e)).join(' ')+' '+X(2025)+','+Y(a.e);
+el('polygon',{points:band,fill:'#5E97DE',opacity:.16});
+const path=(pts)=>pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join('');
+const act=D.filter(r=>!r.est);
+el('path',{d:path(act.map(r=>[r.y,r.e])),fill:'none',stroke:'#5E97DE','stroke-width':2,'stroke-linejoin':'round'});
+el('path',{d:path([[2025,a.e],...est.map(r=>[r.y,r.e])]),fill:'none',stroke:'#5E97DE','stroke-width':2,'stroke-dasharray':'5 4'});
+el('path',{d:path(D.map(r=>[r.y,r.m])),fill:'none',stroke:'#BC8A22','stroke-width':2.5,'stroke-linejoin':'round'});
+// end labels
+const last=D[D.length-1];
+const lm=el('text',{x:X(2027)+8,y:Y(last.m)+4,'font-size':12,fill:'#E8ECF2','font-weight':600});lm.textContent='$'+last.m.toFixed(2);
+const le=el('text',{x:X(2027)+8,y:Y(last.e)+4,'font-size':12,fill:'#AEB9C9'});le.textContent='$'+last.e.toFixed(2);
+el('circle',{cx:X(2027),cy:Y(last.m),r:4,fill:'#BC8A22',stroke:'#0F1B2D','stroke-width':2});
+el('circle',{cx:X(2027),cy:Y(last.e),r:4,fill:'#0F1B2D',stroke:'#5E97DE','stroke-width':2});
+// hover
+const cross=el('line',{y1:m.t,y2:H-m.b,stroke:'#AEB9C9','stroke-width':1,opacity:0});
+const dm=el('circle',{r:4,fill:'#BC8A22',stroke:'#0F1B2D','stroke-width':2,opacity:0});
+const de=el('circle',{r:4,fill:'#5E97DE',stroke:'#0F1B2D','stroke-width':2,opacity:0});
+const hit=el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent'});
+const notes={2004:'+9.8% increase (Jan)',2005:'+13.5% increase (Apr)',2006:'+17% increase (Jan)',2008:'+3% increase (Sep)',2013:'−6% decrease (Mar) · mortgage refinanced',2024:'+9% increase',2025:'+1.4% increase',2026:'+4% increase · expenses estimated',2027:'+16.35% increase · expenses estimated'};
+hit.addEventListener('mousemove',ev=>{
+  const r=svg.getBoundingClientRect(), sx=(ev.clientX-r.left)*W/r.width;
+  const yr=Math.round(x0+(sx-m.l)/(W-m.l-m.r)*(x1-x0)); const d=D.find(q=>q.y===yr); if(!d)return;
+  cross.setAttribute('x1',X(yr));cross.setAttribute('x2',X(yr));cross.setAttribute('opacity',.5);
+  dm.setAttribute('cx',X(yr));dm.setAttribute('cy',Y(d.m));dm.setAttribute('opacity',1);
+  de.setAttribute('cx',X(yr));de.setAttribute('cy',Y(d.e));de.setAttribute('opacity',1);
+  const diff=d.m-d.e;
+  tip.innerHTML=`<div class="t">${yr}${d.est?' (estimate)':''}</div>
+   <div class="r"><span><span class="sw" style="background:#BC8A22"></span>Maintenance</span><b>$${d.m.toFixed(2)}</b></div>
+   <div class="r"><span><span class="sw" style="background:#5E97DE"></span>Op. expenses</span><b>$${d.e.toFixed(2)}${d.eHi?' – $'+d.eHi.toFixed(2):''}</b></div>
+   <div class="r" style="color:#AEB9C9"><span>Difference</span><span>${diff>=0?'+':'−'}$${Math.abs(diff).toFixed(2)}</span></div>
+   ${notes[yr]?`<div style="color:#D4A63A;margin-top:4px">${notes[yr]}</div>`:''}`;
+  const cr=card.getBoundingClientRect(); let lx=ev.clientX-cr.left+14; if(lx>cr.width-220) lx=ev.clientX-cr.left-220;
+  tip.style.left=lx+'px'; tip.style.top=(ev.clientY-cr.top-20)+'px'; tip.style.opacity=1;
+});
+hit.addEventListener('mouseleave',()=>{tip.style.opacity=0;[cross,dm,de].forEach(e=>e.setAttribute('opacity',0));});
+// data table
+document.querySelector('#dtable tbody').innerHTML=D.map(d=>`<tr><td>${d.y}${d.est?' (est.)':''}</td><td>$${d.m.toFixed(2)}</td><td>$${d.e.toFixed(2)}${d.eHi?' – $'+d.eHi.toFixed(2):''}</td><td>${d.m-d.e>=0?'+':'−'}$${Math.abs(d.m-d.e).toFixed(2)}</td></tr>`).join('');
+</script>
+</body>
+</html>
