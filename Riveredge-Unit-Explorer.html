@@ -851,6 +851,8 @@ function renderTables() {
   out.push(buildTable('4 · Capital & Liquidity', who + ' · Year-end liquidity; benchmarks CPI-adjusted', capRows, { total: true, foot: 'Liquidity and benchmarks are year-end balances, so they have no range total.' }));
 
   document.getElementById('tables').innerHTML = out.join('');
+  // Open each table scrolled to its most recent year
+  requestAnimationFrame(() => document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; }));
 }
 
 // ═════════ START ═════════
