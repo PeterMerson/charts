@@ -208,7 +208,7 @@ table.num tr:hover td { background-color:rgba(88,166,255,0.06); }
     </div>
     <div class="chart-card" onclick="openLightbox('c-capex','Capital Expenditures','BAR CHART · MAJOR BUILDING INVESTMENTS BY YEAR')">
       <span class="expand-hint">⛶ expand</span>
-      <div class="card-header"><div class="card-title">Capital Expenditures</div><div class="card-sub">Bar Chart · Major building investments by year</div></div>
+      <div class="card-header"><div class="card-title">Capital Expenditures</div><div class="card-sub">Bar Chart · Major building investments by year · Hover a bar to see what was purchased</div></div>
       <div class="card-body"><div class="chart-wrap"><canvas id="c-capex"></canvas></div></div>
     </div>
     <div class="chart-card" onclick="openLightbox('c-liq','Total Liquidity (Cash & Equiv + Reserve)','BAR CHART · BUILDING\'S TOTAL FINANCIAL CUSHION · WESTCHESTER BENCHMARKS SHOWN')">
@@ -479,6 +479,8 @@ const APARTMENTS = [
   {apt:'8T', shares:544, type:'1BR', building:'Woodside'},
   {apt:'8U', shares:357, type:'Studio', building:'Woodside'},
 ];
+const CAPEX_DETAILS = {"2008": [["Con Edison electrical upgrade", 24825], ["New security system", 12250], ["Intercom system", 9334], ["Other misc", 109]], "2009": [["Security & key entry system", 53333], ["Parking lot paved", 92225]], "2010": [["Lobby/Hallway renovation", 106449], ["Manchester Management (project mgr)", 5903], ["New Gym equipment", 52279]], "2011": [["Lobby/Hallway renovation", 320795], ["Lobby desk", 11100], ["Snow Blower", 2000]], "2012": [["Lobby & hallways renovations", 117729], ["Washers and dryers", 36310]], "2013": [["Basement renovation", 123192], ["Floor mats", 2595], ["Fencing", 12500], ["Parking lot wall reconstruction", 8800]], "2014": [["Heating System upgrade", 66661], ["Oil transfer pump", 40500], ["Fencing", 4700], ["New Truck", 50464]], "2015": [["Heating System upgrade", 124079], ["Elevator deposit", 31000], ["Picnic area retaining wall demolition", 17900]], "2016": [["Elevator modernization", 250760], ["Security cameras", 39475], ["Storage bin deposit", 32700], ["Bike rack purchase", 7965], ["Retaining wall construction", 11000], ["Lobby improvements", 9998]], "2017": [["Storage bins", 63395], ["Gym equipment", 10723]], "2018": [["Storage bins", 1650], ["Gym equipment", 696]], "2019": [["Storage bins", 17400], ["Garage hydraulic heaters", 11000], ["Garage door", 4500], ["Pool dehumidifier", 10000]], "2020": [["Remodeling Superintendent's Apt", 68000], ["Renovation of Board Room", 16620], ["Lobby Doors", 10000]], "2021": [["Upcoming garage restoration project", 21200], ["Upcoming terrace restoration project", 20000], ["Lobby Doors", 10685], ["Laundry equipment", 16675], ["Logo mats", 5052], ["Common property payable-Balance Sheet", 9529]], "2022": [["Garage restoration project", 69365], ["Terrace and roof restoration", 55681], ["Exterior work", 27175], ["Electrical upgrades", 10200], ["Equipment, furniture and fixtures", 23416]], "2023": [["Garage restoration", 85000], ["Engineering", 800], ["Paving project", 208159], ["Plumbing upgrades", 19582], ["Equipment & furniture purchases", 14027]], "2024": [["Roof and facade restoration", 15763], ["Exterior work", 12900], ["Equipment & furniture purchases", 12641]], "2025": [["Roof, Parking garage & facade restoration project", 316861], ["Pool deck", 56700], ["equipment purchases", 2590]]};
+
 
 // ═════════ STATE ═════════
 const STATE = { apt: '', from: 1990, to: 2025, principal: true, cpi: true, view: 'graphic' };
@@ -712,7 +714,14 @@ function renderCharts() {
       options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
         plugins: { legend: { labels: { ...LEGEND_OPTS.labels, boxWidth: 16, filter: item => item.text && item.text.indexOf('Cumulative') > -1 } },
           tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: { title: i => i[0].label,
-            label: i => { if (i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString(); if (i.parsed.y == null) return null; return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString(); } }}},
+            label: i => { if (i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString(); if (i.parsed.y == null) return null; return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString(); },
+            afterBody: items => {
+              const yr = parseInt(items[0].label), list = CAPEX_DETAILS[yr];
+              if (!list) return ['', ' No itemized detail in the audited statements'];
+              const lines = ['', ' What it was spent on' + (UNIT ? ' (your share · building total):' : ':')];
+              list.forEach(([item, amt]) => lines.push(' • ' + item + ': $' + sc(amt).toLocaleString() + (UNIT ? '  ·  $' + amt.toLocaleString() : '')));
+              return lines;
+            } }}},
         scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }}, y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
           y2: { position: 'right', title: { display: true, text: 'Cumulative CapEx', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
             ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888', callback: v => fmtM(v) }, grid: { drawOnChartArea: false } } } }
