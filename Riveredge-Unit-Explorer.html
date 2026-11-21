@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riveredge Unit Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0d2240; --ink2: #1a3a5c; --deep: #0a1a30;
+  --gold: #c9a84c; --text: #f7f3ec; --muted: #9a8f7e;
+  --green: #3fb950; --red: #f47a70; --blue: #58a6ff;
+  --line: rgba(201,168,76,0.22);
+}
+body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: var(--ink); color: var(--text); min-height: 100vh; font-size: 13px; }
+
+/* ── MASTHEAD ── */
+.masthead { background: var(--deep); border-bottom: 3px solid var(--gold); }
+.masthead-inner { max-width: 1400px; margin: 0 auto; padding: 16px 32px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.masthead h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.7rem; font-weight: 900; color: #fff; }
+.masthead h1 em { color: var(--gold); font-style: normal; }
+.masthead-sub { font-size: 0.62rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── MY UNIT PANEL ── */
+.bar { max-width:1400px; margin:14px auto 0; padding:0 32px; }
+.myunit-panel { background: linear-gradient(135deg, #0d2240 0%, #1a3a5c 100%); border: 2px solid var(--gold); border-radius: 8px; padding: 16px 24px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.myunit-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--gold); white-space:nowrap; }
+.myunit-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.lbl { font-size:0.66rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); white-space:nowrap; }
+.sel { font-family:'IBM Plex Mono',monospace; font-size:0.76rem; font-weight:600; background:#fff; border:2px solid var(--gold); color:var(--ink); padding:6px 28px 6px 10px; border-radius:4px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230d2240'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; }
+.sel:focus { outline:2px solid var(--gold); outline-offset:1px; }
+.myunit-info { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+.stat { text-align:center; padding:4px 14px; border-left:1px solid rgba(201,168,76,0.3); }
+.stat-label { font-size:0.56rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:2px; }
+.stat-val { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--gold); }
+
+/* ── GLOBAL TOGGLES ── */
+.toggles { background:var(--deep); border:1px solid #3a3028; border-radius:6px; padding:10px 20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+.tg-title { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--gold); font-weight:600; }
+.tg-div { width:1px; height:20px; background:#3a3028; }
+.tg-group { display:flex; align-items:center; gap:8px; }
+.tg-note { font-size:0.6rem; color:var(--muted); margin-left:auto; }
+.mode-btn { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; padding:5px 12px; border-radius:3px; border:2px solid var(--gold); background:#fff; color:var(--ink); cursor:pointer; transition:all 0.15s; min-width:86px; }
+.mode-btn.active { background:var(--ink); color:var(--gold); }
+.mode-btn:hover:not(.active) { background:#f0e4c0; }
+
+/* ── VIEW BUTTONS ── */
+.views { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+.view-btn { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:700; padding:14px 10px; border-radius:6px; border:2px solid var(--gold); background:rgba(255,255,255,0.04); color:var(--gold); cursor:pointer; transition:all 0.15s; }
+.view-btn small { display:block; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+.view-btn:hover:not(.active) { background:rgba(201,168,76,0.12); }
+.view-btn.active { background:var(--gold); color:var(--ink); }
+.view-btn.active small { color:var(--ink); }
+.view { display:none; }
+.view.show { display:block; }
+
+/* ── GRAPHIC VIEW (from Riveredge-Charts export) ── */
+.g-header { max-width:1400px; margin:18px auto 0; padding:0 32px; }
+.header-title { font-family: Georgia, serif; font-size: 1.35rem; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.header-title em { color: var(--gold); font-style: normal; }
+.header-meta { font-size: 0.62rem; color: var(--gold); letter-spacing: 0.08em; line-height: 1.6; }
+.charts-grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px 32px 32px; }
+.chart-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; }
+.chart-card:hover .expand-hint { opacity: 1; }
+.expand-hint { position: absolute; top: 10px; right: 12px; font-size: 0.6rem; color: var(--gold); opacity: 0; transition: opacity 0.2s; letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none; }
+.card-header { background: rgba(13,34,64,0.8); padding: 14px 20px; border-bottom: 2px solid rgba(201,168,76,0.3); }
+.card-title { font-family: Georgia, serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.card-sub { font-size: 0.6rem; color: rgba(201,168,76,0.75); letter-spacing: 0.1em; text-transform: uppercase; }
+.card-body { padding: 16px 20px; }
+.chart-wrap { position: relative; height: 280px; }
+
+#chart-lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(7,18,36,0.96); align-items: center; justify-content: center; }
+#chart-lightbox.open { display: flex; }
+#lightbox-inner { background: var(--ink); border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; width: 92vw; height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 80px rgba(0,0,0,0.7); }
+#lightbox-header { background: var(--deep); border-bottom: 2px solid var(--gold); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+#lightbox-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: var(--text); }
+#lightbox-sub { font-size: 0.6rem; color: var(--gold); margin-top: 2px; letter-spacing: 0.06em; text-transform: uppercase; }
+#lightbox-close { background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 1rem; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; }
+#lightbox-close:hover { background: var(--gold); color: var(--ink); }
+#lightbox-body { flex: 1; padding: 16px; min-height: 0; }
+#lightbox-canvas-wrap { width: 100%; height: 100%; }
+#lightbox-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+
+/* ── NUMERIC VIEW ── */
+.tables { max-width:1400px; margin:0 auto; padding:18px 32px 32px; display:flex; flex-direction:column; gap:22px; }
+.t-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 8px; overflow:hidden; }
+.t-scroll { overflow-x:auto; }
+table.num { border-collapse: separate; border-spacing:0; width:max-content; min-width:100%; font-size:0.72rem; }
+table.num th, table.num td { padding:6px 10px; text-align:right; white-space:nowrap; border-bottom:1px solid rgba(201,168,76,0.1); }
+table.num thead th { background:var(--deep); color:var(--gold); font-weight:600; position:sticky; top:0; }
+table.num th.rowh, table.num td.rowh { text-align:left; position:sticky; left:0; background:#11294b; color:var(--text); font-weight:500; z-index:1; min-width:210px; }
+table.num thead th.rowh { background:var(--deep); color:var(--gold); z-index:2; }
+table.num td.tot, table.num th.tot { background:rgba(201,168,76,0.08); font-weight:600; border-left:1px solid var(--line); }
+table.num tr.sum td { border-top:2px solid var(--gold); font-weight:700; color:#fff; }
+table.num tr.sum td.rowh { color:var(--gold); }
+table.num tr.note td { font-style:italic; color:var(--muted); }
+table.num tr.cpi td { color:var(--gold); font-style:italic; }
+table.num tr:hover td { background-color:rgba(88,166,255,0.06); }
+.pos { color:var(--green); } .neg { color:var(--red); }
+.t-foot { font-size:0.6rem; color:var(--muted); padding:8px 20px 12px; letter-spacing:0.04em; }
+
+/* ── OTHER VIEW ── */
+.other { max-width:900px; margin:28px auto; padding:28px 32px; border:1px dashed var(--gold); border-radius:8px; text-align:center; color:var(--muted); }
+.other h2 { font-family:'Playfair Display',serif; color:var(--gold); margin-bottom:8px; }
+
+.footer { text-align: center; padding: 24px 32px; font-size: 0.6rem; color: rgba(201,168,76,0.5); border-top: 1px solid var(--line); letter-spacing: 0.1em; }
+
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; padding: 16px; }
+  .bar, .g-header, .tables { padding-left:16px; padding-right:16px; }
+  .masthead-inner { padding:14px 16px; }
+  .tg-note { margin-left:0; }
+  .view-btn { font-size:1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <h1>Riveredge <em>Unit Explorer</em></h1>
+    <div class="masthead-sub">Audited Annual Financial Statements 1990–2025</div>
+  </div>
+</div>
+
+<!-- Apartment selector -->
+<div class="bar">
+  <div class="myunit-panel">
+    <div class="myunit-title">🏢 My Unit Calculator</div>
+    <div class="myunit-select-wrap">
+      <span class="lbl">Select Apartment</span>
+      <select class="sel" id="apt-select" onchange="onAptChange()">
+        <option value="">Building Totals (all apartments)</option>
+      </select>
+    </div>
+    <div class="myunit-info" id="myunit-info">
+      <div class="stat"><div class="stat-label">Apt Type</div><div class="stat-val" id="mu-type">—</div></div>
+      <div class="stat"><div class="stat-label">Building</div><div class="stat-val" id="mu-building">—</div></div>
+      <div class="stat"><div class="stat-label">Shares</div><div class="stat-val" id="mu-shares">—</div></div>
+      <div class="stat"><div class="stat-label">% of Building</div><div class="stat-val" id="mu-pct">—</div></div>
+      <div class="stat"><div class="stat-label">2025 Maint.</div><div class="stat-val" id="mu-maint">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Global toggles -->
+<div class="bar">
+  <div class="toggles">
+    <span class="tg-title">Global Toggles</span>
+    <div class="tg-div"></div>
+    <div class="tg-group">
+      <span class="lbl">Year Range From</span>
+      <select class="sel" id="sel-from" onchange="onRangeChange()"></select>
+      <span class="lbl">To</span>
+      <select class="sel" id="sel-to" onchange="onRangeChange()"></select>
+    </div>
+    <div class="tg-div"></div>
+    <div class="tg-group">
+      <span class="lbl">Mortgage Principal</span>
+      <button class="mode-btn active" id="btn-principal" onclick="togglePrincipal()">Included</button>
+    </div>
+    <div class="tg-div"></div>
+    <div class="tg-group">
+      <span class="lbl">CPI-U Overlay</span>
+      <button class="mode-btn active" id="btn-cpi" onclick="toggleCPI()">On</button>
+    </div>
+    <div class="tg-note">CPI-U: All Urban Consumers (BLS) · Indexed to selected start year</div>
+  </div>
+</div>
+
+<!-- View buttons -->
+<div class="bar">
+  <div class="views">
+    <button class="view-btn active" id="vb-graphic" onclick="showView('graphic')">Graphic<small>Six interactive charts</small></button>
+    <button class="view-btn" id="vb-numeric" onclick="showView('numeric')">Numeric<small>Four tables</small></button>
+    <button class="view-btn" id="vb-other" onclick="showView('other')">Other<small>Reserved</small></button>
+  </div>
+</div>
+
+<!-- ════════ GRAPHIC ════════ -->
+<section class="view show" id="view-graphic">
+  <div class="g-header">
+    <div class="header-title" id="main-title">Riveredge <em>Income &amp; Expense Matrix</em></div>
+    <div class="header-meta" id="main-meta"></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card" onclick="openLightbox('c-net','Net Income — Surplus / Deficit','TOTAL INCOME MINUS TOTAL EXPENSES · BAR CHART · GREEN = SURPLUS · RED = DEFICIT')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Net Income — Surplus / Deficit</div><div class="card-sub">Total Income minus Total Expenses · Bar Chart · Green = surplus · Red = deficit</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-net"></canvas></div></div>
+    </div>
+    <div class="chart-card" onclick="openLightbox('c-compare','Total Income vs Total Expenses','LINE CHART · GREEN = INCOME · RED = EXPENSES')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Total Income vs Total Expenses</div><div class="card-sub">Line Chart · Green = Income · Red = Expenses · ◆ = maintenance change (click for Board memo)</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-compare"></canvas></div></div>
+    </div>
+    <div class="chart-card" onclick="openLightbox('c-maint','Total Income','LINE CHART · ALL INCOME CATEGORIES COMBINED · CPI-U INFLATION BASELINE')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Total Income</div><div class="card-sub">Line Chart · All income categories combined · CPI-U inflation baseline</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-maint"></canvas></div></div>
+    </div>
+    <div class="chart-card" onclick="openLightbox('c-exp','Total Expenses','LINE CHART · ALL EXPENSE CATEGORIES COMBINED')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Total Expenses</div><div class="card-sub">Line Chart · All expense categories combined · CPI-U inflation baseline</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-exp"></canvas></div></div>
+    </div>
+    <div class="chart-card" onclick="openLightbox('c-capex','Capital Expenditures','BAR CHART · MAJOR BUILDING INVESTMENTS BY YEAR')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Capital Expenditures</div><div class="card-sub">Bar Chart · Major building investments by year</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-capex"></canvas></div></div>
+    </div>
+    <div class="chart-card" onclick="openLightbox('c-liq','Total Liquidity (Cash & Equiv + Reserve)','BAR CHART · BUILDING\'S TOTAL FINANCIAL CUSHION · WESTCHESTER BENCHMARKS SHOWN')">
+      <span class="expand-hint">⛶ expand</span>
+      <div class="card-header"><div class="card-title">Total Liquidity (Cash &amp; Equiv + Reserve)</div><div class="card-sub">Bar Chart · Building's total financial cushion · Westchester benchmarks shown</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="c-liq"></canvas></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ NUMERIC ════════ -->
+<section class="view" id="view-numeric">
+  <div class="g-header">
+    <div class="header-title" id="num-title">Riveredge <em>Income &amp; Expense Matrix</em></div>
+    <div class="header-meta" id="num-meta"></div>
+  </div>
+  <div class="tables" id="tables"></div>
+</section>
+
+<!-- ════════ OTHER ════════ -->
+<section class="view" id="view-other">
+  <div class="other">
+    <h2>Other</h2>
+    <p>This space is reserved for the next view.</p>
+  </div>
+</section>
+
+<div class="footer">RIVEREDGE OWNERS, INC. · 1-3 DAVID LANE, YONKERS NY · SOURCE: AUDITED ANNUAL FINANCIAL STATEMENTS 1990–2025 · UNIT FIGURES = BUILDING FIGURES × UNIT SHARES ÷ 85,027</div>
+
+<div id="chart-lightbox" onclick="closeLightbox(event)">
+  <div id="lightbox-inner">
+    <div id="lightbox-header">
+      <div><div id="lightbox-title"></div><div id="lightbox-sub"></div></div>
+      <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+    </div>
+    <div id="lightbox-body"><div id="lightbox-canvas-wrap"><canvas id="lightbox-canvas"></canvas></div></div>
+  </div>
+</div>
+
+<script>
+// ═════════ DATA (from Riveredge Income & Expense Matrix) ═════════
+const ALL_YEARS = [1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const TOTAL_SHARES = 85027;
+
+const INCOME = {
+  "Maintenance Charges": [1020324,1020324,1020324,1027976,1048884,1066534,1074031,1073289,1073379,1042612,1069444,1075712,1069345,1088387,1161724,1308354,1571429,1570096,1587982,1620174,1620174,1620174,1620174,1531251,1513447,1513447,1507782,1513404,1513404,1513404,1513404,1513404,1503542,1513404,1644840,1667847],
+  "Parking":             [87315,84893,85403,83638,83792,82754,82684,80162,78700,77113,76065,80649,86754,87193,84212,83814,85139,87939,87407,88235,88043,88352,87530,85794,86622,85896,87949,87754,86302,86251,83510,80949,81578,81329,80383,96261],
+  "Laundry":             [15025,15000,15000,15550,15600,15600,15600,15600,15600,14300,17283,17838,27727,26278,23477,29926,28597,39492,35355,33798,36357,34675,31954,29333,28676,26581,28937,30524,31379,30853,26325,26000,25635,26280,25850,36585],
+  "Transfer Fees":       [8750,10189,1026,6276,11231,11798,8481,11693,15735,20941,30057,17042,16019,15271,30594,18224,13233,9309,7818,7233,0,3251,3707,11602,10126,7378,4956,6121,4364,3457,3234,13024,12598,7599,4378,7131],
+  "Interest":            [32403,17121,7906,6225,7200,7029,14977,14038,24687,26646,36306,25123,6885,4451,2478,5104,7688,10178,12746,8410,5139,9512,7863,6840,6626,11355,10461,12997,27950,40294,27550,5624,13889,76136,53776,57349],
+  "Miscellaneous":       [11836,3284,4076,8433,9582,15376,9882,12994,11548,20226,6502,7569,9256,4955,7103,8617,14022,5131,5529,26690,7146,11997,9663,37358,13735,19712,12367,8729,8247,7976,3356,11189,8643,9734,6421,24721],
+  "Storage":             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1719,2067,1487,0,0,0,0,0,10654,22550,26658,27566,28446,31121,31297,31023,31771],
+  "SpecialAssessment":   [0,0,0,170050,0,0,0,0,0,0,0,0,63771,191313,189681,191313,127542,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+};
+
+const EXPENSES = {
+  "Real Estate Taxes":  [265982,273827,277303,295757,302044,267846,241053,135681,252250,235110,266507,276498,288391,299670,351533,372308,397399,407434,378212,301570,314334,321051,315063,326072,346985,365790,360439,366335,379323,399172,381895,240345,365157,369302,384242,396990],
+  "Utilities":          [104562,88133,90745,92375,91005,88951,106499,92253,81239,89577,148203,130296,122339,168270,171051,232000,211495,259964,302455,191123,251570,248050,291470,271746,337417,199659,175192,199826,215961,231878,163262,232313,344997,290726,328592,304261],
+  "Payroll":            [110540,111036,125652,133297,137797,127715,130715,137073,143621,141939,142862,157841,162718,172346,166694,188198,185106,166463,164760,155977,158597,166778,182676,180957,187354,205605,205640,220249,223696,238312,239114,236860,235531,249503,262939,268934],
+  "Mortgage Interest":  [433000,433000,433000,433000,433000,433000,433000,426831,305677,301364,296226,290886,289478,305153,298482,291305,275460,250029,240100,230771,220137,208911,197128,147614,141878,141555,139217,136748,134153,131439,128522,125512,122321,120862,115424,111699],
+  "Repairs & Maint.":   [82760,85751,113059,93777,109903,83332,79472,73216,62731,83622,128259,232217,117152,141385,156003,120358,110046,108752,156132,178962,174561,192528,160652,132144,229776,263380,150620,163940,154212,139146,134721,230215,199709,224945,495817,259749],
+  "Insurance":          [18834,22208,23521,22324,23100,26217,26181,26264,29617,34158,31445,36238,47531,46519,60106,63743,64626,68873,52752,49013,57164,59481,57732,57757,64292,71196,65161,63759,66478,67615,64733,73682,76529,86587,99094,115384],
+  "Security":           [36400,35843,31908,35336,32978,34155,34296,36149,38515,35989,41865,38131,48819,46157,49395,46115,47102,46998,53504,49606,50564,55463,53133,51562,56237,52724,54226,56376,60748,61180,60629,63439,71560,72322,77374,80153],
+  "Management Fee":     [25250,27000,27000,27000,30000,30000,30000,30750,31000,31000,31000,31232,31000,31000,31000,33250,34000,31333,30000,30000,30000,39816,39816,41807,42643,43496,44246,45131,46033,46954,47893,48552,49341,51150,52725,54439],
+  "Water & Sewer":      [9624,9996,8468,8586,8995,17993,14000,5038,4627,9055,6903,7286,7639,5303,14056,9202,11909,12223,19675,15650,21137,21851,17196,32294,27383,38772,43820,41666,31278,37334,34416,48244,46731,52920,52221,55523],
+  "Legal & Audit":      [4350,10206,8521,7994,5905,7106,9445,94442,10713,6243,13782,12597,32421,24977,12651,16887,8050,9261,4950,104876,10560,12285,31756,8979,8520,11069,7961,27642,48669,46161,9225,76978,24450,39560,10953,15720],
+  "Corp Tax & Misc.":   [14602,17963,17213,8522,7333,10334,11312,23042,10295,11443,9811,10894,15410,12504,12261,10242,8050,16206,16089,16602,18065,26097,19156,23644,28399,20319,24623,24437,24027,24004,29322,27275,26900,24720,31577,30321]
+};
+
+const MORTGAGE_PRINCIPAL = [0,0,0,0,0,0,0,0,55958,65133,70241,75566,81296,87458,94089,101223,108896,117152,126026,135596,145869,156927,168738,33488,41572,44034,46362,48819,51404,54125,56991,60008,63185,66530,70052,73761];
+const CAPEX_DATA = [242235,55804,8192,125517,27396,0,3483,18599,270838,85057,102732,38733,235389,274710,233070,198459,32932,12950,46518,145558,164631,333895,154039,152683,162335,172979,351898,74118,2346,42920,94620,73612,185837,327568,41304,157995];
+const LIQUIDITY_DATA = [383527,300047,180787,177502,209161,288525,307762,337957,566633,631864,656294,672010,721199,523256,370624,313914,271218,513300,699797,1079012,1259326,1145026,1151142,1577648,1449243,1564904,1568670,1782849,1976473,2230011,2418793,2509975,2455848,2316313,1976793,2135505];
+const W_BENCH_LOW  = [226503,236034,243140,250418,256830,264109,271908,278146,282479,288718,298422,306914,311767,318872,327364,338455,349373,359251,373115,371728,377967,389751,397897,403789,410201,410721,415920,424758,435156,443128,448500,469469,507249,528045,544508,561484];
+const W_BENCH_HIGH = [323576,337192,347343,357741,366901,377299,388439,397352,403541,412454,426318,438449,445381,455531,467662,483507,499104,513215,533021,531040,539953,556788,568424,576841,586001,586744,594171,606797,621652,633040,640715,670671,724641,754350,777869,802121];
+const CPI_U_DATA = [130.7,136.2,140.3,144.5,148.2,152.4,156.9,160.5,163.0,166.6,172.2,177.1,179.9,184.0,188.9,195.3,201.6,207.3,215.3,214.5,218.1,224.9,229.6,233.0,236.7,237.0,240.0,245.1,251.1,255.7,258.8,270.9,292.7,304.7,314.2,319.1];
+
+function getCPIIndexed(years) {
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const val = years[0] === y ? 100 : null; // placeholder
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return (cpi / startCPI) * 100;
+  });
+}
+
+function scaleToMatch(baseVals, years) {
+  // Scale CPI to match the first value of baseVals
+  const startCPI = CPI_U_DATA[ALL_YEARS.indexOf(years[0])];
+  return years.map(y => {
+    const cpi = CPI_U_DATA[ALL_YEARS.indexOf(y)];
+    return Math.round(baseVals[0] * (cpi / startCPI));
+  });
+}
+
+const MAINT_INCREASES = {
+  2004:'+9.8%',2005:'+13.5%',2006:'+17%',2008:'+3%',2013:'+5.45%',2023:'+9%',2024:'+1.5%',2025:'+4%'
+};
+const MAINT_PDF_URLS = {
+  2004:'https://petermerson.github.io/charts/maintenance_increase_2004.pdf',
+  2005:'https://petermerson.github.io/charts/maintenance_increase_2005.pdf',
+  2006:'https://petermerson.github.io/charts/maintenance_increase_2006.pdf',
+  2008:'https://petermerson.github.io/charts/maintenance_increase_2008.pdf',
+  2013:'https://petermerson.github.io/charts/maintenance_increase_2013.pdf',
+  2023:'https://petermerson.github.io/charts/maintenance_increase_2023.pdf',
+  2024:'https://petermerson.github.io/charts/Maint-12-04-2024.pdf',
+  2025:'https://petermerson.github.io/charts/Maint-Assessment-01-01-2026.pdf'
+};
+
+const SQFT_BY_TYPE = { 'Studio': 480, '1BR': 770, 'Jr 2BR': 786, '2BR': 1098, '3BR': 1098 };
+
+
+const APARTMENTS = [
+  {apt:'1B', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1C', shares:511, type:'Jr 2BR', building:'Woodside'},
+  {apt:'1D', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1E', shares:644, type:'2BR', building:'Woodside'},
+  {apt:'1G', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1H', shares:566, type:'Jr 2BR', building:'Riverside'},
+  {apt:'1J', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1K', shares:369, type:'Studio', building:'Riverside'},
+  {apt:'1L', shares:369, type:'Studio', building:'Riverside'},
+  {apt:'1M', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1N', shares:566, type:'Jr 2BR', building:'Riverside'},
+  {apt:'1O', shares:556, type:'1BR', building:'Riverside'},
+  {apt:'1P', shares:671, type:'2BR', building:'Riverside'},
+  {apt:'1Q', shares:644, type:'3BR', building:'Woodside'},
+  {apt:'1R', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'1S', shares:511, type:'Jr 2BR', building:'Woodside'},
+  {apt:'1T', shares:501, type:'1BR', building:'Woodside'},
+  {apt:'2A', shares:337, type:'Studio', building:'Woodside'},
+  {apt:'2B', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2C', shares:524, type:'Jr 2BR', building:'Woodside'},
+  {apt:'2D', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2E', shares:657, type:'2BR', building:'Woodside'},
+  {apt:'2F', shares:676, type:'3BR', building:'Riverside'},
+  {apt:'2G', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2H', shares:571, type:'Jr 2BR', building:'Riverside'},
+  {apt:'2J', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2K', shares:371, type:'Studio', building:'Riverside'},
+  {apt:'2L', shares:371, type:'Studio', building:'Riverside'},
+  {apt:'2M', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2N', shares:571, type:'Jr 2BR', building:'Riverside'},
+  {apt:'2O', shares:561, type:'1BR', building:'Riverside'},
+  {apt:'2P', shares:676, type:'2BR', building:'Riverside'},
+  {apt:'2Q', shares:657, type:'3BR', building:'Woodside'},
+  {apt:'2R', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2S', shares:524, type:'Jr 2BR', building:'Woodside'},
+  {apt:'2T', shares:514, type:'1BR', building:'Woodside'},
+  {apt:'2U', shares:337, type:'Studio', building:'Woodside'},
+  {apt:'3A', shares:347, type:'Studio', building:'Woodside'},
+  {apt:'3B', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3C', shares:529, type:'Jr 2BR', building:'Woodside'},
+  {apt:'3D', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3E', shares:662, type:'2BR', building:'Woodside'},
+  {apt:'3F', shares:681, type:'3BR', building:'Riverside'},
+  {apt:'3G', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3H', shares:576, type:'Jr 2BR', building:'Riverside'},
+  {apt:'3J', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3K', shares:373, type:'Studio', building:'Riverside'},
+  {apt:'3L', shares:373, type:'Studio', building:'Riverside'},
+  {apt:'3M', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3N', shares:576, type:'Jr 2BR', building:'Riverside'},
+  {apt:'3O', shares:566, type:'1BR', building:'Riverside'},
+  {apt:'3P', shares:681, type:'2BR', building:'Riverside'},
+  {apt:'3Q', shares:662, type:'3BR', building:'Woodside'},
+  {apt:'3R', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3S', shares:529, type:'Jr 2BR', building:'Woodside'},
+  {apt:'3T', shares:519, type:'1BR', building:'Woodside'},
+  {apt:'3U', shares:347, type:'Studio', building:'Woodside'},
+  {apt:'4A', shares:349, type:'Studio', building:'Woodside'},
+  {apt:'4B', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4C', shares:534, type:'Jr 2BR', building:'Woodside'},
+  {apt:'4D', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4E', shares:667, type:'2BR', building:'Woodside'},
+  {apt:'4F', shares:686, type:'3BR', building:'Riverside'},
+  {apt:'4G', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4H', shares:581, type:'Jr 2BR', building:'Riverside'},
+  {apt:'4J', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4K', shares:375, type:'Studio', building:'Riverside'},
+  {apt:'4L', shares:375, type:'Studio', building:'Riverside'},
+  {apt:'4M', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4N', shares:581, type:'Jr 2BR', building:'Riverside'},
+  {apt:'4O', shares:571, type:'1BR', building:'Riverside'},
+  {apt:'4P', shares:686, type:'2BR', building:'Riverside'},
+  {apt:'4Q', shares:667, type:'3BR', building:'Woodside'},
+  {apt:'4R', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4S', shares:534, type:'Jr 2BR', building:'Woodside'},
+  {apt:'4T', shares:524, type:'1BR', building:'Woodside'},
+  {apt:'4U', shares:349, type:'Studio', building:'Woodside'},
+  {apt:'5A', shares:351, type:'Studio', building:'Woodside'},
+  {apt:'5B', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5C', shares:539, type:'Jr 2BR', building:'Woodside'},
+  {apt:'5D', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5E', shares:672, type:'2BR', building:'Woodside'},
+  {apt:'5F', shares:691, type:'3BR', building:'Riverside'},
+  {apt:'5G', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5H', shares:586, type:'Jr 2BR', building:'Riverside'},
+  {apt:'5J', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5K', shares:377, type:'Studio', building:'Riverside'},
+  {apt:'5L', shares:377, type:'Studio', building:'Riverside'},
+  {apt:'5M', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5N', shares:586, type:'Jr 2BR', building:'Riverside'},
+  {apt:'5O', shares:576, type:'1BR', building:'Riverside'},
+  {apt:'5P', shares:691, type:'2BR', building:'Riverside'},
+  {apt:'5Q', shares:672, type:'3BR', building:'Woodside'},
+  {apt:'5R', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5S', shares:539, type:'Jr 2BR', building:'Woodside'},
+  {apt:'5T', shares:529, type:'1BR', building:'Woodside'},
+  {apt:'5U', shares:351, type:'Studio', building:'Woodside'},
+  {apt:'6A', shares:353, type:'Studio', building:'Woodside'},
+  {apt:'6B', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6C', shares:544, type:'Jr 2BR', building:'Woodside'},
+  {apt:'6D', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6E', shares:677, type:'2BR', building:'Woodside'},
+  {apt:'6F', shares:696, type:'3BR', building:'Riverside'},
+  {apt:'6G', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6H', shares:591, type:'Jr 2BR', building:'Riverside'},
+  {apt:'6J', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6K', shares:379, type:'Studio', building:'Riverside'},
+  {apt:'6L', shares:379, type:'Studio', building:'Riverside'},
+  {apt:'6M', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6N', shares:591, type:'Jr 2BR', building:'Riverside'},
+  {apt:'6O', shares:581, type:'1BR', building:'Riverside'},
+  {apt:'6P', shares:696, type:'2BR', building:'Riverside'},
+  {apt:'6Q', shares:677, type:'3BR', building:'Woodside'},
+  {apt:'6R', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6S', shares:544, type:'Jr 2BR', building:'Woodside'},
+  {apt:'6T', shares:534, type:'1BR', building:'Woodside'},
+  {apt:'6U', shares:353, type:'Studio', building:'Woodside'},
+  {apt:'7A', shares:355, type:'Studio', building:'Woodside'},
+  {apt:'7B', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7C', shares:549, type:'Jr 2BR', building:'Woodside'},
+  {apt:'7D', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7E', shares:682, type:'2BR', building:'Woodside'},
+  {apt:'7F', shares:701, type:'3BR', building:'Riverside'},
+  {apt:'7G', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7H', shares:596, type:'Jr 2BR', building:'Riverside'},
+  {apt:'7J', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7K', shares:381, type:'Studio', building:'Riverside'},
+  {apt:'7L', shares:381, type:'Studio', building:'Riverside'},
+  {apt:'7M', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7N', shares:596, type:'Jr 2BR', building:'Riverside'},
+  {apt:'7O', shares:586, type:'1BR', building:'Riverside'},
+  {apt:'7P', shares:701, type:'2BR', building:'Riverside'},
+  {apt:'7Q', shares:682, type:'3BR', building:'Woodside'},
+  {apt:'7R', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7S', shares:549, type:'Jr 2BR', building:'Woodside'},
+  {apt:'7T', shares:539, type:'1BR', building:'Woodside'},
+  {apt:'7U', shares:355, type:'Studio', building:'Woodside'},
+  {apt:'8A', shares:357, type:'Studio', building:'Woodside'},
+  {apt:'8B', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8C', shares:554, type:'Jr 2BR', building:'Woodside'},
+  {apt:'8D', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8E', shares:687, type:'2BR', building:'Woodside'},
+  {apt:'8F', shares:706, type:'3BR', building:'Riverside'},
+  {apt:'8G', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8H', shares:601, type:'Jr 2BR', building:'Riverside'},
+  {apt:'8J', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8K', shares:383, type:'Studio', building:'Riverside'},
+  {apt:'8L', shares:383, type:'Studio', building:'Riverside'},
+  {apt:'8M', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8N', shares:601, type:'Jr 2BR', building:'Riverside'},
+  {apt:'8O', shares:591, type:'1BR', building:'Riverside'},
+  {apt:'8P', shares:706, type:'2BR', building:'Riverside'},
+  {apt:'8Q', shares:687, type:'3BR', building:'Woodside'},
+  {apt:'8R', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8S', shares:554, type:'Jr 2BR', building:'Woodside'},
+  {apt:'8T', shares:544, type:'1BR', building:'Woodside'},
+  {apt:'8U', shares:357, type:'Studio', building:'Woodside'},
+];
+
+// ═════════ STATE ═════════
+const STATE = { apt: '8T', from: 1990, to: 2025, principal: true, cpi: true, view: 'graphic' };
+let years = [], scale = 1, UNIT = null;
+
+function recompute() {
+  years = ALL_YEARS.filter(y => y >= STATE.from && y <= STATE.to);
+  UNIT = STATE.apt ? APARTMENTS.find(a => a.apt === STATE.apt) : null;
+  scale = UNIT ? UNIT.shares / TOTAL_SHARES : 1;
+}
+function sc(v) { return Math.round(v * scale); }
+function fmtM(v) { const a = Math.abs(v), s = v < 0 ? '-' : ''; return a >= 1000000 ? s+'$'+(a/1000000).toFixed(2)+'M' : s+'$'+(a/1000).toFixed(a < 10000 && scale < 1 ? 1 : 0)+'K'; }
+function idx(y) { return ALL_YEARS.indexOf(y); }
+function rawIncome(i) { return Object.keys(INCOME).reduce((s,k) => k==='SpecialAssessment' ? s : s + INCOME[k][i], 0); }
+function rawExpense(i) { return Object.values(EXPENSES).reduce((s,a) => s + a[i], 0) + (STATE.principal ? MORTGAGE_PRINCIPAL[i] : 0); }
+function sqft(u) { return SQFT_BY_TYPE[u.type] ? ', ' + SQFT_BY_TYPE[u.type] + ' sq ft' : ''; }
+function unitText() { return UNIT ? 'Apt ' + UNIT.apt + ' (' + UNIT.type + ', ' + UNIT.shares + ' shares' + sqft(UNIT) + ')' : 'Building Totals'; }
+
+// ═════════ CONTROLS ═════════
+function initControls() {
+  const sel = document.getElementById('apt-select');
+  const groups = {'Studio':[], '1BR':[], 'Jr 2BR':[], '2BR':[], '3BR':[]};
+  APARTMENTS.forEach(a => { if (groups[a.type]) groups[a.type].push(a); });
+  Object.entries(groups).forEach(([type, apts]) => {
+    const og = document.createElement('optgroup');
+    og.label = type + ' (' + apts.length + ' apts)';
+    apts.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.apt; o.textContent = 'Apt ' + a.apt + ' — ' + a.shares + ' shares (' + a.building + ')';
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+  sel.value = STATE.apt;
+  ['sel-from','sel-to'].forEach(id => {
+    const s = document.getElementById(id);
+    ALL_YEARS.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; s.appendChild(o); });
+  });
+  document.getElementById('sel-from').value = STATE.from;
+  document.getElementById('sel-to').value = STATE.to;
+}
+function updateUnitInfo() {
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  if (!UNIT) {
+    set('mu-type','All'); set('mu-building','Both'); set('mu-shares', TOTAL_SHARES.toLocaleString()); set('mu-pct','100%');
+    set('mu-maint', '$' + INCOME['Maintenance Charges'][idx(2025)].toLocaleString());
+    return;
+  }
+  set('mu-type', UNIT.type); set('mu-building', UNIT.building); set('mu-shares', UNIT.shares.toLocaleString());
+  set('mu-pct', (UNIT.shares / TOTAL_SHARES * 100).toFixed(3) + '%');
+  set('mu-maint', '$' + Math.round(INCOME['Maintenance Charges'][idx(2025)] * UNIT.shares / TOTAL_SHARES).toLocaleString());
+}
+function onAptChange() { STATE.apt = document.getElementById('apt-select').value; refresh(); }
+function onRangeChange() {
+  let f = +document.getElementById('sel-from').value, t = +document.getElementById('sel-to').value;
+  if (f > t) { [f, t] = [t, f]; document.getElementById('sel-from').value = f; document.getElementById('sel-to').value = t; }
+  STATE.from = f; STATE.to = t; refresh();
+}
+function togglePrincipal() {
+  STATE.principal = !STATE.principal;
+  const b = document.getElementById('btn-principal');
+  b.textContent = STATE.principal ? 'Included' : 'Excluded'; b.classList.toggle('active', STATE.principal);
+  refresh();
+}
+function toggleCPI() {
+  STATE.cpi = !STATE.cpi;
+  const b = document.getElementById('btn-cpi');
+  b.textContent = STATE.cpi ? 'On' : 'Off'; b.classList.toggle('active', STATE.cpi);
+  refresh();
+}
+function showView(v) {
+  STATE.view = v;
+  ['graphic','numeric','other'].forEach(n => {
+    document.getElementById('view-' + n).classList.toggle('show', n === v);
+    document.getElementById('vb-' + n).classList.toggle('active', n === v);
+  });
+  refresh();
+}
+function updateHeaders() {
+  const principalLabel = STATE.principal ? 'Mortgage Principal Included' : 'Mortgage Principal Excluded';
+  const title = 'Riveredge <em>Income &amp; Expense Matrix</em> — ' + unitText();
+  const meta = 'Year Range: ' + STATE.from + ' – ' + STATE.to + '  ·  ' + years.length + ' years  ·  ' + (UNIT ? 'My Unit View: ' + unitText() : 'Building Totals') + '  ·  ' + principalLabel + '  ·  CPI-U Overlay ' + (STATE.cpi ? 'On' : 'Off') + '  ·  Source: Audited Annual Financial Statements 1990–2025';
+  ['main','num'].forEach(p => {
+    document.getElementById(p + '-title').innerHTML = title;
+    document.getElementById(p + '-meta').textContent = meta;
+  });
+}
+function refresh() {
+  recompute(); updateUnitInfo(); updateHeaders();
+  if (STATE.view === 'graphic') renderCharts();
+  if (STATE.view === 'numeric') renderTables();
+}
+
+// ═════════ GRAPHIC: CHARTS (from the Apt 8T chart export, made live) ═════════
+const TOOLTIP_OPTS = { backgroundColor: '#0d2240', titleColor: '#c9a84c', bodyColor: '#f0f4fa', borderColor: '#2a4a6a', borderWidth: 1, padding: 10 };
+const TICK_OPTS = { font: { family: 'IBM Plex Mono', size: 10, weight: 'bold' }, color: '#c9a84c' };
+const GRID_OPTS = { color: 'rgba(201,168,76,0.08)' };
+const LEGEND_OPTS = { labels: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#c9a84c', boxWidth: 20 } };
+var barLabelPlugin;
+var _lbChart = null;
+
+function freshCanvas(id) { const c = document.getElementById(id); const old = Chart.getChart(c); if (old) old.destroy(); return c; }
+function memoClick(e, els) {
+  if (!els.length) return;
+  const yr = parseInt(years[els[0].index]);
+  if (MAINT_PDF_URLS[yr]) window.open(MAINT_PDF_URLS[yr], '_blank');
+}
+function memoNote(yr) { return MAINT_PDF_URLS[yr] ? ['', '📄 Maintenance ' + (MAINT_INCREASES[yr] || '') + ' — click chart to open Board Memo →'] : []; }
+
+function renderCharts() {
+  // 1. NET INCOME BAR
+  (function() {
+    const vals = years.map(y => sc(rawIncome(idx(y)) - rawExpense(idx(y))));
+    const perShare = years.map(y => Math.round((rawIncome(idx(y)) - rawExpense(idx(y))) / TOTAL_SHARES * 100) / 100 + 0);
+    const dense = years.length > 24;
+    barLabelPlugin = {
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data, scales: { x, y } } = chart;
+        ctx.save();
+        ctx.font = '600 8px IBM Plex Mono, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        data.datasets[0].data.forEach((v, i) => {
+          const ps = perShare[i], positive = v >= 0;
+          const xPos = x.getPixelForValue(i), yPos = y.getPixelForValue(v);
+          ctx.fillStyle = positive ? '#3fb950' : '#f47a70';
+          const offset = positive ? -22 : 22;
+          ctx.fillText((ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh', xPos, yPos + offset);
+          ctx.fillText(String(years[i]), xPos, yPos + offset + 11);
+        });
+        ctx.restore();
+      }
+    };
+    new Chart(freshCanvas('c-net'), {
+      type: 'bar', plugins: [barLabelPlugin],
+      data: { labels: years, datasets: [{ data: vals,
+        backgroundColor: vals.map(v => v >= 0 ? 'rgba(63,185,80,0.85)' : 'rgba(244,122,112,0.85)'),
+        borderColor: vals.map(v => v >= 0 ? '#3fb950' : '#f47a70'), borderWidth: 1, borderRadius: 3 }]},
+      options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30, bottom: 8 } },
+        plugins: { legend: { display: false },
+          tooltip: { ...TOOLTIP_OPTS, callbacks: {
+            title: i => i[0].label,
+            label: i => { const v = i.parsed.y, ps = perShare[i.dataIndex];
+              return [(v >= 0 ? ' Surplus: +' : ' Deficit: -') + '$' + Math.abs(v).toLocaleString(), ' Per Share: ' + (ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh']; },
+            afterBody: items => memoNote(parseInt(items[0].label)) }}},
+        scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }},
+          y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => (v >= 0 ? '+' : '-') + '$' + (Math.abs(v)/1000).toFixed(scale < 1 ? 1 : 0) + 'K' }}},
+        onClick: memoClick }
+    });
+  })();
+
+  // 2. TOTAL INCOME VS TOTAL EXPENSES
+  (function() {
+    const incVals = years.map(y => sc(rawIncome(idx(y))));
+    const expVals = years.map(y => sc(rawExpense(idx(y))));
+    new Chart(freshCanvas('c-compare'), {
+      type: 'line',
+      data: { labels: years, datasets: [
+        { label: 'Total Income', data: incVals, borderColor: '#3fb950', backgroundColor: 'rgba(63,185,80,0.1)', borderWidth: 3,
+          pointRadius: years.map(y => MAINT_PDF_URLS[y] ? 8 : 4), pointStyle: years.map(y => MAINT_PDF_URLS[y] ? 'rectRot' : 'circle'),
+          pointBackgroundColor: years.map(y => MAINT_PDF_URLS[y] ? '#c9a84c' : '#3fb950'), pointBorderColor: '#fff', pointBorderWidth: 1.5, tension: 0.3, fill: true },
+        { label: 'Total Expenses', data: expVals, borderColor: '#f47a70', backgroundColor: 'rgba(244,122,112,0.1)', borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#f47a70', tension: 0.3, fill: true }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: LEGEND_OPTS,
+          tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+            title: i => i[0].label,
+            label: i => ' ' + i.dataset.label + ': $' + i.parsed.y.toLocaleString(),
+            afterBody: items => {
+              if (items.length < 2) return '';
+              const yr = parseInt(items[0].label), i = idx(yr);
+              const rawNet = rawIncome(i) - rawExpense(i), net2 = sc(rawNet), ps = Math.round(rawNet / TOTAL_SHARES * 100) / 100 + 0;
+              return ['', (net2 >= 0 ? ' Surplus: +' : ' Deficit: -') + '$' + Math.abs(net2).toLocaleString(),
+                ' Per Share: ' + (ps >= 0 ? '+' : '-') + '$' + Math.abs(ps).toFixed(2) + '/sh'].concat(memoNote(yr));
+            }}}},
+        scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }}, y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}},
+        onClick: memoClick }
+    });
+  })();
+
+  // 3 & 4. TOTAL INCOME / TOTAL EXPENSES + CPI
+  function trendChart(canvasId, label, color, fillColor, cpiLabel, valFn) {
+    const vals = years.map(y => sc(valFn(idx(y))));
+    const datasets = [{ label: label, data: vals, borderColor: color, backgroundColor: fillColor, borderWidth: 3, tension: 0.3, fill: true,
+      pointRadius: 4, pointBackgroundColor: color, pointBorderColor: '#fff', pointBorderWidth: 2 }];
+    if (STATE.cpi) datasets.push({ label: cpiLabel, data: scaleToMatch(vals, years), borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false, tension: 0.3 });
+    new Chart(freshCanvas(canvasId), {
+      type: 'line', data: { labels: years, datasets: datasets },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: LEGEND_OPTS,
+          tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: {
+            title: i => i[0].label,
+            label: i => i.datasetIndex === 1 ? ' CPI baseline: $' + i.parsed.y.toLocaleString() : ' ' + label + ': $' + i.parsed.y.toLocaleString(),
+            afterBody: items => {
+              const main = items.find(i => i.datasetIndex === 0), cpi = items.find(i => i.datasetIndex === 1);
+              if (main && cpi) { const d = main.parsed.y - cpi.parsed.y; return ['', ' vs CPI baseline: ' + (d >= 0 ? '+' : '-') + '$' + Math.abs(d).toLocaleString()]; }
+              return [];
+            }}}},
+        scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }}, y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }}}}
+    });
+  }
+  trendChart('c-maint', 'Total Income', '#3fb950', 'rgba(63,185,80,0.08)', 'CPI-U (if income tracked inflation)', rawIncome);
+  trendChart('c-exp', 'Total Expenses', '#f47a70', 'rgba(244,122,112,0.08)', 'CPI-U (if expenses tracked inflation)', rawExpense);
+
+  // 5. CAPITAL EXPENDITURES
+  (function() {
+    const P1_END = 2005, P2_START = 2006;
+    const vals = years.map(y => sc(CAPEX_DATA[idx(y)]));
+    let cum1 = 0, cum2 = 0;
+    ALL_YEARS.forEach(y => {
+      if (years.indexOf(y) >= 0) return;
+      const v = sc(CAPEX_DATA[idx(y)] || 0);
+      if (y <= P1_END && y < years[0]) cum1 += v;
+      else if (y > P1_END && y < years[0]) cum2 += v;
+    });
+    const cumP1 = [], cumP2 = [];
+    years.forEach(y => {
+      const v = sc(CAPEX_DATA[idx(y)] || 0);
+      if (y <= P1_END) { cum1 += v; cumP1.push(cum1); cumP2.push(null); }
+      else { cum2 += v; cumP1.push(null); cumP2.push(cum2); }
+    });
+    const lastY = years[years.length - 1];
+    new Chart(freshCanvas('c-capex'), {
+      type: 'bar',
+      data: { labels: years, datasets: [
+        { type: 'bar', label: 'Capital Expenditures', data: vals, backgroundColor: 'rgba(255,167,38,0.75)', borderColor: '#ffa726', borderWidth: 1, borderRadius: 3 },
+        { type: 'line', label: 'Cumulative 1990–2005', data: cumP1, yAxisID: 'y2', borderColor: '#58a6ff', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [6,3],
+          pointRadius: years.map(y => y === P1_END ? 7 : 2), pointBackgroundColor: '#58a6ff', pointBorderColor: '#fff', pointBorderWidth: 1.5, tension: 0.3, spanGaps: false },
+        { type: 'line', label: 'Cumulative 2006–' + Math.max(lastY, P2_START), data: cumP2, yAxisID: 'y2', borderColor: '#e8a020', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [6,3],
+          pointRadius: years.map(y => y === lastY && y >= P2_START ? 7 : 2), pointBackgroundColor: '#e8a020', pointBorderColor: '#fff', pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { ...LEGEND_OPTS.labels, boxWidth: 16, filter: item => item.text && item.text.indexOf('Cumulative') > -1 } },
+          tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: { title: i => i[0].label,
+            label: i => { if (i.datasetIndex === 0) return ' CapEx: $' + i.parsed.y.toLocaleString(); if (i.parsed.y == null) return null; return ' ' + i.dataset.label + ': $' + Math.round(i.parsed.y).toLocaleString(); } }}},
+        scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }}, y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+          y2: { position: 'right', title: { display: true, text: 'Cumulative CapEx', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+            ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888', callback: v => fmtM(v) }, grid: { drawOnChartArea: false } } } }
+    });
+  })();
+
+  // 6. TOTAL LIQUIDITY
+  (function() {
+    const P2_START = 2006;
+    const vals = years.map(y => sc(LIQUIDITY_DATA[idx(y)]));
+    const wHigh = years.map(y => sc(W_BENCH_HIGH[idx(y)]));
+    const wLow = years.map(y => sc(W_BENCH_LOW[idx(y)]));
+    const base2006 = sc(271218);
+    let cumLiq = 0;
+    const cumLiqData = years.map(y => { if (y < P2_START) return null; cumLiq += sc(LIQUIDITY_DATA[idx(y)] || 0); return cumLiq; });
+    const lastY = years[years.length - 1];
+    new Chart(freshCanvas('c-liq'), {
+      type: 'bar',
+      data: { labels: years, datasets: [
+        { type: 'bar', label: 'Total Liquidity', data: vals, backgroundColor: 'rgba(88,166,255,0.75)', borderColor: '#58a6ff', borderWidth: 1, borderRadius: 3 },
+        { type: 'line', label: 'W.High Standard $5,000/unit', data: wHigh, borderColor: '#c9a84c', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false },
+        { type: 'line', label: 'W.Low Standard $3,500/unit', data: wLow, borderColor: '#f47a70', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false },
+        { type: 'line', label: 'Cumulative 2006–' + Math.max(lastY, P2_START), data: cumLiqData, yAxisID: 'y2', borderColor: '#e8a020', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [6,3],
+          pointRadius: years.map(y => y === lastY && y >= P2_START ? 7 : 2), pointBackgroundColor: '#e8a020', pointBorderColor: '#fff', pointBorderWidth: 1.5, tension: 0.3, spanGaps: false }
+      ]},
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#c9a84c', boxWidth: 16 }},
+          tooltip: { ...TOOLTIP_OPTS, mode: 'index', callbacks: { title: i => i[0].label,
+            label: i => {
+              if (i.datasetIndex === 0) return [' Total Liquidity: $' + i.parsed.y.toLocaleString(), ''];
+              if (i.datasetIndex === 1) return [' W.High $5,000/unit: $' + Math.round(i.parsed.y).toLocaleString(), ''];
+              if (i.datasetIndex === 2) return ' W.Low $3,500/unit: $' + Math.round(i.parsed.y).toLocaleString();
+              return null;
+            },
+            afterBody: items => { const m = items.find(i => i.datasetIndex === 0); if (!m) return []; const c = m.parsed.y - base2006; return ['', ' Change from 2006: ' + (c >= 0 ? '+' : '-') + '$' + Math.abs(c).toLocaleString()]; } }}},
+        scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, maxRotation: 45 }}, y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, callback: v => fmtM(v) }},
+          y2: { position: 'right', title: { display: true, text: 'Cumulative Liquidity (2006–' + Math.max(lastY, P2_START) + ')', font: { family: 'IBM Plex Mono', size: 9 }, color: '#888' },
+            ticks: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#888', callback: v => fmtM(v) }, grid: { drawOnChartArea: false } } } }
+    });
+  })();
+}
+
+function openLightbox(canvasId, title, sub) {
+  const srcChart = Chart.getChart(document.getElementById(canvasId));
+  if (!srcChart) return;
+  document.getElementById('lightbox-title').textContent = title;
+  document.getElementById('lightbox-sub').textContent = sub;
+  if (_lbChart) { _lbChart.destroy(); _lbChart = null; }
+  const cfg = srcChart.config;
+  _lbChart = new Chart(document.getElementById('lightbox-canvas'), { type: cfg.type, data: cfg.data, options: cfg.options, plugins: canvasId === 'c-net' ? [barLabelPlugin] : [] });
+  document.getElementById('chart-lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e) {
+  if (e && e.target !== document.getElementById('chart-lightbox') && e.target !== document.getElementById('lightbox-close')) return;
+  document.getElementById('chart-lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  if (_lbChart) { _lbChart.destroy(); _lbChart = null; }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox({ target: document.getElementById('chart-lightbox') }); });
+
+// ═════════ NUMERIC: FOUR TABLES ═════════
+function money(v, signed) {
+  if (v === null || v === undefined || v === '') return '—';
+  const s = '$' + Math.abs(Math.round(v)).toLocaleString();
+  if (signed) return v < 0 ? '<span class="neg">(' + s + ')</span>' : '<span class="pos">+' + s + '</span>';
+  return v < 0 ? '(' + s + ')' : s;
+}
+function buildTable(title, sub, rows, opts) {
+  opts = opts || {};
+  let h = '<div class="t-card"><div class="card-header"><div class="card-title">' + title + '</div><div class="card-sub">' + sub + '</div></div><div class="t-scroll"><table class="num"><thead><tr><th class="rowh">Category</th>';
+  years.forEach(y => h += '<th>' + y + '</th>');
+  if (opts.total) h += '<th class="tot">' + (opts.totalLabel || 'Total ' + STATE.from + '–' + STATE.to) + '</th>';
+  h += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    h += '<tr class="' + (r.cls || '') + '"><td class="rowh">' + r.label + '</td>';
+    r.vals.forEach(v => h += '<td>' + money(v, r.signed) + '</td>');
+    if (opts.total) {
+      const t = r.noTotal ? null : (r.totalVal !== undefined ? r.totalVal : r.vals.reduce((s, v) => s + (v || 0), 0));
+      h += '<td class="tot">' + (t === null ? '—' : money(t, r.signed)) + '</td>';
+    }
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>' + (opts.foot ? '<div class="t-foot">' + opts.foot + '</div>' : '') + '</div>';
+  return h;
+}
+function cpiRow(label, baseVals) {
+  const base = baseVals[0], c0 = CPI_U_DATA[idx(years[0])];
+  return { label: label, cls: 'cpi', noTotal: true, vals: years.map(y => Math.round(base * CPI_U_DATA[idx(y)] / c0)) };
+}
+function renderTables() {
+  const who = UNIT ? 'Apt ' + UNIT.apt + ' share (' + UNIT.shares + ' of 85,027 shares)' : 'Building totals';
+  const out = [];
+
+  // 1. Income
+  const incRows = Object.keys(INCOME).filter(k => k !== 'SpecialAssessment').map(k => ({ label: k, vals: years.map(y => sc(INCOME[k][idx(y)])) }));
+  const incTot = years.map((y, j) => incRows.reduce((s, r) => s + r.vals[j], 0));
+  incRows.push({ label: '<em>Special Assessments (excluded)</em>', cls: 'note', vals: years.map(y => sc(INCOME.SpecialAssessment[idx(y)])) });
+  incRows.push({ label: 'Total Income', cls: 'sum', vals: incTot });
+  if (STATE.cpi) incRows.push(cpiRow('CPI-U baseline (if income tracked inflation)', incTot));
+  out.push(buildTable('1 · Income', who + ' · Special assessments shown but excluded from total', incRows, { total: true }));
+
+  // 2. Expenses
+  const expRows = Object.keys(EXPENSES).map(k => ({ label: k, vals: years.map(y => sc(EXPENSES[k][idx(y)])) }));
+  expRows.push({ label: STATE.principal ? 'Mortgage Principal' : '<em>Mortgage Principal (excluded)</em>', cls: STATE.principal ? '' : 'note', vals: years.map(y => sc(MORTGAGE_PRINCIPAL[idx(y)])) });
+  const expTot = years.map((y, j) => expRows.reduce((s, r, k) => (k === expRows.length - 1 && !STATE.principal) ? s : s + r.vals[j], 0));
+  expRows.push({ label: 'Total Expenses', cls: 'sum', vals: expTot });
+  if (STATE.cpi) expRows.push(cpiRow('CPI-U baseline (if expenses tracked inflation)', expTot));
+  out.push(buildTable('2 · Expenses', who + ' · Mortgage principal ' + (STATE.principal ? 'included' : 'excluded') + ' in total', expRows, { total: true }));
+
+  // 3. Net Income
+  const net = years.map((y, j) => incTot[j] - expTot[j]);
+  let cum = 0; const cumNet = net.map(v => cum += v);
+  const perSh = years.map(y => Math.round((rawIncome(idx(y)) - rawExpense(idx(y))) / TOTAL_SHARES * 100) / 100 + 0);
+  const netRows = [
+    { label: 'Total Income', vals: incTot },
+    { label: 'Total Expenses', vals: expTot },
+    { label: 'Surplus / (Deficit)', cls: 'sum', signed: true, vals: net },
+    { label: 'Cumulative Surplus / (Deficit)', signed: true, noTotal: true, vals: cumNet }
+  ];
+  let netHtml = buildTable('3 · Net Income — Surplus / Deficit', who + ' · Total income minus total expenses', netRows, { total: true });
+  // per-share row (2 decimals)
+  netHtml = netHtml.replace('</tbody>', '<tr class="note"><td class="rowh"><em>Per share</em></td>' + perSh.map(v => '<td>' + (v < 0 ? '<span class="neg">-$' : '<span class="pos">+$') + Math.abs(v).toFixed(2) + '</span></td>').join('') + '<td class="tot">—</td></tr></tbody>');
+  out.push(netHtml);
+
+  // 4. Capital & Liquidity
+  const capex = years.map(y => sc(CAPEX_DATA[idx(y)]));
+  let cc = 0; const cumCap = capex.map(v => cc += v);
+  const capRows = [
+    { label: 'Capital Expenditures', vals: capex },
+    { label: 'Cumulative CapEx (from ' + STATE.from + ')', noTotal: true, vals: cumCap },
+    { label: 'Total Liquidity (Cash + Reserve)', cls: 'sum', noTotal: true, vals: years.map(y => sc(LIQUIDITY_DATA[idx(y)])) },
+    { label: '<em>Westchester Low ($3,500/unit)</em>', cls: 'note', noTotal: true, vals: years.map(y => sc(W_BENCH_LOW[idx(y)])) },
+    { label: '<em>Westchester High ($5,000/unit)</em>', cls: 'note', noTotal: true, vals: years.map(y => sc(W_BENCH_HIGH[idx(y)])) }
+  ];
+  out.push(buildTable('4 · Capital & Liquidity', who + ' · Year-end liquidity; benchmarks CPI-adjusted', capRows, { total: true, foot: 'Liquidity and benchmarks are year-end balances, so they have no range total.' }));
+
+  document.getElementById('tables').innerHTML = out.join('');
+}
+
+// ═════════ START ═════════
+initControls();
+refresh();
+</script>
+</body>
+</html>
