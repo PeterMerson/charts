@@ -97,9 +97,28 @@ table.num tr.sum td { border-top:2px solid var(--gold); font-weight:700; color:#
 table.num tr.sum td.rowh { color:var(--gold); }
 table.num tr.note td { font-style:italic; color:var(--muted); }
 table.num tr.cpi td { color:var(--gold); font-style:italic; }
-table.num tr:hover td { background-color:rgba(88,166,255,0.06); }
+table.num tbody tr:hover td { background-color:#15305a; }
 .pos { color:var(--green); } .neg { color:var(--red); }
 .t-foot { font-size:0.6rem; color:var(--muted); padding:8px 20px 12px; letter-spacing:0.04em; }
+
+.t-layout { display:grid; grid-template-columns: minmax(0,1fr) 330px; }
+.t-panel { border-left:1px solid var(--line); background:rgba(10,26,48,0.6); display:flex; flex-direction:column; }
+.p-head { background:var(--deep); padding:12px 16px; border-bottom:2px solid rgba(201,168,76,0.3); }
+.p-cat { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--text); }
+.p-range { font-size:0.58rem; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
+.p-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px 10px; padding:10px 16px; border-bottom:1px solid var(--line); }
+.p-stat-l { font-size:0.52rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
+.p-stat-v { font-size:0.8rem; font-weight:600; color:var(--text); margin-top:2px; }
+.p-empty { padding:28px 18px; color:var(--muted); font-size:0.7rem; line-height:1.7; text-align:center; }
+.p-empty b { color:var(--gold); font-size:1.2rem; display:block; }
+.p-chart { position:relative; height:250px; padding:30px 12px 12px; }
+.p-expand { position:absolute; right:12px; top:8px; background:transparent; border:1px solid var(--gold); color:var(--gold); border-radius:4px; width:26px; height:26px; cursor:pointer; }
+.p-expand:hover { background:var(--gold); color:var(--ink); }
+table.num tbody tr { cursor:pointer; }
+table.num tbody tr.sel td { background-color:#1f4170 !important; color:#fff !important; }
+table.num tbody tr.sel td.rowh { box-shadow: inset 3px 0 0 var(--blue); }
+.t-hint { font-size:0.58rem; color:var(--muted); padding:6px 20px 0; letter-spacing:0.06em; }
+@media (max-width: 1100px) { .t-layout { grid-template-columns: 1fr; } .t-panel { border-left:none; border-top:1px solid var(--line); } }
 
 /* ── OTHER VIEW ── */
 .other { max-width:900px; margin:28px auto; padding:28px 32px; border:1px dashed var(--gold); border-radius:8px; text-align:center; color:var(--muted); }
@@ -790,14 +809,17 @@ function money(v, signed) {
   if (signed) return v < 0 ? '<span class="neg">(' + s + ')</span>' : '<span class="pos">+' + s + '</span>';
   return v < 0 ? '(' + s + ')' : s;
 }
-function buildTable(title, sub, rows, opts) {
+const TABLE_ROWS = [];
+const SELECTED = {};
+function buildTable(tIdx, title, sub, rows, opts) {
   opts = opts || {};
-  let h = '<div class="t-card"><div class="card-header"><div class="card-title">' + title + '</div><div class="card-sub">' + sub + '</div></div><div class="t-scroll"><table class="num"><thead><tr><th class="rowh">Category</th>';
+  TABLE_ROWS[tIdx] = rows;
+  let h = '<div class="t-card"><div class="card-header"><div class="card-title">' + title + '</div><div class="card-sub">' + sub + '</div></div><div class="t-hint">Click any row to see its trend chart →</div><div class="t-layout"><div class="t-scroll"><table class="num" data-t="' + tIdx + '"><thead><tr><th class="rowh">Category</th>';
   years.forEach(y => h += '<th>' + y + '</th>');
   if (opts.total) h += '<th class="tot">' + (opts.totalLabel || 'Total ' + STATE.from + '–' + STATE.to) + '</th>';
   h += '</tr></thead><tbody>';
-  rows.forEach(r => {
-    h += '<tr class="' + (r.cls || '') + '"><td class="rowh">' + r.label + '</td>';
+  rows.forEach((r, rIdx) => {
+    h += '<tr class="' + (r.cls || '') + '" onclick="selectRow(' + tIdx + ',' + rIdx + ')"><td class="rowh">' + r.label + '</td>';
     r.vals.forEach(v => h += '<td>' + money(v, r.signed) + '</td>');
     if (opts.total) {
       const t = r.noTotal ? null : (r.totalVal !== undefined ? r.totalVal : r.vals.reduce((s, v) => s + (v || 0), 0));
@@ -805,7 +827,7 @@ function buildTable(title, sub, rows, opts) {
     }
     h += '</tr>';
   });
-  h += '</tbody></table></div>' + (opts.foot ? '<div class="t-foot">' + opts.foot + '</div>' : '') + '</div>';
+  h += '</tbody></table></div>' + panelHTML(tIdx) + '</div>' + (opts.foot ? '<div class="t-foot">' + opts.foot + '</div>' : '') + '</div>';
   return h;
 }
 function cpiRow(label, baseVals) {
@@ -822,7 +844,7 @@ function renderTables() {
   incRows.push({ label: '<em>Special Assessments (excluded)</em>', cls: 'note', vals: years.map(y => sc(INCOME.SpecialAssessment[idx(y)])) });
   incRows.push({ label: 'Total Income', cls: 'sum', vals: incTot });
   if (STATE.cpi) incRows.push(cpiRow('CPI-U baseline (if income tracked inflation)', incTot));
-  out.push(buildTable('1 · Income', who + ' · Special assessments shown but excluded from total', incRows, { total: true }));
+  out.push(buildTable(0, '1 · Income', who + ' · Special assessments shown but excluded from total', incRows, { total: true }));
 
   // 2. Expenses
   const expRows = Object.keys(EXPENSES).map(k => ({ label: k, vals: years.map(y => sc(EXPENSES[k][idx(y)])) }));
@@ -830,7 +852,7 @@ function renderTables() {
   const expTot = years.map((y, j) => expRows.reduce((s, r, k) => (k === expRows.length - 1 && !STATE.principal) ? s : s + r.vals[j], 0));
   expRows.push({ label: 'Total Expenses', cls: 'sum', vals: expTot });
   if (STATE.cpi) expRows.push(cpiRow('CPI-U baseline (if expenses tracked inflation)', expTot));
-  out.push(buildTable('2 · Expenses', who + ' · Mortgage principal ' + (STATE.principal ? 'included' : 'excluded') + ' in total', expRows, { total: true }));
+  out.push(buildTable(1, '2 · Expenses', who + ' · Mortgage principal ' + (STATE.principal ? 'included' : 'excluded') + ' in total', expRows, { total: true }));
 
   // 3. Net Income
   const net = years.map((y, j) => incTot[j] - expTot[j]);
@@ -842,7 +864,7 @@ function renderTables() {
     { label: 'Surplus / (Deficit)', cls: 'sum', signed: true, vals: net },
     { label: 'Cumulative Surplus / (Deficit)', signed: true, noTotal: true, vals: cumNet }
   ];
-  let netHtml = buildTable('3 · Net Income — Surplus / Deficit', who + ' · Total income minus total expenses', netRows, { total: true });
+  let netHtml = buildTable(2, '3 · Net Income — Surplus / Deficit', who + ' · Total income minus total expenses', netRows, { total: true });
   // per-share row (2 decimals)
   netHtml = netHtml.replace('</tbody>', '<tr class="note"><td class="rowh"><em>Per share</em></td>' + perSh.map(v => '<td>' + (v < 0 ? '<span class="neg">-$' : '<span class="pos">+$') + Math.abs(v).toFixed(2) + '</span></td>').join('') + '<td class="tot">—</td></tr></tbody>');
   out.push(netHtml);
@@ -857,11 +879,68 @@ function renderTables() {
     { label: '<em>Westchester Low ($3,500/unit)</em>', cls: 'note', noTotal: true, vals: years.map(y => sc(W_BENCH_LOW[idx(y)])) },
     { label: '<em>Westchester High ($5,000/unit)</em>', cls: 'note', noTotal: true, vals: years.map(y => sc(W_BENCH_HIGH[idx(y)])) }
   ];
-  out.push(buildTable('4 · Capital & Liquidity', who + ' · Year-end liquidity; benchmarks CPI-adjusted', capRows, { total: true, foot: 'Liquidity and benchmarks are year-end balances, so they have no range total.' }));
+  out.push(buildTable(3, '4 · Capital & Liquidity', who + ' · Year-end liquidity; benchmarks CPI-adjusted', capRows, { total: true, foot: 'Liquidity and benchmarks are year-end balances, so they have no range total.' }));
 
   document.getElementById('tables').innerHTML = out.join('');
+  // Restore any selected rows (matched by label)
+  Object.keys(SELECTED).forEach(t => { const r = TABLE_ROWS[t].findIndex(x => x.label === SELECTED[t]); if (r >= 0) selectRow(+t, r); });
   // Open each table scrolled to its most recent year
   requestAnimationFrame(() => document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; }));
+}
+
+// ═════════ ROW TREND PANEL (as in the original Matrix) ═════════
+function panelHTML(t) {
+  return '<div class="t-panel" id="pn-' + t + '">' +
+    '<div class="p-head"><div class="p-cat" id="pn-cat-' + t + '">Select a Row</div><div class="p-range" id="pn-range-' + t + '">Click any row in the table</div></div>' +
+    '<div class="p-stats" id="pn-stats-' + t + '" style="display:none"></div>' +
+    '<div class="p-empty" id="pn-empty-' + t + '"><b>←</b>Click any row in the table<br>to see its trend over the<br>selected year range</div>' +
+    '<div class="p-chart" id="pn-chart-' + t + '" style="display:none"><canvas id="pn-canvas-' + t + '"></canvas>' +
+    '<button class="p-expand" title="Expand chart" onclick="expandTrend(' + t + ')">⤢</button></div></div>';
+}
+function plainLabel(l) { const d = document.createElement('div'); d.innerHTML = l; return d.textContent; }
+function pct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+function selectRow(t, r) {
+  const row = TABLE_ROWS[t][r]; if (!row) return;
+  SELECTED[t] = row.label;
+  document.querySelectorAll('table.num[data-t="' + t + '"] tbody tr').forEach((tr, i) => tr.classList.toggle('sel', i === r));
+  const name = plainLabel(row.label), vals = row.vals;
+  document.getElementById('pn-cat-' + t).textContent = name;
+  document.getElementById('pn-range-' + t).textContent = STATE.from + ' – ' + STATE.to + ' · ' + years.length + ' years · ' + (UNIT ? 'Apt ' + UNIT.apt : 'Building totals');
+  // stats
+  let pk = 0; vals.forEach((v, i) => { if (v > vals[pk]) pk = i; });
+  const first = vals[0], last = vals[vals.length - 1];
+  const chg = first > 0 ? (last - first) / first * 100 : null;
+  const cpiChg = (CPI_U_DATA[idx(years[years.length - 1])] - CPI_U_DATA[idx(years[0])]) / CPI_U_DATA[idx(years[0])] * 100;
+  const stat = (l, v, c) => '<div><div class="p-stat-l">' + l + '</div><div class="p-stat-v"' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</div></div>';
+  const st = document.getElementById('pn-stats-' + t);
+  st.innerHTML = stat('Peak Year', years[pk]) + stat('Peak Value', money(vals[pk])) + stat('Latest Value', money(last)) +
+    stat('Range Change', chg === null ? '—' : pct(chg), chg === null ? null : (chg >= 0 ? '#3fb950' : '#f47a70')) +
+    stat('CPI Same Period', pct(cpiChg), '#c9a84c') + stat('Years', years.length);
+  st.style.display = 'grid';
+  document.getElementById('pn-empty-' + t).style.display = 'none';
+  document.getElementById('pn-chart-' + t).style.display = 'block';
+  // chart: indexed vs CPI when CPI is on and the first year is positive; otherwise dollars
+  const indexed = STATE.cpi && first > 0;
+  const c0 = CPI_U_DATA[idx(years[0])];
+  const ds = [{ label: name, data: indexed ? vals.map(v => +(v / first * 100).toFixed(1)) : vals,
+    borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,0.08)', borderWidth: 3, borderDash: [2, 3], fill: true, tension: 0.25,
+    pointRadius: 3, pointBackgroundColor: '#58a6ff', pointBorderColor: '#58a6ff' }];
+  if (indexed) ds.push({ label: 'US CPI-U (indexed to ' + years[0] + ')', data: years.map(y => +(CPI_U_DATA[idx(y)] / c0 * 100).toFixed(1)),
+    borderColor: '#c9a84c', borderWidth: 3, borderDash: [5, 4], pointRadius: 0, fill: false, tension: 0.25 });
+  const canvas = freshCanvas('pn-canvas-' + t);
+  new Chart(canvas, { type: 'line', data: { labels: years, datasets: ds },
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#c9a84c', boxWidth: 18 } },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: { title: i => i[0].label,
+          label: i => i.datasetIndex === 0
+            ? ' ' + name + ': ' + money(vals[i.dataIndex]) + (indexed ? '  (index ' + i.parsed.y + ')' : '')
+            : ' CPI-U index: ' + i.parsed.y } } },
+      scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, font: { family: 'IBM Plex Mono', size: 9 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } },
+        y: { grid: GRID_OPTS, title: { display: indexed, text: 'Index (' + years[0] + ' = 100)', color: '#888', font: { family: 'IBM Plex Mono', size: 9 } },
+          ticks: { ...TICK_OPTS, font: { family: 'IBM Plex Mono', size: 9 }, callback: v => indexed ? v : fmtM(v) } } } } });
+}
+function expandTrend(t) {
+  openLightbox('pn-canvas-' + t, document.getElementById('pn-cat-' + t).textContent, document.getElementById('pn-range-' + t).textContent);
 }
 
 // ═════════ START ═════════
