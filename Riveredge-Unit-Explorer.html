@@ -109,6 +109,19 @@ table.num tbody tr:hover td { background-color:#15305a; }
 .p-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px 10px; padding:10px 16px; border-bottom:1px solid var(--line); }
 .p-stat-l { font-size:0.52rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
 .p-stat-v { font-size:0.8rem; font-weight:600; color:var(--text); margin-top:2px; }
+.p-modes { display:flex; gap:6px; margin-top:8px; }
+.p-mode { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:3px 10px; border-radius:3px; border:1px solid var(--gold); background:transparent; color:var(--gold); cursor:pointer; }
+.p-mode.active { background:var(--gold); color:var(--ink); }
+.p-year { position:absolute; left:12px; top:6px; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; background:#fff; color:var(--ink); border:1px solid var(--gold); border-radius:3px; padding:2px 4px; }
+.p-note { display:none; margin:0 12px 12px; padding:10px 12px; border-left:3px solid #e03040; background:rgba(224,48,64,0.08); font-size:0.64rem; line-height:1.6; color:var(--text); }
+.p-note.open { display:block; }
+#lightbox-note h4, .p-note h4 { font-family:'Playfair Display',serif; color:#f0c96a; font-size:0.78rem; margin-bottom:4px; }
+#lightbox-note .src, .p-note .src { color:var(--muted); font-size:0.56rem; margin-top:6px; }
+#lightbox-note button, .p-note button { float:right; background:transparent; border:1px solid var(--gold); color:var(--gold); font-size:0.6rem; border-radius:3px; cursor:pointer; padding:1px 6px; }
+.p-extra { padding:0 14px 8px; font-size:0.62rem; color:var(--muted); line-height:1.6; }
+.p-extra b { color:var(--green); }
+.p-extra a { color:var(--gold); }
+#lightbox-note { display:none; margin-top:8px; padding:10px 14px; border-left:3px solid #e03040; background:rgba(224,48,64,0.1); font-size:0.72rem; line-height:1.6; color:var(--text); }
 .p-empty { padding:28px 18px; color:var(--muted); font-size:0.7rem; line-height:1.7; text-align:center; }
 .p-empty b { color:var(--gold); font-size:1.2rem; display:block; }
 .p-chart { position:relative; height:250px; padding:30px 12px 12px; }
@@ -192,7 +205,7 @@ table.num tbody tr.sel td.rowh { box-shadow: inset 3px 0 0 var(--blue); }
 <!-- View buttons -->
 <div class="bar">
   <div class="views">
-    <button class="view-btn active" id="vb-graphic" onclick="showView('graphic')">Graphic<small>Six interactive charts</small></button>
+    <button class="view-btn active" id="vb-graphic" onclick="showView('graphic')">Graphic<small>Six interactive charts · Click to expand</small></button>
     <button class="view-btn" id="vb-numeric" onclick="showView('numeric')">Numeric<small>Four tables</small></button>
     <button class="view-btn" id="vb-other" onclick="showView('other')">Other<small>Reserved</small></button>
   </div>
@@ -263,7 +276,7 @@ table.num tbody tr.sel td.rowh { box-shadow: inset 3px 0 0 var(--blue); }
       <div><div id="lightbox-title"></div><div id="lightbox-sub"></div></div>
       <button id="lightbox-close" onclick="closeLightbox()">✕</button>
     </div>
-    <div id="lightbox-body"><div id="lightbox-canvas-wrap"><canvas id="lightbox-canvas"></canvas></div></div>
+    <div id="lightbox-body" style="display:flex;flex-direction:column;"><div id="lightbox-canvas-wrap" style="flex:1;min-height:0;"><canvas id="lightbox-canvas"></canvas></div><div id="lightbox-note"></div></div>
   </div>
 </div>
 
@@ -790,7 +803,8 @@ function openLightbox(canvasId, title, sub) {
   document.getElementById('lightbox-sub').textContent = sub;
   if (_lbChart) { _lbChart.destroy(); _lbChart = null; }
   const cfg = srcChart.config;
-  _lbChart = new Chart(document.getElementById('lightbox-canvas'), { type: cfg.type, data: cfg.data, options: cfg.options, plugins: canvasId === 'c-net' ? [barLabelPlugin] : [] });
+  document.getElementById('lightbox-note').style.display = 'none';
+  _lbChart = new Chart(document.getElementById('lightbox-canvas'), { type: cfg.type, data: cfg.data, options: cfg.options, plugins: canvasId === 'c-net' ? [barLabelPlugin] : (cfg.plugins || []) });
   document.getElementById('chart-lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -885,22 +899,25 @@ function renderTables() {
   // Restore any selected rows (matched by label)
   Object.keys(SELECTED).forEach(t => { const r = TABLE_ROWS[t].findIndex(x => x.label === SELECTED[t]); if (r >= 0) selectRow(+t, r); });
   // Open each table scrolled to its most recent year
-  requestAnimationFrame(() => document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; }));
+  requestAnimationFrame(scrollTablesEnd);
 }
 
 // ═════════ ROW TREND PANEL (as in the original Matrix) ═════════
 function panelHTML(t) {
   return '<div class="t-panel" id="pn-' + t + '">' +
-    '<div class="p-head"><div class="p-cat" id="pn-cat-' + t + '">Select a Row</div><div class="p-range" id="pn-range-' + t + '">Click any row in the table</div></div>' +
+    '<div class="p-head"><div class="p-cat" id="pn-cat-' + t + '">Select a Row</div><div class="p-range" id="pn-range-' + t + '">Click any row in the table</div>' +
+    '<div class="p-modes" id="pn-modes-' + t + '" style="display:none"><button class="p-mode" id="pn-mt-' + t + '" onclick="setPanelMode(' + t + ',\'trend\')">Trend</button><button class="p-mode" id="pn-mp-' + t + '" onclick="setPanelMode(' + t + ',\'pie\')">Pie</button><button class="p-mode" id="pn-mr-' + t + '" onclick="setPanelMode(' + t + ',\'retax\')">vs CPI</button></div></div>' +
     '<div class="p-stats" id="pn-stats-' + t + '" style="display:none"></div>' +
     '<div class="p-empty" id="pn-empty-' + t + '"><b>←</b>Click any row in the table<br>to see its trend over the<br>selected year range</div>' +
-    '<div class="p-chart" id="pn-chart-' + t + '" style="display:none"><canvas id="pn-canvas-' + t + '"></canvas>' +
-    '<button class="p-expand" title="Expand chart" onclick="expandTrend(' + t + ')">⤢</button></div></div>';
+    '<div class="p-chart" id="pn-chart-' + t + '" style="display:none"><select class="p-year" id="pn-year-' + t + '" style="display:none" onchange="PIE_YEAR[' + t + ']=+this.value; renderPanelChart(' + t + ')"></select><canvas id="pn-canvas-' + t + '"></canvas>' +
+    '<button class="p-expand" title="Expand chart" onclick="expandTrend(' + t + ')">⤢</button></div>' +
+    '<div class="p-extra" id="pn-extra-' + t + '" style="display:none"></div><div class="p-note" id="pn-note-' + t + '"></div></div>';
 }
 function plainLabel(l) { const d = document.createElement('div'); d.innerHTML = l; return d.textContent; }
 function pct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
 function selectRow(t, r) {
   const row = TABLE_ROWS[t][r]; if (!row) return;
+  SELECT_CHANGED = CUR_ROW[t] !== r || SELECTED[t] !== row.label;
   SELECTED[t] = row.label;
   document.querySelectorAll('table.num[data-t="' + t + '"] tbody tr').forEach((tr, i) => tr.classList.toggle('sel', i === r));
   const name = plainLabel(row.label), vals = row.vals;
@@ -919,6 +936,29 @@ function selectRow(t, r) {
   st.style.display = 'grid';
   document.getElementById('pn-empty-' + t).style.display = 'none';
   document.getElementById('pn-chart-' + t).style.display = 'block';
+  CUR_ROW[t] = r;
+  const pieable = (t === 0 && row.label === 'Total Income') || (t === 1 && row.label === 'Total Expenses');
+  const retax = (t === 1 && row.label === 'Real Estate Taxes');
+  document.getElementById('pn-modes-' + t).style.display = (pieable || retax) ? 'flex' : 'none';
+  document.getElementById('pn-mp-' + t).style.display = pieable ? '' : 'none';
+  document.getElementById('pn-mr-' + t).style.display = retax ? '' : 'none';
+  if (retax && SELECT_CHANGED) PANEL_MODE[t] = 'retax';
+  if (!pieable && PANEL_MODE[t] === 'pie') PANEL_MODE[t] = 'trend';
+  if (!retax && PANEL_MODE[t] === 'retax') PANEL_MODE[t] = 'trend';
+  renderPanelChart(t);
+}
+function renderPanelChart(t) {
+  const row = TABLE_ROWS[t][CUR_ROW[t]], name = plainLabel(row.label), vals = row.vals, first = vals[0];
+  const mode = PANEL_MODE[t] || 'trend';
+  document.getElementById('pn-mt-' + t).classList.toggle('active', mode === 'trend');
+  document.getElementById('pn-mp-' + t).classList.toggle('active', mode === 'pie');
+  document.getElementById('pn-mr-' + t).classList.toggle('active', mode === 'retax');
+  document.getElementById('pn-extra-' + t).style.display = 'none';
+  document.getElementById('pn-note-' + t).classList.remove('open');
+  if (mode === 'retax') { document.getElementById('pn-year-' + t).style.display = 'none'; renderRETax(t); return; }
+  const ysel = document.getElementById('pn-year-' + t);
+  ysel.style.display = mode === 'pie' ? 'block' : 'none';
+  if (mode === 'pie') { renderPie(t, ysel); return; }
   // chart: indexed vs CPI when CPI is on and the first year is positive; otherwise dollars
   const indexed = STATE.cpi && first > 0;
   const c0 = CPI_U_DATA[idx(years[0])];
@@ -939,13 +979,99 @@ function selectRow(t, r) {
         y: { grid: GRID_OPTS, title: { display: indexed, text: 'Index (' + years[0] + ' = 100)', color: '#888', font: { family: 'IBM Plex Mono', size: 9 } },
           ticks: { ...TICK_OPTS, font: { family: 'IBM Plex Mono', size: 9 }, callback: v => indexed ? v : fmtM(v) } } } } });
 }
+const PANEL_MODE = {}, PIE_YEAR = {}, CUR_ROW = {};
+const PIE_COLORS = ['#3987e5','#d95926','#199e70','#c98500','#d55181','#0ca30c','#9085e9','#e66767'];
+// ── Real Estate Taxes vs CPI (from RE-Tax-vs-CPI.html) ──
+var SELECT_CHANGED = false;
+const RE_DIP_YEARS = [1997, 2009, 2021];
+const RE_AUDIT_NOTES = {
+  1997: { heading: 'Note 6: REAL ESTATE TAXES — PROFESSIONAL FEES',
+    body: 'Real estate tax expense is reduced by tax certiorari refunds of $113,939. Included in professional fees is legal fees of $81,881 related to the tax certiorari.' },
+  2009: { heading: '11. REAL ESTATE TAX REFUND:',
+    body: 'In August 2009, the Corporation was successful in its real estate tax assessment proceedings. A refund representing the years 1998-2004, 2005, 2006 and 2007 was awarded to the Corporation. The gross amount of the real estate tax refund was $256,431. After certiorari legal fees that totaled $85,442 and other legal expenses, a net check of $158,699 was received by the Corporation and deposited into a CD account with the Astoria Federal Savings Bank. When the CD matured in December 2009 the funds were used to purchase another CD with Signature Bank. See Note 3.' },
+  2021: { heading: '10. Real Estate Tax Refunds',
+    body: 'During February 2022, the Corporation settled the property tax review proceedings from the City of Yonkers and Westchester County. The settlement pertaining to tax periods 2016 through 2020 resulted in gross tax refunds amounting to $123,918 and gross tax savings amounting to $40,353. The gross tax refunds have been included as a reduction of real estate tax expense for the year ended December 31, 2021; whereas gross tax savings is given to the Corporation in the form of reduced real estate tax bills. The associated legal fees amounted to $59,237 and were expensed during 2021. As of December 31, 2021, real estate tax refunds receivable was $123,918, and real estate tax refund legal fees payable was $59,237, as shown on the accompanying Balance Sheet.' }
+};
+function reAuditHTML(yr, closeFn) {
+  const n = RE_AUDIT_NOTES[yr];
+  return '<button onclick="' + closeFn + '">✕</button><h4>' + yr + ' — Tax Appeal Year</h4><b>' + n.heading + '</b><br>' + n.body +
+    '<div class="src">Source: Riveredge Owners, Inc. · Audited Annual Financial Statement · Exact wording from auditor\'s notes</div>';
+}
+function showREAudit(t, yr) {
+  if (!RE_AUDIT_NOTES[yr]) return;
+  const el = document.getElementById('pn-note-' + t);
+  el.innerHTML = reAuditHTML(yr, "this.parentNode.classList.remove('open')"); el.classList.add('open');
+  const lb = document.getElementById('lightbox-note');
+  if (document.getElementById('chart-lightbox').classList.contains('open')) { lb.innerHTML = reAuditHTML(yr, "this.parentNode.style.display='none'"); lb.style.display = 'block'; }
+}
+function renderRETax(t) {
+  const vals = TABLE_ROWS[t][CUR_ROW[t]].vals;
+  const c0 = CPI_U_DATA[idx(years[0])];
+  const cpiProj = years.map(y => Math.round(vals[0] * CPI_U_DATA[idx(y)] / c0));
+  const dips = years.map(y => RE_DIP_YEARS.indexOf(y) >= 0);
+  const cpiArea = { id: 'cpiArea', beforeDatasetsDraw(chart) {
+    const { ctx, scales: { x, y }, chartArea } = chart; if (!x || !y || !chartArea) return;
+    ctx.save(); ctx.beginPath(); ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(cpiProj[0]));
+    for (let i = 1; i < cpiProj.length; i++) ctx.lineTo(x.getPixelForValue(i), y.getPixelForValue(cpiProj[i]));
+    ctx.lineTo(x.getPixelForValue(cpiProj.length - 1), chartArea.bottom); ctx.lineTo(x.getPixelForValue(0), chartArea.bottom); ctx.closePath();
+    ctx.fillStyle = 'rgba(58,143,212,0.16)'; ctx.fill(); ctx.restore(); } };
+  const dipMarks = { id: 'dipMarkers', afterDatasetsDraw(chart) {
+    const { ctx, scales: { x, y } } = chart; if (!x || !y) return;
+    ctx.save(); dips.forEach((d, i) => { if (!d) return; ctx.beginPath(); ctx.arc(x.getPixelForValue(i), y.getPixelForValue(vals[i]), 6, 0, Math.PI * 2); ctx.fillStyle = '#e03040'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); }); ctx.restore(); } };
+  new Chart(freshCanvas('pn-canvas-' + t), { type: 'line', plugins: [cpiArea, dipMarks],
+    data: { labels: years, datasets: [
+      { label: 'CPI-projected', data: cpiProj, borderColor: '#3a8fd4', backgroundColor: 'transparent', borderWidth: 2, borderDash: [6, 3], pointRadius: 2, pointBackgroundColor: '#3a8fd4', tension: 0.3, order: 2 },
+      { label: 'Actual RE Taxes', data: vals, borderColor: '#e8913a', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 2, pointBackgroundColor: '#e8913a', tension: 0.3, order: 1 } ] },
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      onClick: (e, els) => { if (els.length && dips[els[0].index]) showREAudit(t, years[els[0].index]); },
+      plugins: { legend: { labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#c9a84c', boxWidth: 16 } },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: { title: i => i[0].label,
+          label: i => i.datasetIndex === 0 ? ' CPI-projected: ' + money(i.parsed.y) : ' Actual paid: ' + money(i.parsed.y),
+          afterBody: items => { const i = items[0].dataIndex, d = cpiProj[i] - vals[i];
+            const l = ['', d > 0 ? ' ✓ Saved vs CPI: ' + money(d) : ' ▲ Above CPI: ' + money(-d)];
+            if (dips[i]) l.push(' ★ Tax appeal year — click to read the audited note'); return l; } } } },
+      scales: { x: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, font: { family: 'IBM Plex Mono', size: 9 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } },
+        y: { grid: GRID_OPTS, ticks: { ...TICK_OPTS, font: { family: 'IBM Plex Mono', size: 9 }, callback: v => fmtM(v) } } } } });
+  const saved = cpiProj.reduce((s, v, i) => s + v - vals[i], 0);
+  const perSh = saved / (UNIT ? UNIT.shares : TOTAL_SHARES);
+  const ex = document.getElementById('pn-extra-' + t);
+  ex.innerHTML = 'Had taxes grown with CPI from ' + years[0] + ', ' + (UNIT ? 'your share' : 'the building') + ' would have paid ' + money(cpiProj.reduce((a, b) => a + b, 0)) +
+    '. Actual: ' + money(vals.reduce((a, b) => a + b, 0)) + '. ' + (saved >= 0 ? 'Saved: <b>' + money(saved) + '</b>' : 'Above CPI: ' + money(-saved)) +
+    ' (' + (perSh >= 0 ? '$' : '-$') + Math.abs(perSh).toFixed(2) + '/share). ' +
+    (years.some(y => RE_DIP_YEARS.indexOf(y) >= 0) ? '<span style="color:#e03040">●</span> Click a red marker to read the audited tax-appeal note. ' : '') +
+    '<a href="https://petermerson.github.io/charts/RE-Tax-vs-CPI.html" target="_blank">Full analysis ↗</a>';
+  ex.style.display = 'block';
+}
+function setPanelMode(t, m) { PANEL_MODE[t] = m; renderPanelChart(t); }
+function renderPie(t, ysel) {
+  if (!PIE_YEAR[t] || years.indexOf(PIE_YEAR[t]) < 0) PIE_YEAR[t] = years[years.length - 1];
+  ysel.innerHTML = years.slice().reverse().map(y => '<option value="' + y + '"' + (y === PIE_YEAR[t] ? ' selected' : '') + '>' + y + '</option>').join('');
+  const j = years.indexOf(PIE_YEAR[t]);
+  // the category rows that make up the total (excluded rows, totals and CPI rows left out)
+  let parts = TABLE_ROWS[t].filter(r => !/sum|cpi|note/.test(r.cls || '')).map(r => ({ label: plainLabel(r.label), v: r.vals[j] })).filter(p => p.v > 0);
+  parts.sort((a, b) => b.v - a.v);
+  if (parts.length > 8) { const rest = parts.slice(7).reduce((s, p) => s + p.v, 0); parts = parts.slice(0, 7).concat([{ label: 'All other', v: rest }]); }
+  const total = parts.reduce((s, p) => s + p.v, 0);
+  new Chart(freshCanvas('pn-canvas-' + t), { type: 'pie',
+    data: { labels: parts.map(p => p.label), datasets: [{ data: parts.map(p => p.v), backgroundColor: PIE_COLORS.slice(0, parts.length), borderColor: '#0d2240', borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#f0efec', boxWidth: 10, padding: 6,
+          generateLabels: ch => ch.data.labels.map((l, i) => ({ text: l + ' ' + (parts[i].v / total * 100).toFixed(0) + '%', fillStyle: PIE_COLORS[i], strokeStyle: PIE_COLORS[i], fontColor: '#f0efec', index: i })) } },
+        title: { display: true, text: (t === 0 ? 'Income' : 'Expenses') + ' by category · ' + PIE_YEAR[t] + ' · ' + money(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' (' + (i.parsed / total * 100).toFixed(1) + '%)' } } } } });
+}
 function expandTrend(t) {
   openLightbox('pn-canvas-' + t, document.getElementById('pn-cat-' + t).textContent, document.getElementById('pn-range-' + t).textContent);
 }
 
+function scrollTablesEnd() { document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; }); }
+
 // ═════════ START ═════════
 initControls();
 refresh();
+// Web fonts widen the columns after they load, so scroll to the latest year again
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (STATE.view === 'numeric') scrollTablesEnd(); });
+window.addEventListener('load', () => { if (STATE.view === 'numeric') scrollTablesEnd(); });
 </script>
 </body>
 </html>
