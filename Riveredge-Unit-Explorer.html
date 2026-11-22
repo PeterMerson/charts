@@ -1072,15 +1072,22 @@ function renderPie(t, ysel) {
   // the category rows that make up the total (excluded rows, totals and CPI rows left out)
   let parts = TABLE_ROWS[t].filter(r => !/sum|cpi|note/.test(r.cls || '')).map(r => ({ label: plainLabel(r.label), v: r.vals[j] })).filter(p => p.v > 0);
   parts.sort((a, b) => b.v - a.v);
-  if (parts.length > 8) { const rest = parts.slice(7).reduce((s, p) => s + p.v, 0); parts = parts.slice(0, 7).concat([{ label: 'All other', v: rest }]); }
+  let others = [];
+  if (parts.length > 8) { others = parts.slice(7); const rest = others.reduce((s, p) => s + p.v, 0); parts = parts.slice(0, 7).concat([{ label: 'All other', v: rest }]); }
   const total = parts.reduce((s, p) => s + p.v, 0);
   new Chart(freshCanvas('pn-canvas-' + t), { type: 'pie',
     data: { labels: parts.map(p => p.label), datasets: [{ data: parts.map(p => p.v), backgroundColor: PIE_COLORS.slice(0, parts.length), borderColor: '#0d2240', borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: 'right', labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#f0efec', boxWidth: 10, padding: 6,
-          generateLabels: ch => ch.data.labels.map((l, i) => ({ text: l + ' ' + (parts[i].v / total * 100).toFixed(0) + '%', fillStyle: PIE_COLORS[i], strokeStyle: PIE_COLORS[i], fontColor: '#f0efec', index: i })) } },
+          generateLabels: ch => { const out = ch.data.labels.map((l, i) => ({ text: l + ' ' + (parts[i].v / total * 100).toFixed(0) + '%', fillStyle: PIE_COLORS[i], strokeStyle: PIE_COLORS[i], fontColor: '#f0efec', index: i, hidden: !ch.getDataVisibility(i) }));
+            if (ch.canvas.id !== 'lightbox-canvas' && others.length) out[out.length - 1].text += ' (hover)';
+            // list what "All other" is made of, indented under it
+            if (ch.canvas.id === 'lightbox-canvas') others.forEach(o => out.push({ text: '  · ' + o.label + ' ' + (o.v / total * 100).toFixed(1) + '%', fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)', lineWidth: 0, fontColor: '#c3c2b7', sub: true }));
+            return out; } },
+        onClick: (e, item, legend) => { if (item.sub) return; legend.chart.toggleDataVisibility(item.index); legend.chart.update(); } },
         title: { display: true, text: (t === 0 ? 'Income' : 'Expenses') + ' by category · ' + PIE_YEAR[t] + ' · ' + money(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
-        tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' (' + (i.parsed / total * 100).toFixed(1) + '%)' } } } } });
+        tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' (' + (i.parsed / total * 100).toFixed(1) + '%)',
+          afterLabel: i => i.label === 'All other' ? others.map(o => '   · ' + o.label + ': ' + money(o.v) + ' (' + (o.v / total * 100).toFixed(1) + '%)') : '' } } } } });
 }
 function expandTrend(t) {
   openLightbox('pn-canvas-' + t, document.getElementById('pn-cat-' + t).textContent, document.getElementById('pn-range-' + t).textContent);
