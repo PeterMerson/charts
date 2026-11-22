@@ -102,7 +102,7 @@ table.num tbody tr:hover td { background-color:#15305a; }
 .t-foot { font-size:0.6rem; color:var(--muted); padding:8px 20px 12px; letter-spacing:0.04em; }
 
 .t-layout { display:grid; grid-template-columns: minmax(0,1fr) 330px; }
-.t-panel { border-left:1px solid var(--line); background:rgba(10,26,48,0.6); display:flex; flex-direction:column; }
+.t-panel { min-width:0; overflow:hidden; border-left:1px solid var(--line); background:rgba(10,26,48,0.6); display:flex; flex-direction:column; }
 .p-head { background:var(--deep); padding:12px 16px; border-bottom:2px solid rgba(201,168,76,0.3); }
 .p-cat { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--text); }
 .p-range { font-size:0.58rem; color:var(--gold); letter-spacing:0.08em; text-transform:uppercase; margin-top:2px; }
@@ -899,6 +899,8 @@ function renderTables() {
   // Restore any selected rows (matched by label)
   Object.keys(SELECTED).forEach(t => { const r = TABLE_ROWS[t].findIndex(x => x.label === SELECTED[t]); if (r >= 0) selectRow(+t, r); });
   // Open each table scrolled to its most recent year
+  if (TABLE_RO) TABLE_RO.disconnect();
+  watchTables();
   requestAnimationFrame(scrollTablesEnd);
 }
 
@@ -1064,7 +1066,19 @@ function expandTrend(t) {
   openLightbox('pn-canvas-' + t, document.getElementById('pn-cat-' + t).textContent, document.getElementById('pn-range-' + t).textContent);
 }
 
-function scrollTablesEnd() { document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; }); }
+function scrollTablesEnd() { document.querySelectorAll('#tables .t-scroll').forEach(el => { el.scrollLeft = el.scrollWidth; el._fromRight = 0; }); }
+// Keep each table anchored to the same right-hand position when its box changes size
+// (opening a chart, a scrollbar appearing, fonts loading), so the latest years never slip under the chart.
+const TABLE_RO = window.ResizeObserver ? new ResizeObserver(entries => entries.forEach(e => {
+  const el = e.target; el.scrollLeft = el.scrollWidth - el.clientWidth - (el._fromRight || 0);
+})) : null;
+function watchTables() {
+  document.querySelectorAll('#tables .t-scroll').forEach(el => {
+    el._fromRight = 0;
+    el.addEventListener('scroll', () => { el._fromRight = Math.max(0, el.scrollWidth - el.clientWidth - el.scrollLeft); }, { passive: true });
+    if (TABLE_RO) { TABLE_RO.observe(el); TABLE_RO.observe(el.querySelector('table')); }
+  });
+}
 
 // ═════════ START ═════════
 initControls();
