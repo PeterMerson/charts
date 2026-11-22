@@ -1064,7 +1064,7 @@ function renderRETax(t) {
     '<a href="https://petermerson.github.io/charts/RE-Tax-vs-CPI.html" target="_blank">Full analysis ↗</a>';
   ex.style.display = 'block';
 }
-function perMonth(v) { return '$' + (v / 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/mo'; }
+function perMonth(v) { return '$' + (v / 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' monthly'; }
 function setPanelMode(t, m) { PANEL_MODE[t] = m; renderPanelChart(t); }
 function renderPie(t, ysel) {
   if (!PIE_YEAR[t] || years.indexOf(PIE_YEAR[t]) < 0) PIE_YEAR[t] = years[years.length - 1];
@@ -1086,9 +1086,9 @@ function renderPie(t, ysel) {
             if (ch.canvas.id === 'lightbox-canvas') others.forEach(o => out.push({ text: '  · ' + o.label + ' ' + (o.v / total * 100).toFixed(1) + '%', fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)', lineWidth: 0, fontColor: '#c3c2b7', sub: true }));
             return out; } },
         onClick: (e, item, legend) => { if (item.sub) return; legend.chart.toggleDataVisibility(item.index); legend.chart.update(); } },
-        title: { display: true, text: (t === 0 ? 'Income' : 'Expenses') + ' by category · ' + PIE_YEAR[t] + ' · ' + money(total) + ' · ' + perMonth(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
-        tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' (' + (i.parsed / total * 100).toFixed(1) + '%) · ' + perMonth(i.parsed),
-          afterLabel: i => i.label === 'All other' ? others.map(o => '   · ' + o.label + ': ' + money(o.v) + ' (' + (o.v / total * 100).toFixed(1) + '%) · ' + perMonth(o.v)) : '' } } } } });
+        title: { display: true, text: (t === 0 ? 'Income' : 'Expenses') + ' by category · ' + PIE_YEAR[t] + ' · ' + money(total) + ' annually · ' + perMonth(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
+        tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' annually (' + (i.parsed / total * 100).toFixed(1) + '%) · ' + perMonth(i.parsed),
+          afterLabel: i => i.label === 'All other' ? others.map(o => '   · ' + o.label + ': ' + money(o.v) + ' annually (' + (o.v / total * 100).toFixed(1) + '%) · ' + perMonth(o.v)) : '' } } } } });
 }
 function expandTrend(t) {
   openLightbox('pn-canvas-' + t, document.getElementById('pn-cat-' + t).textContent, document.getElementById('pn-range-' + t).textContent);
