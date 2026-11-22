@@ -804,7 +804,20 @@ function openLightbox(canvasId, title, sub) {
   if (_lbChart) { _lbChart.destroy(); _lbChart = null; }
   const cfg = srcChart.config;
   document.getElementById('lightbox-note').style.display = 'none';
-  _lbChart = new Chart(document.getElementById('lightbox-canvas'), { type: cfg.type, data: cfg.data, options: cfg.options, plugins: canvasId === 'c-net' ? [barLabelPlugin] : (cfg.plugins || []) });
+  // A pie keeps its legend beside it: narrow the drawing area and enlarge the legend text
+  document.getElementById('chart-lightbox').classList.add('open');
+  const wrap = document.getElementById('lightbox-canvas-wrap');
+  let opts = cfg.options;
+  if (cfg.type === 'pie') {
+    const body = document.getElementById('lightbox-body');
+    wrap.style.width = Math.min(body.clientWidth - 32, Math.round((body.clientHeight - 32) * 1.45)) + 'px';
+    wrap.style.margin = '0 auto';
+    const pl = opts.plugins, lg = pl.legend;
+    opts = { ...opts, plugins: { ...pl,
+      legend: { ...lg, labels: { ...lg.labels, font: { family: 'IBM Plex Mono', size: 14 }, boxWidth: 18, padding: 12 } },
+      title: { ...pl.title, font: { family: 'IBM Plex Mono', size: 14 } } } };
+  } else { wrap.style.width = ''; wrap.style.margin = ''; }
+  _lbChart = new Chart(document.getElementById('lightbox-canvas'), { type: cfg.type, data: cfg.data, options: opts, plugins: canvasId === 'c-net' ? [barLabelPlugin] : (cfg.plugins || []) });
   document.getElementById('chart-lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
