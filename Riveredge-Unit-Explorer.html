@@ -928,6 +928,12 @@ function panelHTML(t) {
     '<button class="p-expand" title="Expand chart" onclick="expandTrend(' + t + ')">⤢</button></div>' +
     '<div class="p-extra" id="pn-extra-' + t + '" style="display:none"></div><div class="p-note" id="pn-note-' + t + '"></div></div>';
 }
+function anchorTable(t) {
+  const tbl = document.querySelector('table.num[data-t="' + t + '"]'); if (!tbl) return;
+  const el = tbl.closest('.t-scroll');
+  const fix = () => { el.scrollLeft = el.scrollWidth - el.clientWidth - (el._fromRight || 0); };
+  fix(); requestAnimationFrame(() => { fix(); requestAnimationFrame(fix); }); setTimeout(fix, 300); setTimeout(fix, 1200);
+}
 function plainLabel(l) { const d = document.createElement('div'); d.innerHTML = l; return d.textContent; }
 function pct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
 function selectRow(t, r) {
@@ -961,6 +967,7 @@ function selectRow(t, r) {
   if (!pieable && PANEL_MODE[t] === 'pie') PANEL_MODE[t] = 'trend';
   if (!retax && PANEL_MODE[t] === 'retax') PANEL_MODE[t] = 'trend';
   renderPanelChart(t);
+  anchorTable(t);
 }
 function renderPanelChart(t) {
   const row = TABLE_ROWS[t][CUR_ROW[t]], name = plainLabel(row.label), vals = row.vals, first = vals[0];
@@ -1099,6 +1106,7 @@ refresh();
 // Web fonts widen the columns after they load, so scroll to the latest year again
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (STATE.view === 'numeric') scrollTablesEnd(); });
 window.addEventListener('load', () => { if (STATE.view === 'numeric') scrollTablesEnd(); });
+window.addEventListener('resize', () => { if (STATE.view === 'numeric') [0,1,2,3].forEach(anchorTable); });
 </script>
 </body>
 </html>
