@@ -25,14 +25,14 @@ body { font-family: 'IBM Plex Mono', monospace, sans-serif; background: var(--in
 
 /* ── MY UNIT PANEL ── */
 .bar { max-width:1400px; margin:14px auto 0; padding:0 32px; }
-.myunit-panel { background: linear-gradient(135deg, #0d2240 0%, #1a3a5c 100%); border: 2px solid var(--gold); border-radius: 8px; padding: 16px 24px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.myunit-panel { background: linear-gradient(135deg, #0d2240 0%, #1a3a5c 100%); border: 2px solid var(--gold); border-radius: 8px; padding: 16px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .myunit-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--gold); white-space:nowrap; }
 .myunit-select-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .lbl { font-size:0.66rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); white-space:nowrap; }
 .sel { font-family:'IBM Plex Mono',monospace; font-size:0.76rem; font-weight:600; background:#fff; border:2px solid var(--gold); color:var(--ink); padding:6px 28px 6px 10px; border-radius:4px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230d2240'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; }
 .sel:focus { outline:2px solid var(--gold); outline-offset:1px; }
 .myunit-info { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
-.stat { text-align:center; padding:4px 14px; border-left:1px solid rgba(201,168,76,0.3); }
+.stat { text-align:center; padding:4px 11px; border-left:1px solid rgba(201,168,76,0.3); }
 .stat-label { font-size:0.56rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:2px; }
 .stat-val { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:var(--gold); }
 
@@ -171,6 +171,7 @@ table.num tbody tr.sel td.rowh { box-shadow: inset 3px 0 0 var(--blue); }
       <div class="stat"><div class="stat-label">Apt Type</div><div class="stat-val" id="mu-type">—</div></div>
       <div class="stat"><div class="stat-label">Building</div><div class="stat-val" id="mu-building">—</div></div>
       <div class="stat"><div class="stat-label">Shares</div><div class="stat-val" id="mu-shares">—</div></div>
+      <div class="stat"><div class="stat-label">Apartments</div><div class="stat-val" id="mu-apts">—</div></div>
       <div class="stat"><div class="stat-label">% of Building</div><div class="stat-val" id="mu-pct">—</div></div>
       <div class="stat"><div class="stat-label">2025 Maint.</div><div class="stat-val" id="mu-maint">—</div></div>
     </div>
@@ -357,6 +358,7 @@ const APARTMENTS = [
   {apt:'1C', shares:511, type:'Jr 2BR', building:'Woodside'},
   {apt:'1D', shares:501, type:'1BR', building:'Woodside'},
   {apt:'1E', shares:644, type:'2BR', building:'Woodside'},
+  {apt:'1F', shares:0, type:'Superintendent', building:'Riverside'},
   {apt:'1G', shares:556, type:'1BR', building:'Riverside'},
   {apt:'1H', shares:566, type:'Jr 2BR', building:'Riverside'},
   {apt:'1J', shares:556, type:'1BR', building:'Riverside'},
@@ -534,14 +536,14 @@ function unitText() { return UNIT ? 'Apt ' + UNIT.apt + ' (' + UNIT.type + ', ' 
 // ═════════ CONTROLS ═════════
 function initControls() {
   const sel = document.getElementById('apt-select');
-  const groups = {'Studio':[], '1BR':[], 'Jr 2BR':[], '2BR':[], '3BR':[]};
+  const groups = {'Studio':[], '1BR':[], 'Jr 2BR':[], '2BR':[], '3BR':[], 'Superintendent':[]};
   APARTMENTS.forEach(a => { if (groups[a.type]) groups[a.type].push(a); });
   Object.entries(groups).forEach(([type, apts]) => {
     const og = document.createElement('optgroup');
-    og.label = type + ' (' + apts.length + ' apts)';
+    og.label = type + ' (' + apts.length + (apts.length === 1 ? ' apt)' : ' apts)');
     apts.forEach(a => {
       const o = document.createElement('option');
-      o.value = a.apt; o.textContent = 'Apt ' + a.apt + ' — ' + a.shares + ' shares (' + a.building + ')';
+      o.value = a.apt; o.textContent = 'Apt ' + a.apt + ' — ' + a.shares + ' shares (' + a.building + ')' + (a.type === 'Superintendent' ? ' · Superintendent' : '');
       og.appendChild(o);
     });
     sel.appendChild(og);
@@ -557,11 +559,11 @@ function initControls() {
 function updateUnitInfo() {
   const set = (id, v) => document.getElementById(id).textContent = v;
   if (!UNIT) {
-    set('mu-type','All'); set('mu-building','Both'); set('mu-shares', TOTAL_SHARES.toLocaleString()); set('mu-pct','100%');
+    set('mu-type','All'); set('mu-building','Both'); set('mu-shares', TOTAL_SHARES.toLocaleString()); set('mu-apts', APARTMENTS.length); set('mu-pct','100%');
     set('mu-maint', '$' + INCOME['Maintenance Charges'][idx(2025)].toLocaleString());
     return;
   }
-  set('mu-type', UNIT.type); set('mu-building', UNIT.building); set('mu-shares', UNIT.shares.toLocaleString());
+  set('mu-type', UNIT.type === 'Superintendent' ? 'Super' : UNIT.type); set('mu-building', UNIT.building); set('mu-shares', UNIT.shares.toLocaleString()); set('mu-apts', '1 of ' + APARTMENTS.length);
   set('mu-pct', (UNIT.shares / TOTAL_SHARES * 100).toFixed(3) + '%');
   set('mu-maint', '$' + Math.round(INCOME['Maintenance Charges'][idx(2025)] * UNIT.shares / TOTAL_SHARES).toLocaleString());
 }
