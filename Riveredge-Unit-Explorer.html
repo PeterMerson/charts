@@ -960,7 +960,7 @@ function selectRow(t, r) {
   document.getElementById('pn-empty-' + t).style.display = 'none';
   document.getElementById('pn-chart-' + t).style.display = 'block';
   CUR_ROW[t] = r;
-  const pieable = (t === 0 && row.label === 'Total Income') || (t === 1 && row.label === 'Total Expenses');
+  const pieable = (t === 0 && row.label === 'Total Income') || (t === 1 && row.label === 'Total Expenses') || (t === 2 && row.label === 'Surplus / (Deficit)');
   const retax = (t === 1 && row.label === 'Real Estate Taxes');
   document.getElementById('pn-modes-' + t).style.display = (pieable || retax) ? 'flex' : 'none';
   document.getElementById('pn-mp-' + t).style.display = pieable ? '' : 'none';
@@ -1072,23 +1072,36 @@ function renderPie(t, ysel) {
   if (!PIE_YEAR[t] || years.indexOf(PIE_YEAR[t]) < 0) PIE_YEAR[t] = years[years.length - 1];
   ysel.innerHTML = years.slice().reverse().map(y => '<option value="' + y + '"' + (y === PIE_YEAR[t] ? ' selected' : '') + '>' + y + '</option>').join('');
   const j = years.indexOf(PIE_YEAR[t]);
-  // the category rows that make up the total (excluded rows, totals and CPI rows left out)
-  let parts = TABLE_ROWS[t].filter(r => !/sum|cpi|note/.test(r.cls || '')).map(r => ({ label: plainLabel(r.label), v: r.vals[j] })).filter(p => p.v > 0);
-  parts.sort((a, b) => b.v - a.v);
-  let others = [];
-  if (parts.length > 8) { others = parts.slice(7); const rest = others.reduce((s, p) => s + p.v, 0); parts = parts.slice(0, 7).concat([{ label: 'All other', v: rest }]); }
+  // the category rows that make up a total (excluded rows, totals and CPI rows left out)
+  const cats = tt => TABLE_ROWS[tt].filter(r => !/sum|cpi|note/.test(r.cls || '')).map(r => ({ label: plainLabel(r.label), v: r.vals[j] })).filter(p => p.v > 0).sort((a, b) => b.v - a.v);
+  let parts, others = [], colors = PIE_COLORS, heading = (t === 0 ? 'Income' : 'Expenses') + ' by category';
+  if (t === 2) {
+    // Surplus year: where each income dollar went (expenses + the surplus).
+    // Deficit year: how expenses were paid (income sources + the shortfall drawn from cash).
+    const net = TABLE_ROWS[0].find(r => r.label === 'Total Income').vals[j] - TABLE_ROWS[1].find(r => r.label === 'Total Expenses').vals[j];
+    parts = cats(net >= 0 ? 1 : 0);
+    if (parts.length > 7) { others = parts.slice(6); parts = parts.slice(0, 6).concat([{ label: 'All other', v: others.reduce((s, p) => s + p.v, 0) }]); }
+    const extra = net >= 0 ? { label: 'Surplus', v: net, color: '#3fb950' } : { label: 'Deficit (paid from cash)', v: -net, color: '#ff4d4d' };
+    const base = ['#3987e5', '#d95926', '#c98500', '#d55181', '#9085e9', '#5fb3b3', '#7a8aa0'];
+    if (extra.v > 0) parts.push(extra);
+    colors = parts.map((p, i) => p === extra ? extra.color : base[i]);
+    heading = net >= 0 ? 'Where income went' : 'How expenses were paid';
+  } else {
+    parts = cats(t);
+    if (parts.length > 8) { others = parts.slice(7); parts = parts.slice(0, 7).concat([{ label: 'All other', v: others.reduce((s, p) => s + p.v, 0) }]); }
+  }
   const total = parts.reduce((s, p) => s + p.v, 0);
   new Chart(freshCanvas('pn-canvas-' + t), { type: 'pie',
-    data: { labels: parts.map(p => p.label), datasets: [{ data: parts.map(p => p.v), backgroundColor: PIE_COLORS.slice(0, parts.length), borderColor: '#0d2240', borderWidth: 2 }] },
+    data: { labels: parts.map(p => p.label), datasets: [{ data: parts.map(p => p.v), backgroundColor: colors.slice(0, parts.length), borderColor: '#0d2240', borderWidth: 2 }] },
     options: { responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: 'right', labels: { font: { family: 'IBM Plex Mono', size: 9 }, color: '#f0efec', boxWidth: 10, padding: 6,
-          generateLabels: ch => { const out = ch.data.labels.map((l, i) => ({ text: l + ' ' + (parts[i].v / total * 100).toFixed(0) + '%', fillStyle: PIE_COLORS[i], strokeStyle: PIE_COLORS[i], fontColor: '#f0efec', index: i, hidden: !ch.getDataVisibility(i) }));
-            if (ch.canvas.id !== 'lightbox-canvas' && others.length) out[out.length - 1].text += ' (hover)';
+          generateLabels: ch => { const out = ch.data.labels.map((l, i) => ({ text: l + ' ' + (parts[i].v / total * 100).toFixed(0) + '%', fillStyle: colors[i], strokeStyle: colors[i], fontColor: '#f0efec', index: i, hidden: !ch.getDataVisibility(i) }));
+            if (ch.canvas.id !== 'lightbox-canvas' && others.length) { const k = parts.findIndex(p => p.label === 'All other'); out[k].text += ' (hover)'; }
             // list what "All other" is made of, indented under it
-            if (ch.canvas.id === 'lightbox-canvas') others.forEach(o => out.push({ text: '  · ' + o.label + ' ' + (o.v / total * 100).toFixed(1) + '%', fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)', lineWidth: 0, fontColor: '#c3c2b7', sub: true }));
+            if (ch.canvas.id === 'lightbox-canvas' && others.length) { const k = parts.findIndex(p => p.label === 'All other'); out.splice(k + 1, 0, ...others.map(o => ({ text: '  · ' + o.label + ' ' + (o.v / total * 100).toFixed(1) + '%', fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)', lineWidth: 0, fontColor: '#c3c2b7', sub: true }))); }
             return out; } },
         onClick: (e, item, legend) => { if (item.sub) return; legend.chart.toggleDataVisibility(item.index); legend.chart.update(); } },
-        title: { display: true, text: (UNIT ? 'Apt ' + UNIT.apt : 'Building Totals') + ' · ' + (t === 0 ? 'Income' : 'Expenses') + ' by category · ' + PIE_YEAR[t] + ' · ' + money(total) + ' annually · ' + perMonth(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
+        title: { display: true, text: (UNIT ? 'Apt ' + UNIT.apt : 'Building Totals') + ' · ' + heading + ' · ' + PIE_YEAR[t] + ' · ' + money(total) + ' annually · ' + perMonth(total), color: '#c9a84c', font: { family: 'IBM Plex Mono', size: 9 } },
         tooltip: { ...TOOLTIP_OPTS, callbacks: { label: i => ' ' + i.label + ': ' + money(i.parsed) + ' annually (' + (i.parsed / total * 100).toFixed(1) + '%) · ' + perMonth(i.parsed),
           afterLabel: i => i.label === 'All other' ? others.map(o => '   · ' + o.label + ': ' + money(o.v) + ' annually (' + (o.v / total * 100).toFixed(1) + '%) · ' + perMonth(o.v)) : '' } } } } });
 }
